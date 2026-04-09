@@ -18,10 +18,10 @@ export default function CTASection() {
         >
           <p className="text-primary text-xs tracking-[0.4em] uppercase mb-4">Let's Create Magic</p>
           <h2 className="font-heading text-3xl md:text-5xl lg:text-6xl leading-tight mb-6">
-            Ready to Plan Your <span className="text-gradient">Dream Event</span>?
+            Plan Your <span className="text-gradient">Dream Wedding in Kerala</span>
           </h2>
           <p className="text-muted-foreground mb-10 max-w-xl mx-auto">
-            Every extraordinary celebration begins with a conversation. Let us bring your vision to life.
+            Every extraordinary celebration begins with a conversation. Whether in Kothamangalam, Ernakulam, or anywhere in Kerala — let us bring your vision to life.
           </p>
           <a
             href="#contact"

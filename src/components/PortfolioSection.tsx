@@ -9,10 +9,10 @@ import fallback3 from '@/assets/portfolio-3.jpg';
 import fallback4 from '@/assets/portfolio-4.jpg';
 
 const fallbackData: PortfolioItem[] = [
-  { $id: '1', title: 'Royal Garden Wedding', image_url: fallback1, category: 'Weddings', description: 'A breathtaking garden ceremony with ocean views.', created_at: '' },
-  { $id: '2', title: 'Emerald Gala Night', image_url: fallback2, category: 'Corporate', description: 'Sophisticated corporate gala with teal uplighting.', created_at: '' },
-  { $id: '3', title: 'Intimate Anniversary', image_url: fallback3, category: 'Private', description: 'A warm, candlelit celebration for two.', created_at: '' },
-  { $id: '4', title: 'Classic White Wedding', image_url: fallback4, category: 'Weddings', description: 'Timeless elegance with white florals.', created_at: '' },
+  { $id: '1', title: 'Royal Garden Wedding', image_url: fallback1, category: 'Weddings', description: 'A breathtaking garden ceremony in Kothamangalam with ocean views.', created_at: '' },
+  { $id: '2', title: 'Emerald Gala Night', image_url: fallback2, category: 'Corporate', description: 'Sophisticated corporate gala in Ernakulam with teal uplighting.', created_at: '' },
+  { $id: '3', title: 'Intimate Anniversary', image_url: fallback3, category: 'Private', description: 'A warm, candlelit anniversary celebration in Kerala.', created_at: '' },
+  { $id: '4', title: 'Classic White Wedding', image_url: fallback4, category: 'Weddings', description: 'Timeless elegance with white florals in Kothamangalam.', created_at: '' },
 ];
 
 const categories = ['All', 'Weddings', 'Corporate', 'Private', 'Destination'];
@@ -44,8 +44,11 @@ export default function PortfolioSection() {
         >
           <p className="text-primary text-xs tracking-[0.4em] uppercase mb-4">Our Work</p>
           <h2 className="font-heading text-3xl md:text-5xl">
-            Curated <span className="text-gradient">Portfolio</span>
+            Luxury Event <span className="text-gradient">Portfolio</span>
           </h2>
+          <p className="mt-4 text-muted-foreground max-w-xl mx-auto text-sm">
+            Browse our curated collection of luxury weddings and premium events across Kothamangalam, Ernakulam, and Kerala.
+          </p>
         </motion.div>
 
         <div className="flex flex-wrap justify-center gap-3 mb-12">
@@ -79,7 +82,7 @@ export default function PortfolioSection() {
               >
                 <img
                   src={item.image_url}
-                  alt={item.title}
+                  alt={`${item.title} - luxury event by Luxevibes in Kerala`}
                   loading="lazy"
                   className="w-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
@@ -104,7 +107,7 @@ export default function PortfolioSection() {
             className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-xl flex items-center justify-center p-6"
             onClick={() => setLightbox(null)}
           >
-            <button onClick={() => setLightbox(null)} className="absolute top-6 right-6 text-foreground hover:text-primary transition-colors">
+            <button onClick={() => setLightbox(null)} aria-label="Close lightbox" className="absolute top-6 right-6 text-foreground hover:text-primary transition-colors">
               <X className="w-8 h-8" />
             </button>
             <motion.div
@@ -114,7 +117,7 @@ export default function PortfolioSection() {
               className="max-w-4xl w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <img src={lightbox.image_url} alt={lightbox.title} className="w-full max-h-[70vh] object-contain" />
+              <img src={lightbox.image_url} alt={`${lightbox.title} - Luxevibes luxury event photography`} className="w-full max-h-[70vh] object-contain" />
               <div className="mt-4 text-center">
                 <p className="text-primary text-xs tracking-widest uppercase">{lightbox.category}</p>
                 <h3 className="font-heading text-2xl mt-2">{lightbox.title}</h3>

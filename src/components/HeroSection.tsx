@@ -12,7 +12,7 @@ export default function HeroSection() {
       >
         <img
           src={heroImg}
-          alt="Luxury wedding venue"
+          alt="Luxury wedding venue setup in Kothamangalam by Luxevibes"
           className="w-full h-full object-cover"
           width={1920}
           height={1080}
@@ -28,17 +28,17 @@ export default function HeroSection() {
           transition={{ delay: 0.5, duration: 0.8 }}
           className="text-primary text-xs tracking-[0.4em] uppercase mb-6"
         >
-          Wedding Planners
+          Premium Wedding & Event Planners in Kerala
         </motion.p>
 
         <motion.h1
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 1 }}
-          className="font-heading text-4xl md:text-6xl lg:text-7xl max-w-4xl leading-tight"
+          className="font-heading text-4xl md:text-6xl lg:text-7xl max-w-5xl leading-tight"
         >
-          Crafting Unforgettable{' '}
-          <span className="text-gradient">Luxury</span> Experiences
+          Luxury Wedding Planners in{' '}
+          <span className="text-gradient">Kothamangalam</span>
         </motion.h1>
 
         <motion.p
@@ -47,7 +47,7 @@ export default function HeroSection() {
           transition={{ delay: 1.2, duration: 0.8 }}
           className="mt-6 text-muted-foreground max-w-xl text-sm md:text-base leading-relaxed"
         >
-          Bespoke weddings & premium events tailored to perfection
+          Bespoke weddings & premium events tailored to perfection across Ernakulam, Kerala & beyond
         </motion.p>
 
         <motion.div

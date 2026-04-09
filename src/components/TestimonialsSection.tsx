@@ -4,9 +4,9 @@ import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getTestimonials, type Testimonial } from '@/lib/appwrite';
 
 const fallbackTestimonials: Testimonial[] = [
-  { $id: '1', name: 'Priya & Arjun', message: 'LuxeVibes transformed our wedding into a fairy tale. Every single detail was perfection. We couldn\'t have dreamed of anything more beautiful.', rating: 5 },
-  { $id: '2', name: 'Sarah Mitchell', message: 'The most incredible event planning experience. Their attention to detail and creativity exceeded all our expectations. Truly world-class.', rating: 5 },
-  { $id: '3', name: 'James & Elena', message: 'Our destination wedding in Santorini was absolutely breathtaking. The LuxeVibes team handled everything flawlessly from start to finish.', rating: 5 },
+  { $id: '1', name: 'Priya & Arjun, Kothamangalam', message: 'Luxevibes transformed our wedding in Kothamangalam into a fairy tale. Every single detail was perfection. The best wedding planners we could have chosen!', rating: 5 },
+  { $id: '2', name: 'Meera & Rahul, Ernakulam', message: 'We searched for premium event planners in Ernakulam and found Luxevibes. Their attention to detail and creativity exceeded all our expectations. Truly world-class.', rating: 5 },
+  { $id: '3', name: 'Ananya & Dev, Kerala', message: 'Our destination wedding in Kerala was absolutely breathtaking. The Luxevibes team handled everything flawlessly — the best luxury wedding planners in Kerala.', rating: 5 },
 ];
 
 export default function TestimonialsSection() {
@@ -27,7 +27,7 @@ export default function TestimonialsSection() {
   const t = testimonials[current];
 
   return (
-    <section className="py-32 grain-overlay">
+    <section className="py-32 grain-overlay" aria-label="Client testimonials">
       <div className="container mx-auto px-6">
         <motion.div
           ref={ref}
@@ -37,7 +37,7 @@ export default function TestimonialsSection() {
           className="text-center mb-16"
         >
           <p className="text-primary text-xs tracking-[0.4em] uppercase mb-4">Testimonials</p>
-          <h2 className="font-heading text-3xl md:text-5xl">Words of <span className="text-gradient">Love</span></h2>
+          <h2 className="font-heading text-3xl md:text-5xl">What Our <span className="text-gradient">Clients Say</span></h2>
         </motion.div>
 
         <div className="max-w-3xl mx-auto text-center">
@@ -54,10 +54,10 @@ export default function TestimonialsSection() {
           </motion.div>
 
           <div className="flex justify-center gap-4 mt-10">
-            <button onClick={prev} className="p-3 border border-border hover:border-primary text-muted-foreground hover:text-primary transition-all">
+            <button onClick={prev} aria-label="Previous testimonial" className="p-3 border border-border hover:border-primary text-muted-foreground hover:text-primary transition-all">
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <button onClick={next} className="p-3 border border-border hover:border-primary text-muted-foreground hover:text-primary transition-all">
+            <button onClick={next} aria-label="Next testimonial" className="p-3 border border-border hover:border-primary text-muted-foreground hover:text-primary transition-all">
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>

@@ -45,7 +45,7 @@ export default function AboutSection() {
             <div className="overflow-hidden">
               <img
                 src={aboutImg}
-                alt="About LuxeVibes"
+                alt="Luxevibes luxury wedding decoration in Ernakulam, Kerala"
                 loading="lazy"
                 width={800}
                 height={1000}
@@ -62,13 +62,18 @@ export default function AboutSection() {
           >
             <p className="text-primary text-xs tracking-[0.4em] uppercase mb-4">Our Story</p>
             <h2 className="font-heading text-3xl md:text-5xl leading-tight mb-6">
-              Where Dreams Meet <span className="text-gradient">Elegance</span>
+              Best Wedding Planners in{' '}
+              <span className="text-gradient">Kothamangalam & Ernakulam</span>
             </h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              At LuxeVibes, we believe every celebration deserves to be extraordinary. With years of expertise in luxury event planning, we transform visions into breathtaking realities that leave lasting impressions.
+              At Luxevibes, we are the leading luxury wedding planners in Kothamangalam and Ernakulam.
+              With years of expertise in premium event planning across Kerala, we transform your vision
+              into breathtaking celebrations that leave lasting impressions.
             </p>
             <p className="text-muted-foreground leading-relaxed mb-10">
-              From intimate gatherings to grand destination weddings, our team of dedicated professionals ensures every detail is meticulously curated to reflect your unique story and style.
+              From intimate gatherings in Ernakulam to grand destination weddings across Kerala,
+              our team of dedicated professionals ensures every detail is meticulously curated
+              to reflect your unique story and style.
             </p>
 
             <div className="grid grid-cols-3 gap-6">

@@ -66,24 +66,38 @@ export default function ContactSection() {
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h3 className="font-heading text-2xl mb-6">Let's Start Planning</h3>
+            <h3 className="font-heading text-2xl mb-6">Plan Your Dream Wedding in Kothamangalam</h3>
             <p className="text-muted-foreground text-sm leading-relaxed mb-10">
               Share your vision with us and we'll create something extraordinary together.
+              We serve Kothamangalam, Ernakulam, and all of Kerala.
             </p>
 
-            <div className="space-y-6">
+            <address className="space-y-6 not-italic">
               <div className="flex items-center gap-4">
-                <Mail className="w-5 h-5 text-primary" />
-                <span className="text-sm text-muted-foreground">luxevibeweddings@gmail.com</span>
+                <Mail className="w-5 h-5 text-primary" aria-hidden="true" />
+                <a href="mailto:luxevibeweddings@gmail.com" className="text-sm text-muted-foreground hover:text-primary transition-colors">luxevibeweddings@gmail.com</a>
               </div>
               <div className="flex items-center gap-4">
-                <Phone className="w-5 h-5 text-primary" />
-                <span className="text-sm text-muted-foreground">+91 98765 43210</span>
+                <Phone className="w-5 h-5 text-primary" aria-hidden="true" />
+                <a href="tel:+919876543210" className="text-sm text-muted-foreground hover:text-primary transition-colors">+91 98765 43210</a>
               </div>
               <div className="flex items-center gap-4">
-                <MapPin className="w-5 h-5 text-primary" />
-                <span className="text-sm text-muted-foreground">India & Worldwide</span>
+                <MapPin className="w-5 h-5 text-primary" aria-hidden="true" />
+                <span className="text-sm text-muted-foreground">Kothamangalam, Ernakulam, Kerala, India</span>
               </div>
+            </address>
+
+            <div className="mt-8 overflow-hidden border border-border">
+              <iframe
+                title="Luxevibes location in Kothamangalam, Ernakulam"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d62788.37!2d76.59!3d10.06!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b07e3a1f2b8c8f7%3A0x2e5b8a3d2c2f9a1b!2sKothamangalam%2C%20Kerala!5e0!3m2!1sen!2sin!4v1680000000000!5m2!1sen!2sin"
+                width="100%"
+                height="200"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
             </div>
           </motion.div>
 
