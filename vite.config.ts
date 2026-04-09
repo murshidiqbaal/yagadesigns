@@ -5,7 +5,9 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  base: "/luxe-vibes-studio/",
   server: {
+
     host: "::",
     port: 8080,
     hmr: {
@@ -19,4 +21,17 @@ export default defineConfig(({ mode }) => ({
     },
     dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime", "@tanstack/react-query", "@tanstack/query-core"],
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-appwrite': ['appwrite'],
+          'vendor-animation': ['framer-motion'],
+          'vendor-ui': ['lucide-react', 'sonner', 'clsx', 'tailwind-merge'],
+        }
+      }
+    }
+  }
 }));
+

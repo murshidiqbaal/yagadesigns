@@ -2,7 +2,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import AdminLayout from "./components/admin/AdminLayout.tsx";
 import KeyboardShortcuts from "./components/admin/KeyboardShortcuts.tsx";
 import { AuthProvider } from "./hooks/useAuth.tsx";
@@ -24,7 +24,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <HashRouter>
           <KeyboardShortcuts />
           {/* <CursorParticles /> */}
           <Routes>
@@ -50,10 +50,11 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
+        </HashRouter>
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
+
 
 export default App;
