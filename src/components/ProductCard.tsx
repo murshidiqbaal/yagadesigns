@@ -23,9 +23,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
     >
       {/* Image Area */}
       <a
-        href={getWhatsAppUrl(product.name)}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={`#/product/${product.$id}`}
         className="block"
         id={`product-${product.$id}`}
       >

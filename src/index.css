@@ -62,7 +62,7 @@
   }
 
   .grain-overlay {
-    position: relative;
+    /* position: relative removed to prevent overriding fixed/absolute positioning */
   }
   
   .grain-overlay::before {

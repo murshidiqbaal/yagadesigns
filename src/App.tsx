@@ -5,20 +5,21 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import AdminLayout from "./components/admin/AdminLayout.tsx";
 import KeyboardShortcuts from "./components/admin/KeyboardShortcuts.tsx";
+import CursorParticles from "./components/CursorParticles.tsx";
+import FloatingWhatsApp from "./components/FloatingWhatsApp.tsx";
+import MobileBottomNav from "./components/MobileBottomNav.tsx";
+import SmoothScroll from "./components/SmoothScroll.tsx";
 import { AuthProvider } from "./hooks/useAuth.tsx";
+import About from "./pages/About.tsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
 import AdminLogin from "./pages/admin/AdminLogin.tsx";
 import AdminProducts from "./pages/admin/AdminProducts.tsx";
-import Index from "./pages/Index.tsx";
 import Collections from "./pages/Collections.tsx";
-import Favorites from "./pages/Favorites.tsx";
-import About from "./pages/About.tsx";
 import Contact from "./pages/Contact.tsx";
+import Favorites from "./pages/Favorites.tsx";
+import Index from "./pages/Index.tsx";
+import ProductDetail from "./pages/ProductDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import SmoothScroll from "./components/SmoothScroll.tsx";
-import CursorParticles from "./components/CursorParticles.tsx";
-import MobileBottomNav from "./components/MobileBottomNav.tsx";
-import FloatingWhatsApp from "./components/FloatingWhatsApp.tsx";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
 
               {/* Admin Routes */}
               <Route path="/admin/login" element={<AdminLogin />} />

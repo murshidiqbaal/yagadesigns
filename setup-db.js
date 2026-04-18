@@ -107,9 +107,15 @@ async function setup() {
 
         const attributes = [
             { id: 'name', type: 'string', size: 255, required: true },
-            { id: 'description', type: 'string', size: 1000, required: false },
+            { id: 'description', type: 'string', size: 2000, required: false },
             { id: 'category', type: 'string', size: 100, required: true },
-            { id: 'image_url', type: 'string', size: 500, required: false },
+            { id: 'image_url', type: 'string', size: 500, required: false }, // Keep for legacy/main
+            { id: 'image_urls', type: 'string', size: 500, required: false, array: true },
+            { id: 'price', type: 'string', size: 100, required: false },
+            { id: 'colors', type: 'string', size: 100, required: false, array: true },
+            { id: 'fabric', type: 'string', size: 255, required: false },
+            { id: 'embroidery', type: 'string', size: 255, required: false },
+            { id: 'occasion', type: 'string', size: 100, required: false },
             { id: 'created_at', type: 'datetime', required: false }
         ];
 
@@ -122,7 +128,9 @@ async function setup() {
                         config.collectionId,
                         attr.id,
                         attr.size,
-                        attr.required
+                        attr.required,
+                        undefined, // Default placeholder
+                        attr.array // Important: Support array attributes
                     );
                 } else if (attr.type === 'datetime') {
                     await databases.createDatetimeAttribute(

@@ -1,0 +1,303 @@
+import { useState, useEffect, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { motion, AnimatePresence } from "framer-motion";
+import { Heart, ChevronLeft, ChevronRight, MessageCircle, Share2, Info, Maximize2 } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
+import { getProductById, getImageUrl, Product } from "@/lib/appwrite";
+import { useFavorites } from "@/hooks/useFavorites";
+import { WHATSAPP_NUMBER } from "@/lib/constants";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+
+export default function ProductDetail() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // ── Embla Setup ────────────────────────────────────────────────────
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setActiveIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on("select", onSelect);
+    onSelect();
+  }, [emblaApi, onSelect]);
+
+  const scrollTo = (index: number) => emblaApi?.scrollTo(index);
+
+  // ── Data Fetching ──────────────────────────────────────────────────
+  const { data: product, isLoading, error } = useQuery({
+    queryKey: ["product", id],
+    queryFn: () => getProductById(id!),
+    enabled: !!id,
+  });
+
+  const liked = product ? isFavorite(product.$id) : false;
+
+  // ── WhatsApp Logic ─────────────────────────────────────────────────
+  const handleWhatsAppEnquiry = () => {
+    if (!product) return;
+    const text = `Hello Yaga Designs,
+I am interested in this product:
+
+Name: ${product.name}
+Category: ${product.category}
+${selectedColor ? `Selected Color: ${selectedColor}` : ""}
+${product.price ? `Price: ${product.price}` : ""}
+
+Please share more details.`;
+
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank");
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: product?.name,
+        url: window.location.href,
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success("Link copied to clipboard!");
+    }
+  };
+
+  // ── Render Helpers ─────────────────────────────────────────────────
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 text-center">
+        <h2 className="text-2xl font-heading mb-4 text-white">Product Not Found</h2>
+        <Button onClick={() => navigate("/collections")} variant="outline">
+          Back to Collections
+        </Button>
+      </div>
+    );
+  }
+
+  const images = product.image_urls?.length ? product.image_urls : [product.image_url];
+  const colors = product.colors || [];
+
+  return (
+    <div className="min-h-screen bg-[#050505] text-white overflow-x-hidden">
+      {/* ── Navigation Header (Mobile Only) ─────────────────────────── */}
+      <div className="fixed top-20 left-4 right-4 z-40 flex justify-between items-center md:hidden">
+        <button
+          onClick={() => navigate(-1)}
+          className="w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleShare}
+            className="w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white"
+          >
+            <Share2 className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => toggleFavorite(product)}
+            className="w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center"
+          >
+            <Heart className={`w-5 h-5 transition-colors ${liked ? "fill-primary text-primary" : "text-white"}`} />
+          </button>
+        </div>
+      </div>
+
+      <div className="container px-0 md:px-6 pt-24 md:pt-32 pb-40">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
+          
+          {/* ── Left Column: Gallery ─────────────────────────────────── */}
+          <div className="relative group">
+            <div className="overflow-hidden md:rounded-3xl" ref={emblaRef}>
+              <div className="flex">
+                {images.map((img, idx) => (
+                  <div key={idx} className="flex-[0_0_100%] min-w-0 relative aspect-[3/4] md:aspect-[4/5]">
+                    <img
+                      src={getImageUrl(img)}
+                      alt={`${product.name} - View ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Pagination / Dots */}
+            {images.length > 1 && (
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 px-3 py-1.5 bg-black/40 backdrop-blur-md rounded-full">
+                {images.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => scrollTo(idx)}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      idx === activeIndex ? "w-6 bg-primary" : "w-1.5 bg-white/40"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Large Screen Thumbnails */}
+            <div className="hidden md:flex gap-4 mt-6">
+              {images.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => scrollTo(idx)}
+                  className={`w-20 h-24 rounded-xl overflow-hidden border-2 transition-all ${
+                    idx === activeIndex ? "border-primary opacity-100 scale-105" : "border-transparent opacity-50 hover:opacity-80"
+                  }`}
+                >
+                  <img src={getImageUrl(img)} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Right Column: Info ──────────────────────────────────── */}
+          <div className="px-6 md:px-0 space-y-8">
+            <div>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="flex items-center gap-2 text-primary text-xs font-bold uppercase tracking-[0.2em] mb-2">
+                  <span className="w-8 h-px bg-primary/40" />
+                  {product.category}
+                </div>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading leading-tight mb-4">
+                  {product.name}
+                </h1>
+                
+                {product.price ? (
+                  <div className="text-2xl md:text-3xl font-heading text-primary bg-primary/5 border border-primary/20 rounded-2xl px-6 py-4 inline-block shadow-[0_0_30px_rgba(212,175,55,0.05)]">
+                    {product.price}
+                  </div>
+                ) : (
+                  <div className="text-lg text-white/40 italic">Price on enquiry</div>
+                )}
+              </motion.div>
+            </div>
+
+            {/* Description */}
+            <div className="space-y-4">
+              <p className="text-white/60 leading-relaxed text-lg">
+                {product.description}
+              </p>
+            </div>
+
+            {/* Color Selector */}
+            {colors.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-white/40">Select Color Variant</h3>
+                <div className="flex flex-wrap gap-4">
+                  {colors.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => setSelectedColor(color)}
+                      className={`px-6 py-2.5 rounded-full border text-sm font-medium transition-all ${
+                        selectedColor === color
+                          ? "bg-primary text-black border-primary"
+                          : "bg-transparent text-white border-white/10 hover:border-white/30"
+                      }`}
+                    >
+                      {color}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setSelectedColor("Custom Swatch")}
+                    className={`px-6 py-2.5 rounded-full border text-sm italic transition-all ${
+                      selectedColor === "Custom Swatch"
+                        ? "bg-white text-black border-white"
+                        : "bg-transparent text-white/60 border-dashed border-white/20 hover:border-white/40"
+                    }`}
+                  >
+                    Custom Color Available
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Product Details Grid */}
+            <div className="grid grid-cols-2 gap-x-8 gap-y-6 pt-8 border-t border-white/5">
+              {[
+                { label: "Fabric", value: product.fabric },
+                { label: "Embroidery", value: product.embroidery },
+                { label: "Occasion", value: product.occasion },
+                { label: "Stitching", value: "Available" }
+              ].map((item, idx) => (
+                <div key={idx} className={item.value ? "" : "opacity-30"}>
+                  <div className="text-[10px] uppercase tracking-widest text-white/40 mb-1">{item.label}</div>
+                  <div className="text-sm font-medium">{item.value || "Not Specified"}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Features / Badges */}
+            <div className="flex flex-wrap gap-2 pt-4">
+              {['Handmade', 'Premium Quality', 'Secure Shipping'].map(tag => (
+                <Badge key={tag} variant="secondary" className="bg-white/5 text-white/60 hover:text-white border-white/10 px-3 py-1">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+
+            {/* Action Buttons (Desktop Only) */}
+            <div className="hidden md:flex gap-4 pt-12">
+              <Button 
+                onClick={handleWhatsAppEnquiry}
+                className="flex-1 py-10 rounded-2xl text-lg gap-3"
+              >
+                <MessageCircle className="w-6 h-6" />
+                Enquire via WhatsApp
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => toggleFavorite(product)}
+                className={`w-20 h-20 rounded-2xl border-white/10 ${liked ? "bg-primary/10 border-primary/30" : ""}`}
+              >
+                <Heart className={`w-8 h-8 ${liked ? "fill-primary text-primary" : "text-white/60"}`} />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Sticky Mobile CTA ────────────────────────────────────────── */}
+      <div className="md:hidden fixed bottom-6 left-6 right-6 z-50">
+        <motion.div
+          initial={{ y: 100 }}
+          animate={{ y: 0 }}
+          className="bg-primary p-1.5 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+        >
+          <Button 
+            onClick={handleWhatsAppEnquiry}
+            className="w-full py-8 rounded-[22px] bg-black text-white hover:bg-[#111] border-none text-lg font-bold gap-3"
+          >
+            <MessageCircle className="w-6 h-6 text-primary" />
+            Enquire on WhatsApp
+          </Button>
+        </motion.div>
+      </div>
+    </div>
+  );
+}

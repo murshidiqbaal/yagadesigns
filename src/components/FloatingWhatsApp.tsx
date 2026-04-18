@@ -17,7 +17,7 @@ export default function FloatingWhatsApp() {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-50 p-3 md:p-4 bg-green-500 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 md:animate-bounce grain-overlay flex items-center justify-center"
+      className="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-50 p-3 md:p-4 bg-green-500 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 md:animate-bounce flex items-center justify-center"
       aria-label="Contact us on WhatsApp"
     >
       <MessageCircle className="w-6 h-6 md:w-8 md:h-8" />

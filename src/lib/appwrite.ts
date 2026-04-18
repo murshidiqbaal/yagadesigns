@@ -29,7 +29,13 @@ export interface Product {
   name: string;
   description: string;
   category: string;
-  image_url: string;
+  image_url: string; // Keep for legacy/main
+  image_urls?: string[]; // Multiple images for gallery
+  price?: string;
+  colors?: string[];
+  fabric?: string;
+  embroidery?: string;
+  occasion?: string;
   created_at: string;
 }
 
@@ -62,6 +68,16 @@ export async function getProducts(category?: string): Promise<Product[]> {
   } catch (error) {
     console.error('Failed to fetch products:', error);
     return [];
+  }
+}
+
+export async function getProductById(id: string): Promise<Product | null> {
+  try {
+    const response = await databases.getDocument(DATABASE_ID, PRODUCTS_COLLECTION, id);
+    return response as unknown as Product;
+  } catch (error) {
+    console.error(`Failed to fetch product with ID ${id}:`, error);
+    return null;
   }
 }
 
