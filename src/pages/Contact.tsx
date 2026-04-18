@@ -1,8 +1,8 @@
-import { motion } from 'framer-motion';
-import { MessageCircle, Phone, MapPin, Instagram, Clock } from 'lucide-react';
-import { getWhatsAppUrl } from '@/lib/constants';
-import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import { getWhatsAppUrl } from '@/lib/constants';
+import { motion } from 'framer-motion';
+import { Clock, Instagram, MapPin, MessageCircle, Phone } from 'lucide-react';
 
 const CONTACT_ITEMS = [
   {
@@ -13,7 +13,7 @@ const CONTACT_ITEMS = [
     color: 'text-[#D4AF37]',
     bg: 'bg-[#D4AF37]/10',
     border: 'border-white/5',
-    href: 'tel:+919876543210',
+    href: 'tel:+919633270639',
   },
   {
     icon: MapPin,

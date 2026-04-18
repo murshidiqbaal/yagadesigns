@@ -1,6 +1,6 @@
 
-import { useLocation } from "react-router-dom";
 import { MessageCircle } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 export default function FloatingWhatsApp() {
   const { pathname } = useLocation();
@@ -8,7 +8,7 @@ export default function FloatingWhatsApp() {
   // Hide in Admin views
   if (pathname?.startsWith("/admin")) return null;
 
-  const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || "919999999999";
+  const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || "919633270639";
   const defaultText = "Hello Yaga Designs, I would like to know more about your collection.";
   const href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(defaultText)}`;
 
