@@ -23,7 +23,7 @@ export default function ProcessSection() {
           className="text-center mb-20"
         >
           <p className="text-primary text-xs tracking-[0.4em] uppercase mb-4">How We Work</p>
-          <h2 className="font-heading text-3xl md:text-5xl">Our <span className="text-gradient">Process</span></h2>
+          <h2 className="font-heading text-4xl md:text-6xl tracking-elegant">Our <span className="text-gradient">Process</span></h2>
         </motion.div>
 
         <div className="relative max-w-3xl mx-auto">
@@ -41,8 +41,8 @@ export default function ProcessSection() {
             >
               <div className="absolute left-8 md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full border-2 border-primary bg-background z-10" />
               <div className={`ml-20 md:ml-0 md:w-1/2 ${i % 2 === 0 ? 'md:pr-16 md:text-right' : 'md:pl-16'}`}>
-                <span className="text-primary font-heading text-3xl">{step.num}</span>
-                <h3 className="font-heading text-xl mt-2 mb-2">{step.title}</h3>
+                <span className="text-primary font-heading text-4xl tracking-cinematic">{step.num}</span>
+                <h3 className="font-heading text-2xl mt-4 mb-4 tracking-editorial text-[#F5F5F5]">{step.title}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">{step.desc}</p>
               </div>
             </motion.div>

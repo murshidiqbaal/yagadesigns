@@ -1,41 +1,38 @@
-import { Outlet, Navigate, Link, useLocation } from "react-router-dom";
+import logoImg from "@/assets/logo.png";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { 
-  Loader2, 
-  LayoutDashboard, 
-  Image as ImageIcon, 
-  Sparkles, 
-  Briefcase, 
-  MessageSquare,
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  ChevronRight,
+  ExternalLink,
+  LayoutDashboard,
+  Loader2,
   LogOut,
   Menu,
+  Package,
   X,
-  ChevronRight
 } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
-import logo from '@/assets/luxevibelogo.png';
+import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
 
-const navItems = [
-  { icon: LayoutDashboard, label: "Overview", path: "/admin/dashboard" },
-  { icon: ImageIcon, label: "Hero Visuals", path: "/admin/hero" },
-  { icon: Sparkles, label: "Services", path: "/admin/services" },
-  { icon: Briefcase, label: "Portfolio", path: "/admin/portfolio" },
-  { icon: MessageSquare, label: "Testimonials", path: "/admin/testimonials" },
+const NAV_ITEMS = [
+  { icon: LayoutDashboard, label: "Dashboard", path: "/admin/dashboard" },
+  { icon: Package, label: "Products", path: "/admin/products" },
 ];
 
 export default function AdminLayout() {
   const { user, loading, logout } = useAuth();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="flex items-center justify-center min-h-screen bg-[#050505]">
         <div className="text-center space-y-4">
           <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto" />
-          <p className="text-sm font-medium uppercase tracking-[0.2em] animate-pulse">Initializing Luxe Console</p>
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground animate-pulse">
+            Loading Console…
+          </p>
         </div>
       </div>
     );
@@ -45,124 +42,159 @@ export default function AdminLayout() {
     return <Navigate to="/admin/login" replace />;
   }
 
+  const currentLabel =
+    NAV_ITEMS.find(i => location.pathname === i.path)?.label ?? "Admin";
+
   return (
     <div className="min-h-screen bg-[#050505] text-foreground flex">
-      {/* Sidebar - Desktop */}
-      <aside className="hidden lg:flex flex-col w-72 border-r border-white/5 bg-[#0A0A0A] fixed inset-y-0 z-50">
-        <div className="p-8">
-          <Link to="/" className="flex items-center gap-3 group">
-            <img src={logo} alt="Luxe Vibe Logo" className="w-10 h-10 transition-transform group-hover:scale-110" />
-            <div>
-              <span className="block text-lg font-heading font-bold tracking-tight">LUXE VIBE</span>
-              <span className="block text-[10px] text-primary font-bold uppercase tracking-[0.2em]">Console v2.0</span>
-            </div>
+      {/* ── Desktop Sidebar ─────────────────────────────────── */}
+      <aside className="hidden lg:flex flex-col w-64 border-r border-white/5 bg-[#080808] fixed inset-y-0 z-50">
+        {/* Brand */}
+        <div className="px-6 py-5 border-b border-white/5">
+          <Link to="/" className="inline-block">
+            <img
+              src={logoImg}
+              alt="Yaga Designs"
+              className="h-10 w-auto mix-blend-screen opacity-90 hover:opacity-100 transition-opacity duration-300"
+            />
           </Link>
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-primary/60 mt-1 pl-0.5">
+            Admin Console
+          </p>
         </div>
 
-        <nav className="flex-1 px-4 py-4 space-y-1">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-5 space-y-1">
+          {NAV_ITEMS.map(item => {
+            const active = location.pathname === item.path;
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center justify-between px-4 py-3.5 rounded-lg transition-all group ${
-                  isActive 
-                  ? "bg-primary/10 text-primary border border-primary/20" 
-                  : "text-muted-foreground hover:bg-white/5 hover:text-white"
-                }`}
+                className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all group ${active
+                    ? "bg-primary/12 text-primary border border-primary/20"
+                    : "text-muted-foreground hover:bg-white/5 hover:text-white"
+                  }`}
               >
                 <div className="flex items-center gap-3">
-                  <item.icon className={`w-5 h-5 ${isActive ? "text-primary" : "text-muted-foreground group-hover:text-white"}`} />
-                  <span className="font-medium">{item.label}</span>
+                  <item.icon
+                    className={`w-4.5 h-4.5 w-5 h-5 ${active ? "text-primary" : "group-hover:text-white"
+                      }`}
+                  />
+                  <span className="text-sm font-medium">{item.label}</span>
                 </div>
-                {isActive && <ChevronRight className="w-4 h-4" />}
+                {active && <ChevronRight className="w-3.5 h-3.5 text-primary" />}
               </Link>
             );
           })}
+
+          {/* View Site Link */}
+          <a
+            href="/#/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:bg-white/5 hover:text-white transition-all group mt-2"
+          >
+            <ExternalLink className="w-5 h-5" />
+            <span className="text-sm font-medium">View Live Site</span>
+          </a>
         </nav>
 
+        {/* Footer */}
         <div className="p-4 border-t border-white/5">
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-muted-foreground hover:text-white hover:bg-destructive/10 hover:text-destructive transition-all"
+          <div className="flex items-center gap-3 px-3 py-3 mb-3">
+            <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary text-sm font-bold">
+              {user.email?.[0].toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium truncate">{user.email?.split("@")[0]}</p>
+              <p className="text-[10px] text-green-500 font-bold uppercase tracking-widest">
+                Online
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all text-sm"
             onClick={logout}
           >
-            <LogOut className="w-5 h-5 mr-3" />
-            Terminate Session
+            <LogOut className="w-4 h-4 mr-3" />
+            Sign Out
           </Button>
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 lg:ml-72 min-h-screen flex flex-col">
-        {/* Header */}
-        <header className="sticky top-0 z-40 h-20 border-b border-white/5 bg-black/50 backdrop-blur-xl flex items-center justify-between px-6 lg:px-10">
-          <div className="flex items-center gap-4">
-            <button 
-              className="lg:hidden p-2 text-muted-foreground hover:text-white"
-              onClick={() => setIsMobileMenuOpen(true)}
+      {/* ── Main Content ────────────────────────────────────── */}
+      <main className="flex-1 lg:ml-64 min-h-screen flex flex-col">
+        {/* Topbar */}
+        <header className="sticky top-0 z-40 h-16 border-b border-white/5 bg-[#050505]/90 backdrop-blur-xl flex items-center justify-between px-5 lg:px-8">
+          <div className="flex items-center gap-3">
+            <button
+              className="lg:hidden p-2 text-muted-foreground hover:text-white transition-colors"
+              onClick={() => setMobileOpen(true)}
             >
-              <Menu className="w-6 h-6" />
+              <Menu className="w-5 h-5" />
             </button>
-            <h2 className="text-sm uppercase tracking-[0.2em] font-bold text-muted-foreground">
-              {navItems.find(i => i.path === location.pathname)?.label || "Dashboard"}
+            <h2 className="text-xs font-bold uppercase tracking-[0.25em] text-muted-foreground">
+              {currentLabel}
             </h2>
           </div>
-
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex flex-col items-end">
-              <span className="text-sm font-medium">{user.email?.split('@')[0]}</span>
-              <span className="text-[10px] text-green-500 font-bold uppercase tracking-widest">Active System</span>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center font-bold text-primary">
+          <div className="hidden sm:flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">{user.email}</span>
+            <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary text-sm font-bold">
               {user.email?.[0].toUpperCase()}
             </div>
           </div>
         </header>
 
-        {/* Content */}
+        {/* Page Content */}
         <div className="p-6 lg:p-10 flex-1">
           <Outlet />
         </div>
       </main>
 
-      {/* Mobile Menu Overlay */}
+      {/* ── Mobile Sidebar ──────────────────────────────────── */}
       <AnimatePresence>
-        {isMobileMenuOpen && (
+        {mobileOpen && (
           <>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
+              onClick={() => setMobileOpen(false)}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] lg:hidden"
             />
-            <motion.div 
+            <motion.div
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 w-80 bg-[#0A0A0A] border-r border-white/5 z-[70] lg:hidden p-6 flex flex-col"
+              className="fixed inset-y-0 left-0 w-72 bg-[#080808] border-r border-white/5 z-[70] lg:hidden flex flex-col p-6"
             >
-              <div className="flex justify-between items-center mb-10">
-                <img src={logo} alt="Logo" className="w-10 h-10" />
-                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2">
-                  <X className="w-6 h-6" />
+              <div className="flex items-center justify-between mb-8">
+                <img
+                  src={logoImg}
+                  alt="Yaga Designs"
+                  className="h-8 w-auto mix-blend-screen opacity-90"
+                />
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="p-2 text-muted-foreground hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
               <nav className="flex-1 space-y-2">
-                {navItems.map((item) => (
+                {NAV_ITEMS.map(item => (
                   <Link
                     key={item.path}
                     to={item.path}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-4 px-4 py-4 rounded-xl transition-all ${
-                      location.pathname === item.path 
-                      ? "bg-primary text-primary-foreground font-bold" 
-                      : "text-muted-foreground hover:bg-white/5"
-                    }`}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-4 px-4 py-4 rounded-xl transition-all ${location.pathname === item.path
+                        ? "bg-primary text-primary-foreground font-bold"
+                        : "text-muted-foreground hover:bg-white/5 hover:text-white"
+                      }`}
                   >
                     <item.icon className="w-5 h-5" />
                     <span>{item.label}</span>
@@ -170,13 +202,13 @@ export default function AdminLayout() {
                 ))}
               </nav>
 
-              <Button 
-                variant="destructive" 
-                className="w-full mt-auto"
+              <Button
+                variant="destructive"
+                className="w-full mt-auto gap-2"
                 onClick={logout}
               >
-                <LogOut className="w-5 h-5 mr-3" />
-                Logout
+                <LogOut className="w-4 h-4" />
+                Sign Out
               </Button>
             </motion.div>
           </>
@@ -185,4 +217,3 @@ export default function AdminLayout() {
     </div>
   );
 }
-

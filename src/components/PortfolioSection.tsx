@@ -43,12 +43,12 @@ export default function PortfolioSection() {
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
           className="text-center mb-16"
         >
-          <p className="text-primary text-[10px] tracking-[0.4em] uppercase mb-6">Our Work</p>
-          <h2 className="font-heading text-4xl md:text-6xl tracking-wide">
-            Luxury Event <span className="text-gradient">Portfolio</span>
+          <p className="text-[#D4AF37] text-[10px] tracking-[0.5em] uppercase mb-6 font-medium">The Archive</p>
+          <h2 className="font-heading text-4xl md:text-6xl lg:text-7xl tracking-tighter italic">
+            Unforgettable <span className="text-gradient not-italic tracking-normal">Chapters</span>
           </h2>
-          <p className="mt-6 text-muted-foreground/80 font-light max-w-2xl mx-auto text-sm md:text-base leading-relaxed tracking-wide">
-            Browse our curated collection of luxury weddings and premium events across Kothamangalam, Ernakulam, and Kerala.
+          <p className="mt-8 text-[#F5F5F5]/60 font-light max-w-3xl mx-auto text-base md:text-lg leading-relaxed tracking-wide">
+            A curated anthology of cinematic wedding narratives and royal celebrations crafted across the tapestry of Kerala.
           </p>
         </motion.div>
 
@@ -57,10 +57,10 @@ export default function PortfolioSection() {
             <button
               key={cat}
               onClick={() => setFilter(cat)}
-              className={`px-6 py-2.5 text-[10px] tracking-[0.2em] uppercase border transition-all duration-500 rounded-sm ${
+              className={`px-8 py-3 text-[10px] tracking-[0.3em] uppercase border transition-all duration-700 royal-border ${
                 filter === cat
-                  ? 'border-primary bg-primary/10 text-primary shadow-[0_0_15px_rgba(0,229,255,0.15)]'
-                  : 'border-white/10 text-muted-foreground hover:border-primary/50 hover:text-foreground'
+                  ? 'bg-[#D4AF37] text-[#0B0B0B] shadow-[0_0_30px_rgba(212,175,55,0.2)]'
+                  : 'text-[#F5F5F5]/40 hover:text-[#F5F5F5] hover:border-[#D4AF37]/50'
               }`}
             >
               {cat}
@@ -83,16 +83,17 @@ export default function PortfolioSection() {
               >
                 <img
                   src={item.image_url}
-                  alt={`${item.title} - luxury event by Luxevibes in Kerala`}
+                  alt={`${item.title} - luxury bridal design by Yaga Designs`}
                   loading="lazy"
-                  className="w-full object-cover group-hover:scale-110 transition-transform duration-[1500ms] ease-out"
+                  className="w-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-[1500ms] ease-out"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-end p-8">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0B] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-end p-10">
                   <div>
-                    <p className="text-primary text-[10px] tracking-[0.3em] uppercase">{item.category}</p>
-                    <h3 className="font-heading text-2xl mt-2 tracking-wide">{item.title}</h3>
+                    <p className="text-[#D4AF37] text-[10px] tracking-[0.5em] uppercase font-medium">{item.category}</p>
+                    <h3 className="font-heading text-3xl mt-3 tracking-tighter italic text-[#F5F5F5]">{item.title}</h3>
                   </div>
                 </div>
+                <div className="absolute inset-0 border border-white/0 group-hover:border-[#D4AF37]/20 transition-all duration-700 pointer-events-none" />
               </motion.div>
             ))}
           </AnimatePresence>
@@ -118,11 +119,11 @@ export default function PortfolioSection() {
               className="max-w-4xl w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <img src={lightbox.image_url} alt={`${lightbox.title} - Luxevibes luxury event photography`} className="w-full max-h-[70vh] object-contain" />
+              <img src={lightbox.image_url} alt={`${lightbox.title} - Yaga Designs luxury bridal photography`} className="w-full max-h-[70vh] object-contain" />
               <div className="mt-4 text-center">
-                <p className="text-primary text-xs tracking-widest uppercase">{lightbox.category}</p>
-                <h3 className="font-heading text-2xl mt-2">{lightbox.title}</h3>
-                <p className="text-muted-foreground text-sm mt-2">{lightbox.description}</p>
+                <p className="text-primary text-xs tracking-cinematic uppercase">{lightbox.category}</p>
+                <h3 className="font-heading text-3xl mt-4 tracking-elegant text-[#F5F5F5]">{lightbox.title}</h3>
+                <p className="text-muted-foreground text-base mt-4 tracking-wide leading-relaxed">{lightbox.description}</p>
               </div>
             </motion.div>
           </motion.div>

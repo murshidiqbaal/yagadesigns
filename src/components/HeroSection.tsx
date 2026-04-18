@@ -1,113 +1,126 @@
-import heroImg from '@/assets/hero-wedding.jpg';
 import { motion } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
-import { databases, appwriteConfig } from '@/lib/appwrite';
-import { Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ChevronDown } from 'lucide-react';
 
 export default function HeroSection() {
-  const { data: heroData, isLoading } = useQuery({
-    queryKey: ['heroSection'],
-    queryFn: async () => {
-      try {
-        const doc = await databases.getDocument(
-          appwriteConfig.databaseId,
-          appwriteConfig.collectionContentId,
-          'hero_section'
-        );
-        return doc;
-      } catch (error) {
-        // Return null if document doesn't exist yet
-        return null;
-      }
-    }
-  });
-
-
-
-  // Fallbacks if data doesn't exist
-  const title = heroData?.title || "Crafting Unforgettable\nLuxury Experiences";
-  const subtitle = heroData?.subtitle || "Bespoke weddings & premium events tailored to perfection";
-  const topText = "Premium Wedding & Event Planners";
-  const bgImage = heroData?.imageUrl || heroImg;
-
   return (
-    <section id="hero" className="relative h-screen w-full overflow-hidden grain-overlay">
-      <motion.div
-        initial={{ scale: 1.05 }}
-        animate={{ scale: 1.15 }}
-        transition={{ duration: 20, ease: 'linear', repeat: Infinity, repeatType: 'reverse' }}
-        className="absolute inset-0"
-      >
-        <img
-          src={bgImage}
-          alt="Luxury wedding venue setup in Kothamangalam by Luxe Vibe"
-          className="w-full h-full object-cover"
-          width={1920}
-          height={1080}
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#050505]">
+      {/* ── Atmospheric Background ─────────────────────────────── */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Deep radial gradient */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_70%_at_50%_60%,#1A1200_0%,#050505_70%)]" />
+        {/* Outer edge vignette */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_100%_at_50%_50%,transparent_40%,#050505_100%)]" />
+        {/* Golden glow orbs */}
+        <motion.div
+          animate={{ scale: [1, 1.08, 1], opacity: [0.06, 0.1, 0.06] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-[#D4AF37] blur-[140px]"
         />
-      </motion.div>
+        <div className="absolute top-16 right-16 w-[200px] h-[200px] rounded-full bg-[#D4AF37]/5 blur-[80px]" />
+        <div className="absolute bottom-24 left-12 w-[150px] h-[150px] rounded-full bg-[#D4AF37]/4 blur-[60px]" />
+        {/* Thin cross-hair lines */}
+        <svg className="absolute inset-0 w-full h-full opacity-[0.04]">
+          <line x1="0" y1="50%" x2="100%" y2="50%" stroke="#D4AF37" strokeWidth="0.5" />
+          <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#D4AF37" strokeWidth="0.5" />
+        </svg>
+        {/* Floating particles */}
+        {[...Array(12)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-px h-px rounded-full bg-[#D4AF37]"
+            style={{
+              left: `${15 + i * 6.5}%`,
+              top: `${20 + (i % 4) * 20}%`,
+            }}
+            animate={{
+              y: [0, -30, 0],
+              opacity: [0, 0.5, 0],
+            }}
+            transition={{
+              duration: 4 + i * 0.4,
+              repeat: Infinity,
+              delay: i * 0.3,
+              ease: 'easeInOut',
+            }}
+          />
+        ))}
+      </div>
 
-      <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/40 to-background/95 z-[2]" />
-
-      <div className="relative z-[3] flex flex-col items-center justify-center h-full text-center px-6">
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="text-primary text-[10px] tracking-[0.5em] uppercase mb-8"
-        >
-          {topText}
-        </motion.p>
-
-        <div className="overflow-hidden">
-          <motion.h1
-            initial={{ opacity: 0, y: "100%" }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
-            className="font-heading text-5xl md:text-7xl lg:text-8xl max-w-5xl leading-tight whitespace-pre-wrap tracking-wide"
-          >
-            {title}
-          </motion.h1>
-        </div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 1.5, ease: "easeInOut" }}
-          className="mt-8 text-muted-foreground/80 font-light max-w-xl text-sm md:text-lg tracking-wide leading-relaxed"
-        >
-          {subtitle}
-        </motion.p>
-
+      {/* ── Content ────────────────────────────────────────────── */}
+      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+        {/* Eyebrow */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-12 flex flex-wrap gap-6 justify-center"
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="mb-8"
         >
-          <a
-            href="#contact"
-            className="px-10 py-4 bg-primary text-primary-foreground text-xs tracking-[0.2em] uppercase hover:brightness-110 hover:shadow-[0_0_20px_rgba(0,229,255,0.4)] transition-all duration-500"
+          <span className="inline-flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.45em] text-[#D4AF37] border border-[#D4AF37]/30 px-6 py-2.5 rounded-full bg-[#D4AF37]/5">
+            <span className="w-4 h-px bg-[#D4AF37]" />
+            Luxury Bridal Atelier
+            <span className="w-4 h-px bg-[#D4AF37]" />
+          </span>
+        </motion.div>
+
+        {/* Main Heading */}
+        <motion.h1
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="font-heading font-medium leading-[0.9] tracking-tight mb-8"
+        >
+          <span className="block text-white text-[clamp(58px,10vw,130px)]">Yaga</span>
+          <span className="block text-gradient italic text-[clamp(58px,10vw,130px)]">Designs</span>
+        </motion.h1>
+
+        {/* Tagline */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.9 }}
+          className="text-white/45 text-lg md:text-xl max-w-lg mx-auto leading-relaxed mb-12 font-body"
+        >
+          Where dreams are woven into silk. Handcrafted bridal couture for your most cherished moment.
+        </motion.p>
+
+        {/* CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.1 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-4"
+        >
+          <Link
+            to="/collections"
+            id="hero-explore-cta"
+            className="px-10 py-4 bg-[#D4AF37] text-black text-sm font-bold uppercase tracking-widest rounded-full hover:bg-[#FFFBD5] hover:shadow-[0_0_40px_rgba(212,175,55,0.45)] transition-all duration-300"
           >
-            Book a Consultation
-          </a>
-          <a
-            href="#portfolio"
-            className="px-10 py-4 border border-foreground/20 text-foreground text-xs tracking-[0.2em] uppercase hover:border-primary hover:text-primary transition-all duration-500"
+            Explore Collection
+          </Link>
+          <Link
+            to="/about"
+            className="px-10 py-4 border border-white/15 text-white/70 text-sm font-bold uppercase tracking-widest rounded-full hover:border-[#D4AF37]/40 hover:text-[#D4AF37] transition-all duration-300"
           >
-            View Portfolio
-          </a>
+            Our Story
+          </Link>
         </motion.div>
       </div>
 
+      {/* ── Scroll Indicator ───────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[3] flex flex-col items-center gap-2"
+        transition={{ delay: 1.8 }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
       >
-        <span className="text-muted-foreground text-[10px] tracking-[0.3em] uppercase">Scroll</span>
-        <div className="w-px h-8 bg-gradient-to-b from-primary to-transparent animate-scroll-hint" />
+        <span className="text-[10px] text-white/25 uppercase tracking-[0.3em]">Scroll</span>
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <ChevronDown className="w-4 h-4 text-[#D4AF37]/40" />
+        </motion.div>
       </motion.div>
     </section>
   );

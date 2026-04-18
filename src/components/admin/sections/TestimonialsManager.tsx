@@ -1,15 +1,16 @@
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { toast } from "sonner";
-import { Loader2, Plus, Trash2, Star, Quote } from "lucide-react";
-import { 
-  getTestimonials, addTestimonial, deleteTestimonial,
-  Testimonial 
+import {
+  addTestimonial, deleteTestimonial,
+  getTestimonials,
+  Testimonial
 } from "@/lib/appwrite";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { Loader2, Plus, Quote, Star, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function TestimonialsManager() {
   const [isLoading, setIsLoading] = useState(false);
@@ -73,11 +74,11 @@ export default function TestimonialsManager() {
               <form onSubmit={handleAdd} className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Client Name & Location</label>
-                  <Input 
-                    placeholder="Priya & Arjun, Ernakulam..." 
+                  <Input
+                    placeholder="Priya & Arjun, Ernakulam..."
                     className="bg-background/50 border-border/50"
                     value={newItem.name}
-                    onChange={(e) => setNewItem({...newItem, name: e.target.value})}
+                    onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
                     required
                   />
                 </div>
@@ -88,7 +89,7 @@ export default function TestimonialsManager() {
                       <button
                         key={num}
                         type="button"
-                        onClick={() => setNewItem({...newItem, rating: num})}
+                        onClick={() => setNewItem({ ...newItem, rating: num })}
                         className={`p-1 transition-all hover:scale-110 ${newItem.rating >= num ? 'text-primary' : 'text-muted-foreground/30'}`}
                       >
                         <Star className={`w-8 h-8 ${newItem.rating >= num ? 'fill-primary' : ''}`} />
@@ -98,11 +99,11 @@ export default function TestimonialsManager() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">The Experience</label>
-                  <Textarea 
-                    placeholder="Describe their journey with Luxe Vibe..." 
+                  <Textarea
+                    placeholder="Describe their experience with Yaga Designs..."
                     className="bg-background/50 border-border/50 h-32 resize-none"
                     value={newItem.message}
-                    onChange={(e) => setNewItem({...newItem, message: e.target.value})}
+                    onChange={(e) => setNewItem({ ...newItem, message: e.target.value })}
                     required
                   />
                 </div>
@@ -145,9 +146,9 @@ export default function TestimonialsManager() {
                       <p className="font-heading text-lg">{t.name}</p>
                       <p className="text-sm text-muted-foreground leading-relaxed italic">"{t.message}"</p>
                     </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className="text-destructive hover:bg-destructive/10 shrink-0"
                       onClick={() => handleDelete(t.$id)}
                     >
@@ -160,7 +161,7 @@ export default function TestimonialsManager() {
             {items.length === 0 && (
               <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed border-border/50 rounded-lg bg-secondary/5 text-muted-foreground text-center">
                 <Quote className="w-12 h-12 mb-2 opacity-10" />
-                <p>No client testimonials gathered yet. <br/> Success starts with your first happy couple!</p>
+                <p>No client testimonials gathered yet. <br /> Success starts with your first happy couple!</p>
               </div>
             )}
           </div>

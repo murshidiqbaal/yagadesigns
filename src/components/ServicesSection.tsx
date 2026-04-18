@@ -6,10 +6,10 @@ import { Heart, Globe, Briefcase, Sparkles, Loader2 } from 'lucide-react';
 const serviceIcons = [Heart, Globe, Briefcase, Sparkles];
 
 const fallbackServices = [
-  { title: 'Luxury Weddings', desc: 'Exquisite wedding celebrations in Kothamangalam and Ernakulam, crafted with unparalleled attention to detail and elegance.', imageUrl: '' },
-  { title: 'Destination Weddings', desc: 'Breathtaking destination wedding ceremonies across Kerala and India\'s most stunning exclusive locations.', imageUrl: '' },
-  { title: 'Corporate Events', desc: 'Sophisticated corporate events and business gatherings in Ernakulam that leave lasting professional impressions.', imageUrl: '' },
-  { title: 'Private Celebrations', desc: 'Intimate private celebrations and anniversary events designed to create unforgettable personal memories in Kerala.', imageUrl: '' },
+  { title: 'Royal Weddings', desc: 'Exquisite wedding celebrations curated with unparalleled attention to royal elegance and refined details.', imageUrl: '' },
+  { title: 'Bespoke Destinations', desc: 'Breathtaking ceremonies across Kerala\'s most stunning and exclusive luxury locations.', imageUrl: '' },
+  { title: 'Signature Galas', desc: 'Sophisticated corporate events and business gatherings that leave a lasting, professional impression.', imageUrl: '' },
+  { title: 'Private Soirées', desc: 'Intimate celebrations designed to create unforgettable personal memories within a royal setting.', imageUrl: '' },
 ];
 
 export default function ServicesSection() {
@@ -46,9 +46,9 @@ export default function ServicesSection() {
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
           className="text-center mb-20"
         >
-          <p className="text-primary text-[10px] tracking-[0.4em] uppercase mb-6">What We Do</p>
-          <h2 className="font-heading text-4xl md:text-6xl tracking-wide">
-            Premium Event Planning <span className="text-gradient">Services</span>
+          <p className="text-[#D4AF37] text-[10px] tracking-[0.5em] uppercase mb-6 font-medium">The Offerings</p>
+          <h2 className="font-heading text-4xl md:text-6xl lg:text-7xl tracking-tighter italic">
+            Royal <span className="text-gradient not-italic tracking-normal">Signature</span> Services
           </h2>
         </motion.div>
 
@@ -61,8 +61,8 @@ export default function ServicesSection() {
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 1.2, delay: i * 0.2, ease: [0.22, 1, 0.36, 1] }}
-                className="group relative h-full min-h-[320px] p-10 glass hover:-translate-y-2 hover:brand-glow hover:border-primary/50 transition-all duration-700 cursor-pointer overflow-hidden rounded-sm flex flex-col justify-end"
+                transition={{ duration: 1.2, delay: i * 0.2, ease: [0.16, 1, 0.3, 1] }}
+                className="group relative h-full min-h-[400px] p-12 glass hover:-translate-y-4 hover:shadow-[0_20px_60px_-15px_rgba(212,175,55,0.2)] hover:border-[#D4AF37]/40 transition-all duration-700 cursor-pointer overflow-hidden rounded-none royal-border flex flex-col justify-end"
               >
                 {s.imageUrl && (
                   <img
@@ -76,9 +76,9 @@ export default function ServicesSection() {
                 <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-0" />
                 
                 <div className="relative z-10 mt-auto">
-                  <Icon className="stroke-[1px] w-10 h-10 text-primary mb-6 group-hover:scale-110 group-hover:text-primary transition-all duration-500" aria-hidden="true" />
-                  <h3 className="font-heading text-2xl mb-4 tracking-wide text-foreground">{s.title}</h3>
-                  <p className="text-muted-foreground/90 font-light text-sm leading-loose">{s.desc}</p>
+                  <Icon className="stroke-[1px] w-12 h-12 text-[#D4AF37] mb-8 group-hover:scale-110 transition-transform duration-700" aria-hidden="true" />
+                  <h3 className="font-heading text-3xl mb-4 tracking-tighter italic text-[#F5F5F5]">{s.title}</h3>
+                  <p className="text-[#F5F5F5]/60 font-light text-base leading-relaxed tracking-wide group-hover:text-[#F5F5F5]/90 transition-colors duration-500">{s.desc}</p>
                 </div>
               </motion.article>
             );

@@ -1,99 +1,137 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import logo from '@/assets/luxevibelogo.png';
+import logoImg from '@/assets/logo.png';
+import { useFavorites } from '@/hooks/useFavorites';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Heart, Menu, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
-const navLinks = [
-  { label: 'Home', href: '#hero' },
-  { label: 'About', href: '#about' },
-  { label: 'Services', href: '#services' },
-  { label: 'Portfolio', href: '#portfolio' },
-  { label: 'Process', href: '#process' },
-  { label: 'Contact', href: '#contact' },
+const NAV_LINKS = [
+  { label: 'Home', to: '/' },
+  { label: 'Collections', to: '/collections' },
+  { label: 'About', to: '/about' },
+  { label: 'Contact', to: '/contact' },
 ];
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { favorites } = useFavorites();
+  const location = useLocation();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', onScroll);
+    const onScroll = () => setScrolled(window.scrollY > 30);
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  return (
-    <motion.header
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.8, ease: 'easeOut' }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled ? 'glass py-3' : 'bg-transparent py-5'
-      }`}
-    >
-      <div className="container mx-auto px-6 flex items-center justify-between">
-        <a href="#hero" className="flex items-center gap-3">
-          <img src={logo} alt="LuxeVibes" className="h-10 w-10 rounded-full object-cover" />
-          <span className="font-heading text-xl tracking-wider text-foreground">
-            LUXE <span className="text-primary">VIBE</span>
-          </span>
-        </a>
+  useEffect(() => setMobileOpen(false), [location]);
 
+  const isActive = (to: string) =>
+    to === '/' ? location.pathname === '/' : location.pathname.startsWith(to);
+
+  return (
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
+          ? 'bg-[#0B0B0B]/95 backdrop-blur-xl border-b border-white/5 py-3'
+          : 'py-6'
+        }`}
+    >
+      <div className="container flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center">
+          <img
+            src={logoImg}
+            alt="Yaga Designs"
+            className="h-10 w-auto mix-blend-screen opacity-95 hover:opacity-100 transition-opacity duration-300"
+          />
+        </Link>
+
+        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="text-sm tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors duration-300"
+          {NAV_LINKS.map(link => (
+            <Link
+              key={link.to}
+              to={link.to}
+              className={`text-xs font-bold uppercase tracking-widest transition-colors duration-300 relative group ${isActive(link.to) ? 'text-[#D4AF37]' : 'text-white/60 hover:text-white'
+                }`}
             >
               {link.label}
-            </a>
+              <span
+                className={`absolute -bottom-1 left-0 h-px bg-[#D4AF37] transition-all duration-300 ${isActive(link.to) ? 'w-full' : 'w-0 group-hover:w-full'
+                  }`}
+              />
+            </Link>
           ))}
         </nav>
 
-        <a
-          href="#contact"
-          className="hidden md:inline-flex px-6 py-2.5 border border-primary text-primary text-xs tracking-widest uppercase hover:bg-primary hover:text-primary-foreground hover:brand-glow transition-all duration-500"
-        >
-          Book Now
-        </a>
+        {/* Right Actions */}
+        <div className="flex items-center gap-3">
+          <Link
+            to="/favorites"
+            id="nav-favorites"
+            className="relative p-2 group"
+            title="My Favorites"
+          >
+            <Heart
+              className={`w-5 h-5 transition-all duration-300 ${favorites.length > 0
+                  ? 'fill-[#D4AF37] text-[#D4AF37]'
+                  : 'text-white/60 group-hover:text-[#D4AF37]'
+                }`}
+            />
+            {favorites.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#D4AF37] text-black text-[10px] font-bold flex items-center justify-center leading-none">
+                {favorites.length}
+              </span>
+            )}
+          </Link>
 
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden flex flex-col gap-1.5 p-2"
-          aria-label="Toggle menu"
-        >
-          <span className={`block w-6 h-0.5 bg-foreground transition-all duration-300 ${mobileOpen ? 'rotate-45 translate-y-2' : ''}`} />
-          <span className={`block w-6 h-0.5 bg-foreground transition-all duration-300 ${mobileOpen ? 'opacity-0' : ''}`} />
-          <span className={`block w-6 h-0.5 bg-foreground transition-all duration-300 ${mobileOpen ? '-rotate-45 -translate-y-2' : ''}`} />
-        </button>
+          <button
+            id="nav-mobile-toggle"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden p-2 text-white/60 hover:text-white transition-colors"
+          >
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
+      {/* Mobile Menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden glass border-t border-border"
+            transition={{ duration: 0.3 }}
+            className="md:hidden bg-[#0B0B0B]/98 backdrop-blur-xl border-t border-white/5"
           >
-            <nav className="flex flex-col items-center py-6 gap-4">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="text-sm tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors"
+            <div className="container py-6 flex flex-col gap-1">
+              {NAV_LINKS.map(link => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`text-sm font-bold uppercase tracking-widest py-3 border-b border-white/5 transition-colors ${isActive(link.to) ? 'text-[#D4AF37]' : 'text-white/60'
+                    }`}
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
-              <a href="#contact" onClick={() => setMobileOpen(false)} className="mt-2 px-6 py-2.5 border border-primary text-primary text-xs tracking-widest uppercase">
-                Book Now
-              </a>
-            </nav>
+              <Link
+                to="/favorites"
+                className="text-sm font-bold uppercase tracking-widest py-3 text-white/60 flex items-center gap-2"
+              >
+                <Heart className={`w-4 h-4 ${favorites.length > 0 ? 'fill-[#D4AF37] text-[#D4AF37]' : ''}`} />
+                Favorites
+                {favorites.length > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-[#D4AF37] text-black text-[10px] font-bold">
+                    {favorites.length}
+                  </span>
+                )}
+              </Link>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </header>
   );
 }

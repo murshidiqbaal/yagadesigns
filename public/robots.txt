@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
 
-Sitemap: https://luxevibes.in/sitemap.xml
+Sitemap: https://yagadesigns.in/sitemap.xml

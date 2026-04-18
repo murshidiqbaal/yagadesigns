@@ -1,51 +1,69 @@
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
-import { Award, Users, MapPin, Calendar } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Scissors, Star, Heart } from 'lucide-react';
 
-const reasons = [
-  { icon: Award, title: 'Incredible Detail', desc: 'Every element of your event is curated with a fresh cinematic eye for unrivaled luxury.' },
-  { icon: Users, title: 'Bespoke Service', desc: 'We work closely with each family to ensure a deeply personal and exclusive planning experience.' },
-  { icon: MapPin, title: 'Local Expertise', desc: 'Deep knowledge of the best venues, vendors, and hidden gems in Kothamangalam and Ernakulam.' },
-  { icon: Calendar, title: 'Flawless Execution', desc: 'Passionate commitment to bringing visionary concepts to life with absolute precision.' },
+const FEATURES = [
+  {
+    icon: Scissors,
+    title: 'Custom Designs',
+    description:
+      'Every outfit is uniquely tailored to bring your vision to life. No two pieces are ever alike — your style, your way.',
+  },
+  {
+    icon: Star,
+    title: 'Premium Fabrics',
+    description:
+      'We source only the finest silks, satins, georgettes, and banarasi weaves for an exquisite drape and feel.',
+  },
+  {
+    icon: Heart,
+    title: 'Handcrafted Quality',
+    description:
+      'Each stitch is placed with intention by master artisans. From zardosi to lacework, perfection is our standard.',
+  },
 ];
 
 export default function WhyChooseSection() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-100px' });
-
   return (
-    <section className="py-32 grain-overlay" aria-label="Why choose Luxevibes">
-      <div className="container mx-auto px-6">
+    <section className="py-28 bg-[#080808] relative overflow-hidden">
+      {/* Subtle background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-[#D4AF37]/3 blur-[120px]" />
+      </div>
+
+      <div className="container relative z-10">
+        {/* Header */}
         <motion.div
-          ref={ref}
           initial={{ opacity: 0, y: 30 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-20"
+          className="text-center mb-16"
         >
-          <p className="text-primary text-xs tracking-[0.4em] uppercase mb-4">Why Us</p>
-          <h2 className="font-heading text-3xl md:text-5xl">
-            Why Choose <span className="text-gradient">Luxevibes in Ernakulam</span>
+          <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-[#D4AF37] mb-4 block">
+            Why Us
+          </span>
+          <h2 className="font-heading text-4xl md:text-6xl font-medium text-white">
+            The Yaga Promise
           </h2>
-          <p className="mt-4 text-muted-foreground max-w-2xl mx-auto text-sm leading-relaxed">
-            As the leading wedding planners in Kothamangalam and event planners in Ernakulam,
-            we bring unmatched expertise, creativity, and dedication to every celebration in Kerala.
-          </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {reasons.map((r, i) => (
-            <motion.article
-              key={r.title}
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {FEATURES.map((feature, i) => (
+            <motion.div
+              key={feature.title}
               initial={{ opacity: 0, y: 40 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: i * 0.15 }}
-              className="text-center p-8 border border-border bg-card hover:border-primary/50 transition-all duration-500"
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: i * 0.15 }}
+              className="group p-8 rounded-2xl bg-[#111]/60 border border-white/5 hover:border-[#D4AF37]/25 hover:bg-[#111]/90 transition-all duration-500 text-center"
             >
-              <r.icon className="w-8 h-8 text-primary mx-auto mb-6" aria-hidden="true" />
-              <h3 className="font-heading text-lg mb-3">{r.title}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">{r.desc}</p>
-            </motion.article>
+              <div className="w-14 h-14 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center mx-auto mb-6 group-hover:bg-[#D4AF37]/20 group-hover:scale-105 transition-all duration-300">
+                <feature.icon className="w-7 h-7 text-[#D4AF37]" />
+              </div>
+              <h3 className="font-heading text-xl text-white mb-3">{feature.title}</h3>
+              <p className="text-sm text-white/45 leading-relaxed">{feature.description}</p>
+            </motion.div>
           ))}
         </div>
       </div>
