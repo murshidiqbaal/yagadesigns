@@ -17,6 +17,8 @@ import Contact from "./pages/Contact.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import SmoothScroll from "./components/SmoothScroll.tsx";
 import CursorParticles from "./components/CursorParticles.tsx";
+import MobileBottomNav from "./components/MobileBottomNav.tsx";
+import FloatingWhatsApp from "./components/FloatingWhatsApp.tsx";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +32,8 @@ const App = () => (
           <HashRouter>
             <KeyboardShortcuts />
             <CursorParticles />
+            <MobileBottomNav />
+            <FloatingWhatsApp />
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Index />} />
