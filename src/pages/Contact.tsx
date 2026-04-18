@@ -8,7 +8,7 @@ const CONTACT_ITEMS = [
   {
     icon: Phone,
     label: 'Phone',
-    value: '+91 98765 43210',
+    value: '+91 96332 70639',
     sub: 'Mon – Sat, 10am – 7pm',
     color: 'text-[#D4AF37]',
     bg: 'bg-[#D4AF37]/10',
@@ -17,7 +17,7 @@ const CONTACT_ITEMS = [
   },
   {
     icon: MapPin,
-    label: 'Location',
+    label: 'Kothamangalam, Kerala',
     value: 'India',
     sub: 'Home consultations & studio visits available',
     color: 'text-[#D4AF37]',

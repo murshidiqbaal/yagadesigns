@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { account } from "@/lib/appwrite";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2, Lock } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -15,12 +15,26 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { checkAuth } = useAuth();
+  const { user, loading, checkAuth } = useAuth();
+  
+  // Auto-redirect if already logged in
+  useEffect(() => {
+    if (user && !loading) {
+      navigate("/admin/dashboard");
+    }
+  }, [user, loading, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
+      // Clear any existing session first to avoid "Creation of a session is prohibited when a session is active"
+      try {
+        await account.deleteSession("current");
+      } catch (e) {
+        // Ignore error if no session exists
+      }
+
       await account.createEmailPasswordSession(email, password);
       await checkAuth();
       toast.success("Welcome to Yaga Designs Admin");
@@ -40,6 +54,14 @@ export default function AdminLogin() {
     setIsLoading(true);
     try {
       await account.create("unique()", email, password);
+      
+      // Clear any existing session before creating a new one
+      try {
+        await account.deleteSession("current");
+      } catch (e) {
+        // Ignore
+      }
+
       await account.createEmailPasswordSession(email, password);
       await checkAuth();
       toast.success("Admin account created!");

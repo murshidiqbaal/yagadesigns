@@ -1,11 +1,6 @@
 /**
  * Yaga Designs - Database Setup Script
- * Sets up the Appwrite database and collection programmatically.
- * 
- * Instructions:
- * 1. Install dependencies: npm install node-appwrite dotenv
- * 2. Create a .env file with your PROJECT_ID and APPWRITE_API_KEY
- * 3. Run: node setup-db.js
+ * Sets up the Appwrite database and collections programmatically.
  */
 
 import { Client, Databases, Storage, ID, Permission, Role } from 'node-appwrite';
@@ -16,18 +11,61 @@ dotenv.config();
 const config = {
     endpoint: 'https://sgp.cloud.appwrite.io/v1',
     projectId: process.env.VITE_APPWRITE_PROJECT_ID || '69d72e170037ae85ba57',
-    apiKey: process.env.APPWRITE_API_KEY, // REQUIRED: Create an API key in Appwrite Console
+    apiKey: process.env.APPWRITE_API_KEY, 
     databaseId: 'yaga-db',
-    collectionId: 'products',
-    collectionName: 'Products',
     bucketId: 'product-images',
     bucketName: 'Product Images'
 };
 
+const COLLECTIONS = [
+    {
+        id: 'products',
+        name: 'Products',
+        attributes: [
+            { id: 'name', type: 'string', size: 255, required: true },
+            { id: 'description', type: 'string', size: 2000, required: false },
+            { id: 'category', type: 'string', size: 100, required: true },
+            { id: 'image_url', type: 'string', size: 500, required: false },
+            { id: 'image_urls', type: 'string', size: 500, required: false, array: true },
+            { id: 'price', type: 'string', size: 100, required: false },
+            { id: 'colors', type: 'string', size: 100, required: false, array: true },
+            { id: 'fabric', type: 'string', size: 255, required: false },
+            { id: 'embroidery', type: 'string', size: 255, required: false },
+            { id: 'occasion', type: 'string', size: 100, required: false },
+            { id: 'variants', type: 'string', size: 10000, required: false },
+            { id: 'created_at', type: 'datetime', required: false }
+        ]
+    },
+    {
+        id: 'testimonials',
+        name: 'Testimonials',
+        attributes: [
+            { id: 'name', type: 'string', size: 100, required: true },
+            { id: 'content', type: 'string', size: 2000, required: true },
+            { id: 'rating', type: 'integer', min: 1, max: 5, required: true },
+            { id: 'avatar_url', type: 'string', size: 500, required: false },
+            { id: 'is_featured', type: 'boolean', required: false, default: false },
+            { id: 'created_at', type: 'datetime', required: false }
+        ]
+    },
+    {
+        id: 'offers',
+        name: 'Offers',
+        attributes: [
+            { id: 'title', type: 'string', size: 255, required: true },
+            { id: 'subtitle', type: 'string', size: 500, required: false },
+            { id: 'image_url', type: 'string', size: 500, required: false },
+            { id: 'button_text', type: 'string', size: 100, required: false },
+            { id: 'link', type: 'string', size: 500, required: false },
+            { id: 'isActive', type: 'boolean', required: false, default: true },
+            { id: 'created_at', type: 'datetime', required: false }
+        ]
+    }
+];
+
 async function setup() {
     if (!config.apiKey) {
-        console.error('❌ Error: APPWRITE_API_KEY is missing in .env file.');
-        console.log('Please create an API key in Appwrite Console with databases.write, collections.write, and attributes.write permissions.');
+        console.error('❌ Error: APPWRITE_API_KEY is missing.');
         process.exit(1);
     }
 
@@ -41,126 +79,72 @@ async function setup() {
 
     try {
         // 1. Create Database
-        console.log(`\n📁 Creating database: ${config.databaseId}...`);
+        console.log(`\n📁 Checking database: ${config.databaseId}...`);
         try {
             await databases.create(config.databaseId, config.databaseId);
-            console.log('✅ Database created successfully.');
+            console.log('✅ Database created.');
         } catch (e) {
-            if (e.code === 409) console.log('ℹ️ Database already exists.');
+            if (e.code === 409) console.log('ℹ️ Database exists.');
             else throw e;
         }
 
-        // 2. Create Collection
-        console.log(`\n📋 Creating collection: ${config.collectionId}...`);
-        try {
-            await databases.createCollection(
-                config.databaseId,
-                config.collectionId,
-                config.collectionName,
-                [
-                    Permission.read(Role.any()), // Public can view products
-                    Permission.create(Role.users()), // Logged in users can create
-                    Permission.update(Role.users()), // Logged in users can update
-                    Permission.delete(Role.users()), // Logged in users can delete
-                ]
-            );
-            console.log('✅ Collection created successfully.');
-        } catch (e) {
-            if (e.code === 409) console.log('ℹ️ Collection already exists.');
-            else throw e;
-        }
-
-        // Wait a moment for collection to be ready
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // 3. Create Storage Bucket
-        console.log(`\n📦 Creating bucket: ${config.bucketId}...`);
+        // 2. Create Bucket
+        console.log(`\n📦 Checking bucket: ${config.bucketId}...`);
         try {
             await storage.createBucket(
                 config.bucketId,
                 config.bucketName,
-                [
-                    Permission.read(Role.any()), // Public can view images
-                    Permission.create(Role.users()), // Authenticated users can upload
-                    Permission.update(Role.users()), // Authenticated users can update
-                    Permission.delete(Role.users()), // Authenticated users can delete
-                ],
-                false, // File Security disabled (easier for public viewing)
-                true, // Enabled
-                undefined, // Max Size
-                ['jpg', 'png', 'webp', 'jpeg'], // Allowed extensions
-                undefined, // Compression
-                true, // Encryption
-                true // Antivirus
+                [Permission.read(Role.any()), Permission.create(Role.users()), Permission.update(Role.users()), Permission.delete(Role.users())],
+                false, true, undefined, ['jpg', 'png', 'webp', 'jpeg'], undefined, true, true
             );
-            console.log('✅ Bucket created successfully.');
+            console.log('✅ Bucket created.');
         } catch (e) {
-            if (e.code === 409) console.log('ℹ️ Bucket already exists.');
-            else {
-                console.warn('⚠️ Bucket creation failed:', e.message);
-                // Continue anyway as it might just be a permission issue in the setup script but bucket exists
-            }
+            if (e.code === 409) console.log('ℹ️ Bucket exists.');
         }
 
-        // 4. Create Attributes
-        console.log('\n🛠️ Adding attributes...');
-
-        const attributes = [
-            { id: 'name', type: 'string', size: 255, required: true },
-            { id: 'description', type: 'string', size: 2000, required: false },
-            { id: 'category', type: 'string', size: 100, required: true },
-            { id: 'image_url', type: 'string', size: 500, required: false }, // Keep for legacy/main
-            { id: 'image_urls', type: 'string', size: 500, required: false, array: true },
-            { id: 'price', type: 'string', size: 100, required: false },
-            { id: 'colors', type: 'string', size: 100, required: false, array: true },
-            { id: 'fabric', type: 'string', size: 255, required: false },
-            { id: 'embroidery', type: 'string', size: 255, required: false },
-            { id: 'occasion', type: 'string', size: 100, required: false },
-            { id: 'created_at', type: 'datetime', required: false }
-        ];
-
-        for (const attr of attributes) {
+        // 3. Process Collections
+        for (const coll of COLLECTIONS) {
+            console.log(`\n📋 Processing collection: ${coll.name} (${coll.id})...`);
             try {
-                process.stdout.write(`   Adding ${attr.id}... `);
-                if (attr.type === 'string') {
-                    await databases.createStringAttribute(
-                        config.databaseId,
-                        config.collectionId,
-                        attr.id,
-                        attr.size,
-                        attr.required,
-                        undefined, // Default placeholder
-                        attr.array // Important: Support array attributes
-                    );
-                } else if (attr.type === 'datetime') {
-                    await databases.createDatetimeAttribute(
-                        config.databaseId,
-                        config.collectionId,
-                        attr.id,
-                        attr.required
-                    );
-                }
-                console.log('Done');
+                await databases.createCollection(
+                    config.databaseId,
+                    coll.id,
+                    coll.name,
+                    [Permission.read(Role.any()), Permission.create(Role.users()), Permission.update(Role.users()), Permission.delete(Role.users())]
+                );
+                console.log(`   ✅ Collection ${coll.id} created.`);
             } catch (e) {
-                if (e.code === 409) console.log('Already exists');
-                else {
-                    console.log('Error');
-                    console.error(`   ❌ Failed to add attribute ${attr.id}:`, e.message);
+                if (e.code === 409) console.log(`   ℹ️ Collection ${coll.id} exists.`);
+                else throw e;
+            }
+
+            // Wait for collection
+            await new Promise(r => setTimeout(r, 1000));
+
+            // Create Attributes
+            for (const attr of coll.attributes) {
+                try {
+                    process.stdout.write(`      Adding ${attr.id}... `);
+                    if (attr.type === 'string') {
+                        await databases.createStringAttribute(config.databaseId, coll.id, attr.id, attr.size, attr.required, undefined, attr.array);
+                    } else if (attr.type === 'integer') {
+                        await databases.createIntegerAttribute(config.databaseId, coll.id, attr.id, attr.required, attr.min, attr.max);
+                    } else if (attr.type === 'boolean') {
+                        await databases.createBooleanAttribute(config.databaseId, coll.id, attr.id, attr.required, attr.default);
+                    } else if (attr.type === 'datetime') {
+                        await databases.createDatetimeAttribute(config.databaseId, coll.id, attr.id, attr.required);
+                    }
+                    console.log('Done');
+                } catch (e) {
+                    if (e.code === 409) console.log('Exists');
+                    else console.log(`Error: ${e.message}`);
                 }
             }
         }
 
-        console.log('\n🚀 Appwrite Database Setup Complete!');
-        console.log('-------------------------------------------');
-        console.log(`Database ID:   ${config.databaseId}`);
-        console.log(`Collection ID: ${config.collectionId}`);
-        console.log(`Bucket ID:     ${config.bucketId}`);
-        console.log('-------------------------------------------');
-        console.log('\nIMPORTANT: Remember to update your .env file with the database and collection IDs if they differ from your previous ones.');
-
+        console.log('\n🚀 Setup Complete!');
     } catch (error) {
-        console.error('\n❌ Fatal Error during setup:');
-        console.error(error.message);
+        console.error('\n❌ Fatal Error:', error.message);
         process.exit(1);
     }
 }

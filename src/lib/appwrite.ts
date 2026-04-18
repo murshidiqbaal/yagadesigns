@@ -7,6 +7,7 @@ export const appwriteConfig = {
   productsCollectionId: import.meta.env.VITE_APPWRITE_PRODUCTS_COLLECTION_ID || 'products',
   portfolioCollectionId: import.meta.env.VITE_APPWRITE_PORTFOLIO_COLLECTION_ID || 'portfolio',
   testimonialsCollectionId: import.meta.env.VITE_APPWRITE_TESTIMONIALS_COLLECTION_ID || 'testimonials',
+  offersCollectionId: import.meta.env.VITE_APPWRITE_OFFERS_COLLECTION_ID || 'offers',
   storageId: import.meta.env.VITE_APPWRITE_BUCKET_ID || 'product-images',
 };
 
@@ -23,6 +24,13 @@ export const DATABASE_ID = appwriteConfig.databaseId;
 export const PRODUCTS_COLLECTION = appwriteConfig.productsCollectionId;
 export const PORTFOLIO_COLLECTION = appwriteConfig.portfolioCollectionId;
 export const TESTIMONIALS_COLLECTION = appwriteConfig.testimonialsCollectionId;
+export const OFFERS_COLLECTION = appwriteConfig.offersCollectionId;
+
+export interface ProductVariant {
+  color: string;
+  images: string[];
+  thumbnail?: string;
+}
 
 export interface Product {
   $id: string;
@@ -30,12 +38,14 @@ export interface Product {
   description: string;
   category: string;
   image_url: string; // Keep for legacy/main
-  image_urls?: string[]; // Multiple images for gallery
+  image_urls?: string[]; // Optional for backward compatibility
   price?: string;
-  colors?: string[];
+  colors?: string[]; // Optional for backward compatibility
   fabric?: string;
   embroidery?: string;
   occasion?: string;
+  is_customizable?: boolean;
+  variants?: string | ProductVariant[]; // Stored as JSON string in DB
   created_at: string;
 }
 
@@ -51,8 +61,22 @@ export interface PortfolioItem {
 export interface Testimonial {
   $id: string;
   name: string;
-  message: string;
+  content: string;
   rating: number;
+  avatar_url?: string;
+  is_featured?: boolean;
+  created_at?: string;
+}
+
+export interface Offer {
+  $id: string;
+  title: string;
+  subtitle?: string;
+  image_url?: string;
+  button_text?: string;
+  link?: string;
+  isActive: boolean;
+  created_at?: string;
 }
 
 // ─── Product CRUD ────────────────────────────────────────────────────────────
@@ -64,7 +88,12 @@ export async function getProducts(category?: string): Promise<Product[]> {
       queries.push(Query.equal('category', category));
     }
     const response = await databases.listDocuments(DATABASE_ID, PRODUCTS_COLLECTION, queries);
-    return response.documents as unknown as Product[];
+    
+    // Parse variants if they are stringified
+    return response.documents.map((doc: any) => ({
+      ...doc,
+      variants: typeof doc.variants === 'string' ? JSON.parse(doc.variants) : doc.variants
+    })) as Product[];
   } catch (error) {
     console.error('Failed to fetch products:', error);
     return [];
@@ -74,7 +103,11 @@ export async function getProducts(category?: string): Promise<Product[]> {
 export async function getProductById(id: string): Promise<Product | null> {
   try {
     const response = await databases.getDocument(DATABASE_ID, PRODUCTS_COLLECTION, id);
-    return response as unknown as Product;
+    const doc = response as any;
+    return {
+      ...doc,
+      variants: typeof doc.variants === 'string' ? JSON.parse(doc.variants) : doc.variants
+    } as Product;
   } catch (error) {
     console.error(`Failed to fetch product with ID ${id}:`, error);
     return null;
@@ -83,14 +116,23 @@ export async function getProductById(id: string): Promise<Product | null> {
 
 export async function addProduct(product: Omit<Product, '$id'>): Promise<Product> {
   console.log('Final Product Payload:', product);
+  const payload = { 
+    ...product, 
+    created_at: product.created_at || new Date().toISOString(),
+    variants: typeof product.variants === 'object' ? JSON.stringify(product.variants) : product.variants
+  };
   return databases.createDocument(
     DATABASE_ID, PRODUCTS_COLLECTION, ID.unique(),
-    { ...product, created_at: product.created_at || new Date().toISOString() }
+    payload
   ) as unknown as Product;
 }
 
 export async function updateProduct(id: string, data: Partial<Omit<Product, '$id'>>): Promise<Product> {
-  return databases.updateDocument(DATABASE_ID, PRODUCTS_COLLECTION, id, data) as unknown as Product;
+  const payload = {
+    ...data,
+    variants: typeof data.variants === 'object' ? JSON.stringify(data.variants) : data.variants
+  };
+  return databases.updateDocument(DATABASE_ID, PRODUCTS_COLLECTION, id, payload) as unknown as Product;
 }
 
 export async function deleteProduct(id: string): Promise<void> {
@@ -113,12 +155,60 @@ export async function getPortfolioItems(): Promise<PortfolioItem[]> {
 
 export async function getTestimonials(): Promise<Testimonial[]> {
   try {
-    const response = await databases.listDocuments(DATABASE_ID, TESTIMONIALS_COLLECTION, [Query.limit(50)]);
+    const response = await databases.listDocuments(DATABASE_ID, TESTIMONIALS_COLLECTION, [Query.orderDesc('created_at'), Query.limit(50)]);
     return response.documents as unknown as Testimonial[];
   } catch (error) {
     console.error('Failed to fetch testimonials:', error);
     return [];
   }
+}
+
+export async function createTestimonial(testimonial: Omit<Testimonial, '$id'>): Promise<Testimonial> {
+  const payload = { ...testimonial, created_at: new Date().toISOString() };
+  return databases.createDocument(DATABASE_ID, TESTIMONIALS_COLLECTION, ID.unique(), payload) as unknown as Testimonial;
+}
+
+export async function deleteTestimonial(id: string): Promise<void> {
+  await databases.deleteDocument(DATABASE_ID, TESTIMONIALS_COLLECTION, id);
+}
+
+// ─── Offers ───────────────────────────────────────────────────────────────────
+
+export async function getOffers(): Promise<Offer[]> {
+  try {
+    const response = await databases.listDocuments(DATABASE_ID, OFFERS_COLLECTION, [Query.orderDesc('created_at'), Query.limit(50)]);
+    return response.documents as unknown as Offer[];
+  } catch (error) {
+    console.error('Failed to fetch offers:', error);
+    return [];
+  }
+}
+
+export async function getActiveOffer(): Promise<Offer | null> {
+  try {
+    const response = await databases.listDocuments(DATABASE_ID, OFFERS_COLLECTION, [
+      Query.equal('isActive', true),
+      Query.orderDesc('created_at'),
+      Query.limit(1)
+    ]);
+    return (response.documents[0] as unknown as Offer) || null;
+  } catch (error) {
+    console.error('Failed to fetch active offer:', error);
+    return null;
+  }
+}
+
+export async function createOffer(offer: Omit<Offer, '$id'>): Promise<Offer> {
+  const payload = { ...offer, created_at: new Date().toISOString() };
+  return databases.createDocument(DATABASE_ID, OFFERS_COLLECTION, ID.unique(), payload) as unknown as Offer;
+}
+
+export async function updateOffer(id: string, data: Partial<Omit<Offer, '$id'>>): Promise<Offer> {
+  return databases.updateDocument(DATABASE_ID, OFFERS_COLLECTION, id, data) as unknown as Offer;
+}
+
+export async function deleteOffer(id: string): Promise<void> {
+  await databases.deleteDocument(DATABASE_ID, OFFERS_COLLECTION, id);
 }
 
 // ─── Storage ─────────────────────────────────────────────────────────────────

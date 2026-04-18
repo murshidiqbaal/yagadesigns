@@ -1,24 +1,50 @@
-import { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
-import { Heart, ChevronLeft, ChevronRight, MessageCircle, Share2, Info, Maximize2 } from "lucide-react";
-import useEmblaCarousel from "embla-carousel-react";
-import { getProductById, getImageUrl, Product } from "@/lib/appwrite";
-import { useFavorites } from "@/hooks/useFavorites";
-import { WHATSAPP_NUMBER } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useFavorites } from "@/hooks/useFavorites";
+import { getImageUrl, getProductById, ProductVariant } from "@/lib/appwrite";
+import { WHATSAPP_NUMBER } from "@/lib/constants";
+import { useQuery } from "@tanstack/react-query";
+import useEmblaCarousel from "embla-carousel-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeft, Heart, MessageCircle, Plus, Scissors, Share2, ShieldCheck, Zap } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isFavorite, toggleFavorite } = useFavorites();
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+
+  // ── Data Fetching ──────────────────────────────────────────────────
+  const { data: product, isLoading, error } = useQuery({
+    queryKey: ["product", id],
+    queryFn: () => getProductById(id!),
+    enabled: !!id,
+  });
+
+  const variants = useMemo(() => {
+    if (!product?.variants) return [];
+    return product.variants as ProductVariant[];
+  }, [product]);
+
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // ── Embla Setup ────────────────────────────────────────────────────
+  // Set initial variant
+  useEffect(() => {
+    if (variants.length > 0 && !selectedVariant) {
+      setSelectedVariant(variants[0]);
+    }
+  }, [variants, selectedVariant]);
+
+  // ── Gallery Logic ──────────────────────────────────────────────────
+  const images = useMemo(() => {
+    const activeVariant = selectedVariant || (variants.length > 0 ? variants[0] : null);
+    if (activeVariant?.images?.length) return activeVariant.images;
+    if (product?.image_urls?.length) return product.image_urls;
+    return product?.image_url ? [product.image_url] : [];
+  }, [selectedVariant, product, variants]);
+
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
 
   const onSelect = useCallback(() => {
@@ -32,14 +58,12 @@ export default function ProductDetail() {
     onSelect();
   }, [emblaApi, onSelect]);
 
-  const scrollTo = (index: number) => emblaApi?.scrollTo(index);
+  useEffect(() => {
+    if (emblaApi) emblaApi.scrollTo(0);
+    setActiveIndex(0);
+  }, [images, emblaApi]);
 
-  // ── Data Fetching ──────────────────────────────────────────────────
-  const { data: product, isLoading, error } = useQuery({
-    queryKey: ["product", id],
-    queryFn: () => getProductById(id!),
-    enabled: !!id,
-  });
+  const scrollTo = (index: number) => emblaApi?.scrollTo(index);
 
   const liked = product ? isFavorite(product.$id) : false;
 
@@ -47,14 +71,12 @@ export default function ProductDetail() {
   const handleWhatsAppEnquiry = () => {
     if (!product) return;
     const text = `Hello Yaga Designs,
-I am interested in this product:
 
-Name: ${product.name}
-Category: ${product.category}
-${selectedColor ? `Selected Color: ${selectedColor}` : ""}
-${product.price ? `Price: ${product.price}` : ""}
+I am interested in:
+Product: ${product.name}
+${selectedVariant ? `Color: ${selectedVariant.color}` : ""}
 
-Please share more details.`;
+Please share customization options and final pricing.`;
 
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
@@ -92,9 +114,6 @@ Please share more details.`;
     );
   }
 
-  const images = product.image_urls?.length ? product.image_urls : [product.image_url];
-  const colors = product.colors || [];
-
   return (
     <div className="min-h-screen bg-[#050505] text-white overflow-x-hidden">
       {/* ── Navigation Header (Mobile Only) ─────────────────────────── */}
@@ -123,22 +142,33 @@ Please share more details.`;
 
       <div className="container px-0 md:px-6 pt-24 md:pt-32 pb-40">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
-          
+
           {/* ── Left Column: Gallery ─────────────────────────────────── */}
           <div className="relative group">
-            <div className="overflow-hidden md:rounded-3xl" ref={emblaRef}>
-              <div className="flex">
-                {images.map((img, idx) => (
-                  <div key={idx} className="flex-[0_0_100%] min-w-0 relative aspect-[3/4] md:aspect-[4/5]">
-                    <img
-                      src={getImageUrl(img)}
-                      alt={`${product.name} - View ${idx + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedVariant?.color || 'default'}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+                className="overflow-hidden md:rounded-3xl"
+                ref={emblaRef}
+              >
+                <div className="flex">
+                  {images.map((img, idx) => (
+                    <div key={idx} className="flex-[0_0_100%] min-w-0 relative aspect-[3/4] md:aspect-[4/5]">
+                      <img
+                        src={getImageUrl(img)}
+                        alt={`${product.name} - View ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                        loading={idx === 0 ? "eager" : "lazy"}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </AnimatePresence>
 
             {/* Pagination / Dots */}
             {images.length > 1 && (
@@ -147,9 +177,8 @@ Please share more details.`;
                   <button
                     key={idx}
                     onClick={() => scrollTo(idx)}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      idx === activeIndex ? "w-6 bg-primary" : "w-1.5 bg-white/40"
-                    }`}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${idx === activeIndex ? "w-6 bg-primary" : "w-1.5 bg-white/40"
+                      }`}
                   />
                 ))}
               </div>
@@ -161,9 +190,8 @@ Please share more details.`;
                 <button
                   key={idx}
                   onClick={() => scrollTo(idx)}
-                  className={`w-20 h-24 rounded-xl overflow-hidden border-2 transition-all ${
-                    idx === activeIndex ? "border-primary opacity-100 scale-105" : "border-transparent opacity-50 hover:opacity-80"
-                  }`}
+                  className={`w-20 h-24 rounded-xl overflow-hidden border-2 transition-all ${idx === activeIndex ? "border-primary opacity-100 scale-105" : "border-transparent opacity-50 hover:opacity-80"
+                    }`}
                 >
                   <img src={getImageUrl(img)} className="w-full h-full object-cover" />
                 </button>
@@ -173,71 +201,111 @@ Please share more details.`;
 
           {/* ── Right Column: Info ──────────────────────────────────── */}
           <div className="px-6 md:px-0 space-y-8">
-            <div>
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <div className="flex items-center gap-2 text-primary text-xs font-bold uppercase tracking-[0.2em] mb-2">
-                  <span className="w-8 h-px bg-primary/40" />
-                  {product.category}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="flex items-center gap-2 text-primary text-xs font-bold uppercase tracking-[0.2em] mb-3">
+                <span className="w-8 h-px bg-primary/40" />
+                {product.category}
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading leading-tight mb-4 tracking-tight">
+                {product.name}
+              </h1>
+
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Investment</span>
+                <div className="text-2xl md:text-4xl font-heading text-primary flex items-baseline gap-2">
+                  <span className="text-lg md:text-xl font-sans text-white/40 font-medium">Starting from</span>
+                  {product.price || "₹45,000"}
                 </div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading leading-tight mb-4">
-                  {product.name}
-                </h1>
-                
-                {product.price ? (
-                  <div className="text-2xl md:text-3xl font-heading text-primary bg-primary/5 border border-primary/20 rounded-2xl px-6 py-4 inline-block shadow-[0_0_30px_rgba(212,175,55,0.05)]">
-                    {product.price}
-                  </div>
-                ) : (
-                  <div className="text-lg text-white/40 italic">Price on enquiry</div>
-                )}
-              </motion.div>
-            </div>
+                <p className="text-[10px] text-white/30 italic mt-1">*Final price depends on customization and measure</p>
+              </div>
+            </motion.div>
 
-            {/* Description */}
-            <div className="space-y-4">
-              <p className="text-white/60 leading-relaxed text-lg">
-                {product.description}
-              </p>
-            </div>
-
-            {/* Color Selector */}
-            {colors.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-white/40">Select Color Variant</h3>
+            {/* Color Swatches */}
+            {variants.length > 0 && (
+              <div className="space-y-5 pt-4">
+                <div className="flex justify-between items-end">
+                  <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">
+                    Heritage Color: <span className="text-white ml-2">{selectedVariant?.color}</span>
+                  </h3>
+                </div>
                 <div className="flex flex-wrap gap-4">
-                  {colors.map((color) => (
+                  {variants.map((v) => (
                     <button
-                      key={color}
-                      onClick={() => setSelectedColor(color)}
-                      className={`px-6 py-2.5 rounded-full border text-sm font-medium transition-all ${
-                        selectedColor === color
-                          ? "bg-primary text-black border-primary"
-                          : "bg-transparent text-white border-white/10 hover:border-white/30"
-                      }`}
+                      key={v.color}
+                      onClick={() => setSelectedVariant(v)}
+                      className="group relative"
                     >
-                      {color}
+                      <div
+                        className={`w-14 h-14 rounded-full border-2 transition-all duration-500 overflow-hidden ${selectedVariant?.color === v.color
+                          ? "border-primary scale-110 shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+                          : "border-white/10 hover:border-white/40"
+                          }`}
+                      >
+                        {v.thumbnail ? (
+                          <img src={getImageUrl(v.thumbnail)} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-white/5 flex items-center justify-center text-[10px] font-bold uppercase">
+                            {v.color.substring(0, 2)}
+                          </div>
+                        )}
+                      </div>
+                      {selectedVariant?.color === v.color && (
+                        <motion.div
+                          layoutId="swatch-glow"
+                          className="absolute -inset-1 rounded-full border border-primary/20 blur-sm pointer-events-none"
+                        />
+                      )}
                     </button>
                   ))}
+
+                  {/* Custom Swatch Option */}
                   <button
-                    onClick={() => setSelectedColor("Custom Swatch")}
-                    className={`px-6 py-2.5 rounded-full border text-sm italic transition-all ${
-                      selectedColor === "Custom Swatch"
-                        ? "bg-white text-black border-white"
-                        : "bg-transparent text-white/60 border-dashed border-white/20 hover:border-white/40"
-                    }`}
+                    onClick={handleWhatsAppEnquiry}
+                    className="flex flex-col items-center justify-center w-14 h-14 rounded-full border-2 border-dashed border-white/20 hover:border-white/40 transition-all text-white/40 hover:text-white"
                   >
-                    Custom Color Available
+                    <Plus className="w-5 h-5" />
+                    <span className="text-[8px] font-bold uppercase mt-0.5">Custom</span>
                   </button>
                 </div>
               </div>
             )}
 
+            {/* Description */}
+            <div className="space-y-4 pt-4 border-t border-white/5">
+              <p className="text-white/60 leading-relaxed text-lg font-light">
+                {product.description}
+              </p>
+            </div>
+
+            {/* Customization Messaging (IMPORTANT) */}
+            <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <Scissors className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-heading text-xl text-white">Fully Customizable Design</h4>
+                  <p className="text-sm text-white/50 mt-1">Our artisans can tailor this piece to your specific color preferences and silhouette needs.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <Zap className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-heading text-xl text-white">Made-to-Measure Available</h4>
+                  <p className="text-sm text-white/50 mt-1">Get the perfect fit with our bespoke stitching service. Simply share your measurements after booking.</p>
+                </div>
+              </div>
+            </div>
+
             {/* Product Details Grid */}
-            <div className="grid grid-cols-2 gap-x-8 gap-y-6 pt-8 border-t border-white/5">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-6 pt-4">
               {[
                 { label: "Fabric", value: product.fabric },
                 { label: "Embroidery", value: product.embroidery },
@@ -245,35 +313,40 @@ Please share more details.`;
                 { label: "Stitching", value: "Available" }
               ].map((item, idx) => (
                 <div key={idx} className={item.value ? "" : "opacity-30"}>
-                  <div className="text-[10px] uppercase tracking-widest text-white/40 mb-1">{item.label}</div>
-                  <div className="text-sm font-medium">{item.value || "Not Specified"}</div>
+                  <div className="text-[10px] uppercase tracking-widest text-white/40 mb-1 font-bold">{item.label}</div>
+                  <div className="text-sm font-medium text-white/80">{item.value || "Not Specified"}</div>
                 </div>
               ))}
             </div>
 
             {/* Features / Badges */}
-            <div className="flex flex-wrap gap-2 pt-4">
-              {['Handmade', 'Premium Quality', 'Secure Shipping'].map(tag => (
-                <Badge key={tag} variant="secondary" className="bg-white/5 text-white/60 hover:text-white border-white/10 px-3 py-1">
-                  {tag}
-                </Badge>
+            <div className="flex flex-wrap gap-3 pt-6">
+              {[
+                { icon: ShieldCheck, label: "Handmade" },
+                { icon: ShieldCheck, label: "Premium Quality" },
+                { icon: ShieldCheck, label: "Custom Fit" }
+              ].map((tag, idx) => (
+                <div key={idx} className="flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full">
+                  <tag.icon className="w-3.5 h-3.5 text-primary" />
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-white/60">{tag.label}</span>
+                </div>
               ))}
             </div>
 
             {/* Action Buttons (Desktop Only) */}
             <div className="hidden md:flex gap-4 pt-12">
-              <Button 
+              <Button
                 onClick={handleWhatsAppEnquiry}
-                className="flex-1 py-10 rounded-2xl text-lg gap-3"
+                className="flex-1 py-10 rounded-2xl text-xl gap-3 font-bold bg-primary hover:bg-primary/90 text-black shadow-[0_20px_40px_rgba(212,175,55,0.15)] transition-all hover:-translate-y-1 active:scale-[0.98]"
               >
-                <MessageCircle className="w-6 h-6" />
+                <MessageCircle className="w-6 h-6 fill-black" />
                 Enquire via WhatsApp
               </Button>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => toggleFavorite(product)}
-                className={`w-20 h-20 rounded-2xl border-white/10 ${liked ? "bg-primary/10 border-primary/30" : ""}`}
+                className={`w-20 h-20 rounded-2xl border-white/10 transition-all ${liked ? "bg-primary/10 border-primary/30" : "hover:bg-white/5"}`}
               >
                 <Heart className={`w-8 h-8 ${liked ? "fill-primary text-primary" : "text-white/60"}`} />
               </Button>
@@ -283,17 +356,17 @@ Please share more details.`;
       </div>
 
       {/* ── Sticky Mobile CTA ────────────────────────────────────────── */}
-      <div className="md:hidden fixed bottom-6 left-6 right-6 z-50">
+      <div className="md:hidden fixed bottom-8 left-6 right-6 z-50">
         <motion.div
           initial={{ y: 100 }}
           animate={{ y: 0 }}
-          className="bg-primary p-1.5 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+          className="bg-primary p-1 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.7)]"
         >
-          <Button 
+          <Button
             onClick={handleWhatsAppEnquiry}
-            className="w-full py-8 rounded-[22px] bg-black text-white hover:bg-[#111] border-none text-lg font-bold gap-3"
+            className="w-full py-9 rounded-[2.25rem] bg-black text-white hover:bg-[#111] border-none text-lg font-bold gap-3 active:scale-[0.98] transition-transform"
           >
-            <MessageCircle className="w-6 h-6 text-primary" />
+            <MessageCircle className="w-6 h-6 text-primary fill-primary" />
             Enquire on WhatsApp
           </Button>
         </motion.div>

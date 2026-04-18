@@ -9,8 +9,10 @@ import {
   Loader2,
   LogOut,
   Menu,
+  MessageSquareQuote,
   Package,
   X,
+  Zap,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
@@ -18,6 +20,8 @@ import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
 const NAV_ITEMS = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/admin/dashboard" },
   { icon: Package, label: "Products", path: "/admin/products" },
+  { icon: MessageSquareQuote, label: "Testimonials", path: "/admin/testimonials" },
+  { icon: Zap, label: "Special Offers", path: "/admin/offers" },
 ];
 
 export default function AdminLayout() {

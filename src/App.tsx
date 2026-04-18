@@ -14,6 +14,8 @@ import About from "./pages/About.tsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
 import AdminLogin from "./pages/admin/AdminLogin.tsx";
 import AdminProducts from "./pages/admin/AdminProducts.tsx";
+import AdminTestimonials from "./pages/admin/AdminTestimonials.tsx";
+import AdminOffers from "./pages/admin/AdminOffers.tsx";
 import Collections from "./pages/Collections.tsx";
 import Contact from "./pages/Contact.tsx";
 import Favorites from "./pages/Favorites.tsx";
@@ -50,6 +52,8 @@ const App = () => (
                 <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/products" element={<AdminProducts />} />
+                <Route path="/admin/testimonials" element={<AdminTestimonials />} />
+                <Route path="/admin/offers" element={<AdminOffers />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />
