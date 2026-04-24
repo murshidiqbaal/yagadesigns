@@ -1,5 +1,6 @@
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
+import HeroScrollAnimation from '@/components/HeroScrollAnimation';
 import FeaturedCollections from '@/components/FeaturedCollections';
 import SignatureDesigns from '@/components/SignatureDesigns';
 import WhyChooseSection from '@/components/WhyChooseSection';
@@ -14,7 +15,9 @@ export default function Index() {
       <OffersPopup />
       <Header />
       <main>
-        <HeroSection />
+        <HeroScrollAnimation>
+          <HeroSection />
+        </HeroScrollAnimation>
         <FeaturedCollections />
         <SignatureDesigns />
         <WhyChooseSection />

@@ -1,8 +1,7 @@
+import { useFavorites } from '@/hooks/useFavorites';
+import { Product, getImageUrl } from '@/lib/appwrite';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
-import { Product, getImageUrl } from '@/lib/appwrite';
-import { useFavorites } from '@/hooks/useFavorites';
-import { getWhatsAppUrl } from '@/lib/constants';
 
 interface ProductCardProps {
   product: Product;
@@ -43,7 +42,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
 
           {/* Hover Overlay */}
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-700 backdrop-blur-[2px] flex items-center justify-center text-center">
-             <div className="px-6 py-3 border border-[#D4AF37]/30 bg-black/60 backdrop-blur-md rounded-full text-[#D4AF37] text-[9px] font-bold uppercase tracking-[0.3em] scale-90 group-hover:scale-100 transition-transform duration-500">
+            <div className="px-6 py-3 border border-[#D4AF37]/30 bg-black/60 backdrop-blur-md rounded-full text-[#D4AF37] text-[9px] font-bold uppercase tracking-[0.3em] scale-90 group-hover:scale-100 transition-transform duration-500">
               Discover Piece
             </div>
           </div>
@@ -58,9 +57,8 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
         title={liked ? 'Remove from favorites' : 'Save to favorites'}
       >
         <Heart
-          className={`w-3.5 h-3.5 transition-all duration-300 group-hover/heart:scale-110 ${
-            liked ? 'fill-[#D4AF37] text-[#D4AF37]' : 'text-white/50 group-hover/heart:text-white'
-          }`}
+          className={`w-3.5 h-3.5 transition-all duration-300 group-hover/heart:scale-110 ${liked ? 'fill-[#D4AF37] text-[#D4AF37]' : 'text-white/50 group-hover/heart:text-white'
+            }`}
         />
       </button>
 
@@ -78,13 +76,13 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             {product.name}
           </h3>
           {product.variants && (product.variants as any[]).length > 1 && (
-             <div className="flex gap-1 mt-1.5 shrink-0">
-               <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]/40" />
-               <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]/20" />
-             </div>
+            <div className="flex gap-1 mt-1.5 shrink-0">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]/40" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]/20" />
+            </div>
           )}
         </div>
-        
+
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {product.price && (

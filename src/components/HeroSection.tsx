@@ -1,16 +1,31 @@
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function HeroSection() {
+  const { scrollY } = useScroll();
+  const fadeOutOpacity = useTransform(scrollY, [0, 100], [1, 0]);
+
+  const [vh, setVh] = useState(typeof window !== 'undefined' ? window.innerHeight : 1000);
+  useEffect(() => {
+    const handleResize = () => setVh(window.innerHeight);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Fade in CTAs at the very end of the 400vh scroll animation
+  const ctaOpacity = useTransform(scrollY, [vh * 2.8, vh * 3], [0, 1]);
+  const ctaPointerEvents = useTransform(scrollY, (val) => (val > vh * 2.8 ? 'auto' : 'none'));
+
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#050505]">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-transparent">
       {/* ── Atmospheric Background ─────────────────────────────── */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Deep radial gradient */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_70%_at_50%_60%,#1A1200_0%,#050505_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_70%_at_50%_60%,rgba(26,18,0,0.1)_0%,rgba(5,5,5,0.7)_70%)]" />
         {/* Outer edge vignette */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_100%_at_50%_50%,transparent_40%,#050505_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_100%_at_50%_50%,transparent_40%,rgba(5,5,5,0.9)_100%)]" />
         {/* Golden glow orbs */}
         <motion.div
           animate={{ scale: [1, 1.08, 1], opacity: [0.06, 0.1, 0.06] }}
@@ -50,7 +65,7 @@ export default function HeroSection() {
       {/* ── Content ────────────────────────────────────────────── */}
       <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
         {/* Eyebrow */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -61,34 +76,34 @@ export default function HeroSection() {
             Luxury Bridal Atelier
             <span className="w-4 h-px bg-[#D4AF37]" />
           </span>
-        </motion.div>
+        </motion.div> */}
 
         {/* Main Heading */}
-        <motion.h1
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="font-heading font-medium leading-[0.9] tracking-tight mb-8"
-        >
-          <span className="block text-white text-[clamp(58px,10vw,130px)]">Yaga</span>
-          <span className="block text-gradient italic text-[clamp(58px,10vw,130px)]">Designs</span>
-        </motion.h1>
+        <motion.div style={{ opacity: fadeOutOpacity }}>
+          <motion.h1
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="font-heading font-medium leading-[0.9] tracking-tight mb-8"
+          >
+            <span className="block text-white text-[clamp(58px,10vw,130px)]">Yaga</span>
+            <span className="block text-gradient italic text-[clamp(58px,10vw,130px)]">Designs</span>
+          </motion.h1>
+        </motion.div>
 
         {/* Tagline */}
-        <motion.p
+        {/* <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.9 }}
           className="text-white/45 text-lg md:text-xl max-w-lg mx-auto leading-relaxed mb-12 font-body"
         >
           Where dreams are woven into silk. Handcrafted bridal couture for your most cherished moment.
-        </motion.p>
+        </motion.p> */}
 
         {/* CTAs */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.1 }}
+          style={{ opacity: ctaOpacity, pointerEvents: ctaPointerEvents as any }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <Link

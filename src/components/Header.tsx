@@ -1,4 +1,4 @@
-import logoImg from '@/assets/logo.png';
+import logoImg from '@/assets/logoyaga.png';
 import { useFavorites } from '@/hooks/useFavorites';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Heart, Menu, X } from 'lucide-react';
@@ -32,18 +32,50 @@ export default function Header() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
-          ? 'bg-[#0B0B0B]/95 backdrop-blur-xl border-b border-white/5 py-3'
-          : 'py-6'
+          ? 'bg-black/10 backdrop-blur-md border-b border-white/10 py-4 shadow-sm'
+          : 'bg-transparent py-6'
         }`}
     >
       <div className="container flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center">
-          <img
-            src={logoImg}
-            alt="Yaga Designs"
-            className="h-10 w-auto mix-blend-screen opacity-95 hover:opacity-100 transition-opacity duration-300"
-          />
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="relative h-10 w-10 overflow-hidden flex items-center justify-center rounded-sm">
+            <img
+              src={logoImg}
+              alt="Yaga Designs"
+              className="absolute top-[-6px] h-12 w-auto max-w-none mix-blend-screen opacity-95 group-hover:opacity-100 transition-opacity duration-300"
+            />
+          </div>
+          <div className="flex flex-col justify-center mt-1">
+            <span
+              className="text-[28px] leading-none uppercase font-normal"
+              style={{
+                fontFamily: '"Optima", "Segoe UI", "Helvetica Neue", sans-serif',
+                background: 'linear-gradient(180deg, #FBF5B7 0%, #D4AF37 45%, #8B6914 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))'
+              }}
+            >
+              Yaga
+            </span>
+            <div className="w-full flex justify-between items-center mt-[2px] px-[1px]">
+              {"DESIGNING STUDIO".split('').map((char, i) => (
+                <span
+                  key={i}
+                  className="text-[5px] uppercase font-semibold"
+                  style={{
+                    background: char !== ' ' ? 'linear-gradient(180deg, #FFFFFF 0%, #D4AF37 100%)' : 'none',
+                    WebkitBackgroundClip: char !== ' ' ? 'text' : 'border-box',
+                    WebkitTextFillColor: char !== ' ' ? 'transparent' : 'currentColor',
+                    filter: char !== ' ' ? 'drop-shadow(0px 1px 1px rgba(0,0,0,0.8))' : 'none'
+                  }}
+                >
+                  {char === ' ' ? '\u00A0' : char}
+                </span>
+              ))}
+            </div>
+          </div>
         </Link>
 
         {/* Desktop Nav */}
@@ -74,8 +106,8 @@ export default function Header() {
           >
             <Heart
               className={`w-5 h-5 transition-all duration-300 ${favorites.length > 0
-                  ? 'fill-[#D4AF37] text-[#D4AF37]'
-                  : 'text-white/60 group-hover:text-[#D4AF37]'
+                ? 'fill-[#D4AF37] text-[#D4AF37]'
+                : 'text-white/60 group-hover:text-[#D4AF37]'
                 }`}
             />
             {favorites.length > 0 && (

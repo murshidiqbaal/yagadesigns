@@ -56,7 +56,7 @@ export default function OffersPopup() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-4xl bg-[#0A0A0A] rounded-[2.5rem] border border-white/10 overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.8)]"
+            className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-[#0A0A0A] rounded-[2.5rem] border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.8)]"
           >
             {/* Close Button */}
             <button
@@ -68,7 +68,7 @@ export default function OffersPopup() {
 
             <div className="flex flex-col md:flex-row min-h-[460px]">
               {/* Media Section */}
-              <div className="w-full md:w-1/2 relative bg-[#111]">
+              <div className="w-full h-56 md:h-auto md:w-1/2 relative bg-[#111] shrink-0">
                 {offer.image_url ? (
                   <>
                     <img
@@ -87,7 +87,7 @@ export default function OffersPopup() {
               </div>
 
               {/* Content Section */}
-              <div className="w-full md:w-1/2 p-8 md:p-14 flex flex-col justify-center relative overflow-hidden">
+              <div className="w-full md:w-1/2 p-6 md:p-14 flex flex-col justify-center relative overflow-hidden">
                 {/* Decorative Pattern */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full pointer-events-none" />
                 
