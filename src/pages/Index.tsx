@@ -7,11 +7,11 @@ import HeroSection from '@/components/HeroSection';
 import OffersPopup from '@/components/OffersPopup';
 import SignatureDesigns from '@/components/SignatureDesigns';
 import Testimonials from '@/components/Testimonials';
-import WhyChooseSection from '@/components/WhyChooseSection';
+// import WhyChooseSection from '@/components/WhyChooseSection';
 
 export default function Index() {
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="site-shell min-h-screen">
       <OffersPopup />
       <Header />
       <main>
@@ -19,8 +19,9 @@ export default function Index() {
           <HeroSection />
         </HeroScrollAnimation>
         <FeaturedCollections />
+        {/* <InstagramShowcaseSection /> */}
         <SignatureDesigns />
-        <WhyChooseSection />
+        {/* <WhyChooseSection /> */}
         <Testimonials />
         <CTASection />
       </main>

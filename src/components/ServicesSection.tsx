@@ -68,7 +68,7 @@ export default function ServicesSection() {
                   <img
                     src={s.imageUrl}
                     alt={s.title}
-                    className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:scale-110 transition-transform duration-[1500ms] ease-out z-[-2]"
+                    className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:scale-110 transition-transform duration-1000 ease-out z-[-2]"
                   />
                 )}
                 {/* Image darkening gradient */}

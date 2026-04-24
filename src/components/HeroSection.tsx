@@ -1,8 +1,8 @@
+import { getWhatsAppUrl } from '@/lib/constants';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getWhatsAppUrl } from '@/lib/constants';
 
 export default function HeroSection() {
   const { scrollY } = useScroll();

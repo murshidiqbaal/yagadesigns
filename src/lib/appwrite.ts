@@ -168,6 +168,10 @@ export async function createTestimonial(testimonial: Omit<Testimonial, '$id'>): 
   return databases.createDocument(DATABASE_ID, TESTIMONIALS_COLLECTION, ID.unique(), payload) as unknown as Testimonial;
 }
 
+export async function updateTestimonial(id: string, data: Partial<Omit<Testimonial, '$id'>>): Promise<Testimonial> {
+  return databases.updateDocument(DATABASE_ID, TESTIMONIALS_COLLECTION, id, data) as unknown as Testimonial;
+}
+
 export async function deleteTestimonial(id: string): Promise<void> {
   await databases.deleteDocument(DATABASE_ID, TESTIMONIALS_COLLECTION, id);
 }

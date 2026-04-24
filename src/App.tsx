@@ -10,6 +10,7 @@ import FloatingWhatsApp from "./components/FloatingWhatsApp.tsx";
 import MobileBottomNav from "./components/MobileBottomNav.tsx";
 import SmoothScroll from "./components/SmoothScroll.tsx";
 import { AuthProvider } from "./hooks/useAuth.tsx";
+import { FavoritesProvider } from "./context/FavoritesContext.tsx";
 import About from "./pages/About.tsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
 import AdminLogin from "./pages/admin/AdminLogin.tsx";
@@ -28,39 +29,41 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <SmoothScroll>
-          <Toaster />
-          <Sonner />
-          <HashRouter>
-            <KeyboardShortcuts />
-            <CursorParticles />
-            <MobileBottomNav />
-            <FloatingWhatsApp />
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Index />} />
-              <Route path="/collections" element={<Collections />} />
-              <Route path="/favorites" element={<Favorites />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
+      <FavoritesProvider>
+        <TooltipProvider>
+          <SmoothScroll>
+            <Toaster />
+            <Sonner />
+            <HashRouter>
+              <KeyboardShortcuts />
+              <CursorParticles />
+              <MobileBottomNav />
+              <FloatingWhatsApp />
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<Index />} />
+                <Route path="/collections" element={<Collections />} />
+                <Route path="/favorites" element={<Favorites />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/product/:id" element={<ProductDetail />} />
 
-              {/* Admin Routes */}
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route element={<AdminLayout />}>
-                <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/products" element={<AdminProducts />} />
-                <Route path="/admin/testimonials" element={<AdminTestimonials />} />
-                <Route path="/admin/offers" element={<AdminOffers />} />
-              </Route>
+                {/* Admin Routes */}
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route element={<AdminLayout />}>
+                  <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                  <Route path="/admin/products" element={<AdminProducts />} />
+                  <Route path="/admin/testimonials" element={<AdminTestimonials />} />
+                  <Route path="/admin/offers" element={<AdminOffers />} />
+                </Route>
 
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </HashRouter>
-        </SmoothScroll>
-      </TooltipProvider>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </HashRouter>
+          </SmoothScroll>
+        </TooltipProvider>
+      </FavoritesProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

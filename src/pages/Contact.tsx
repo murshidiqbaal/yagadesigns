@@ -38,18 +38,18 @@ const CONTACT_ITEMS = [
   {
     icon: Instagram,
     label: 'Instagram',
-    value: '@yagadesigns',
+    value: '@yaga_designs',
     sub: 'Follow our latest creations',
-    color: 'text-purple-400',
-    bg: 'bg-purple-500/10',
+    color: 'text-[#F6C67A]',
+    bg: 'bg-[#F6C67A]/10',
     border: 'border-white/5',
-    href: 'https://instagram.com/yagadesigns',
+    href: 'https://instagram.com/yaga_designs',
   },
 ];
 
 export default function Contact() {
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="site-shell min-h-screen">
       <Header />
       <main className="pt-28 pb-24">
         <div className="container">

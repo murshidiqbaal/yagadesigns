@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquareQuote, Plus, Trash2, Star, User, Loader2, X } from "lucide-react";
-import { getTestimonials, createTestimonial, deleteTestimonial, Testimonial, uploadProductImage, getImageUrl } from "@/lib/appwrite";
+import { getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial, Testimonial, uploadProductImage, getImageUrl } from "@/lib/appwrite";
+import { Edit2, MessageSquareQuote, Plus, Trash2, Star, User, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +13,7 @@ export default function AdminTestimonials() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -49,22 +50,47 @@ export default function AdminTestimonials() {
         avatarUrl = await uploadProductImage(selectedFile);
       }
 
-      await createTestimonial({
-        ...form,
-        avatar_url: avatarUrl
-      });
+      if (editingId) {
+        await updateTestimonial(editingId, {
+          ...form,
+          avatar_url: avatarUrl
+        });
+        toast.success("Testimonial updated!");
+      } else {
+        await createTestimonial({
+          ...form,
+          avatar_url: avatarUrl
+        });
+        toast.success("Testimonial added!");
+      }
       
-      toast.success("Testimonial added successfully!");
-      setIsModalOpen(false);
-      setForm({ name: "", content: "", rating: 5, avatar_url: "" });
-      setSelectedFile(null);
-      setPreviewUrl(null);
+      handleCloseModal();
       fetchTestimonials();
     } catch (error) {
       toast.error("Failed to save testimonial.");
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleEdit = (t: Testimonial) => {
+    setForm({
+      name: t.name,
+      content: t.content,
+      rating: t.rating,
+      avatar_url: t.avatar_url || "",
+    });
+    setEditingId(t.$id);
+    setPreviewUrl(t.avatar_url ? getImageUrl(t.avatar_url) : null);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingId(null);
+    setForm({ name: "", content: "", rating: 5, avatar_url: "" });
+    setSelectedFile(null);
+    setPreviewUrl(null);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,7 +127,7 @@ export default function AdminTestimonials() {
             Manage your boutique's reputation
           </p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)} className="gap-2 h-12 px-6 rounded-xl">
+        <Button onClick={() => { setEditingId(null); setIsModalOpen(true); }} className="gap-2 h-12 px-6 rounded-xl">
           <Plus className="w-4 h-4" /> Add Review
         </Button>
       </div>
@@ -142,14 +168,24 @@ export default function AdminTestimonials() {
                     </div>
                   </div>
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="opacity-0 group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive transition-all"
-                  onClick={() => handleDelete(t.$id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="opacity-0 group-hover:opacity-100 hover:bg-white/5 transition-all"
+                    onClick={() => handleEdit(t)}
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="opacity-0 group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive transition-all"
+                    onClick={() => handleDelete(t.$id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed italic">"{t.content}"</p>
             </motion.div>
@@ -169,8 +205,8 @@ export default function AdminTestimonials() {
               className="w-full max-w-lg bg-[#0A0A0A] border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl"
             >
               <div className="p-8 border-b border-white/5 flex items-center justify-between">
-                <h3 className="text-2xl font-heading">New Testimonial</h3>
-                <button onClick={() => setIsModalOpen(false)} className="text-muted-foreground hover:text-white transition-colors"><X className="w-6 h-6" /></button>
+                <h3 className="text-2xl font-heading">{editingId ? "Edit Testimonial" : "New Testimonial"}</h3>
+                <button onClick={handleCloseModal} className="text-muted-foreground hover:text-white transition-colors"><X className="w-6 h-6" /></button>
               </div>
               <form onSubmit={handleSubmit} className="p-8 space-y-6">
                 <div className="space-y-4">
@@ -223,7 +259,7 @@ export default function AdminTestimonials() {
                   />
                 </div>
                 <Button type="submit" disabled={isSaving} className="w-full h-14 text-lg font-bold">
-                  {isSaving ? "Publishing Love..." : "Publish Testimonial"}
+                  {isSaving ? "Saving..." : editingId ? "Update Testimonial" : "Publish Testimonial"}
                 </Button>
               </form>
             </motion.div>

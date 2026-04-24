@@ -10,7 +10,7 @@ export default function Favorites() {
   const { favorites, removeFavorite } = useFavorites();
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="site-shell min-h-screen">
       <Header />
       <main className="pt-28 pb-24">
         <div className="container">

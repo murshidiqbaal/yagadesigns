@@ -32,7 +32,7 @@ const STATS = [
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="site-shell min-h-screen">
       <Header />
       <main>
         {/* ── Hero ──────────────────────────────────────────────── */}

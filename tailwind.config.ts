@@ -19,8 +19,9 @@ export default {
         'elegant': '0.15em',
       },
       fontFamily: {
-        heading: ['"Playfair Display"', 'serif'],
-        body: ['Inter', 'sans-serif'],
+        heading: ['"Cormorant Garamond"', 'serif'],
+        body: ['"Manrope"', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",

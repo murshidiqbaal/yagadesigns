@@ -85,7 +85,7 @@ export default function PortfolioSection() {
                   src={item.image_url}
                   alt={`${item.title} - luxury bridal design by Yaga Designs`}
                   loading="lazy"
-                  className="w-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-[1500ms] ease-out"
+                  className="w-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000 ease-out"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0B] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-end p-10">
                   <div>

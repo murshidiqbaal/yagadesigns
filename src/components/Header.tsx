@@ -104,17 +104,29 @@ export default function Header() {
             className="relative p-2 group"
             title="My Favorites"
           >
-            <Heart
-              className={`w-5 h-5 transition-all duration-300 ${favorites.length > 0
-                ? 'fill-[#D4AF37] text-[#D4AF37]'
-                : 'text-white/60 group-hover:text-[#D4AF37]'
-                }`}
-            />
-            {favorites.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#D4AF37] text-black text-[10px] font-bold flex items-center justify-center leading-none">
-                {favorites.length}
-              </span>
-            )}
+            <motion.div
+              animate={{ scale: favorites.length > 0 ? [1, 1.2, 1] : 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Heart
+                className={`w-5 h-5 transition-all duration-300 ${favorites.length > 0
+                  ? 'fill-[#D4AF37] text-[#D4AF37]'
+                  : 'text-white/60 group-hover:text-[#D4AF37]'
+                  }`}
+              />
+            </motion.div>
+            <AnimatePresence>
+              {favorites.length > 0 && (
+                <motion.span
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#D4AF37] text-black text-[10px] font-bold flex items-center justify-center leading-none"
+                >
+                  {favorites.length}
+                </motion.span>
+              )}
+            </AnimatePresence>
           </Link>
 
           <button
