@@ -1,13 +1,13 @@
-import Header from '@/components/Header';
-import HeroSection from '@/components/HeroSection';
-import HeroScrollAnimation from '@/components/HeroScrollAnimation';
-import FeaturedCollections from '@/components/FeaturedCollections';
-import SignatureDesigns from '@/components/SignatureDesigns';
-import WhyChooseSection from '@/components/WhyChooseSection';
-import Testimonials from '@/components/Testimonials';
 import CTASection from '@/components/CTASection';
+import FeaturedCollections from '@/components/FeaturedCollections';
 import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import HeroScrollAnimation from '@/components/HeroScrollAnimation';
+import HeroSection from '@/components/HeroSection';
 import OffersPopup from '@/components/OffersPopup';
+import SignatureDesigns from '@/components/SignatureDesigns';
+import Testimonials from '@/components/Testimonials';
+import WhyChooseSection from '@/components/WhyChooseSection';
 
 export default function Index() {
   return (

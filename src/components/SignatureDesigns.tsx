@@ -1,7 +1,7 @@
-import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { getProducts } from "@/lib/appwrite";
+import { useQuery } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 
 /* ─── Font Injection ──────────────────────────────────────────────── */
@@ -61,11 +61,11 @@ function ProcessSection() {
         {/* Timeline */}
         <div className="relative">
           {/* vertical line */}
-          <div 
+          <div
             className="absolute left-4 sm:left-1/2 top-0 bottom-0 w-[1px] transform -translate-x-1/2"
             style={{
               background: "linear-gradient(to bottom, transparent, rgba(212,175,55,0.25) 15%, rgba(212,175,55,0.25) 85%, transparent)",
-            }} 
+            }}
           />
 
           {STEPS.map((step, i) => (
@@ -78,7 +78,7 @@ function ProcessSection() {
               className={`flex mb-14 relative w-full ${i % 2 === 0 ? 'justify-start' : 'sm:justify-end justify-start'}`}
             >
               {/* Dot on line */}
-              <div 
+              <div
                 className="absolute left-4 sm:left-1/2 top-5 sm:top-[1.2rem] transform -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full border border-[#D4AF37] bg-[#060606] z-[2]"
                 style={{ boxShadow: "0 0 12px rgba(212,175,55,0.3)" }}
               />
@@ -87,7 +87,7 @@ function ProcessSection() {
               <div className={`w-full sm:w-[43%] pl-10 sm:pl-0 ${i % 2 === 0 ? 'sm:pr-12' : 'sm:pl-12'}`}>
                 <div className="bg-white/[0.02] border border-[#D4AF37]/10 rounded-sm p-6 sm:p-7 relative overflow-hidden group hover:border-[#D4AF37]/30 transition-colors duration-500">
                   {/* Step number watermark */}
-                  <div 
+                  <div
                     className={`absolute bottom-[-0.75rem] font-heading text-6xl font-light text-[#D4AF37]/[0.06] leading-none select-none pointer-events-none ${i % 2 === 0 ? 'right-[-0.5rem]' : 'sm:left-[-0.5rem] right-[-0.5rem]'}`}
                   >
                     {step.num}

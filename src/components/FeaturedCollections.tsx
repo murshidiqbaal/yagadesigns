@@ -1,7 +1,9 @@
 'use client';
 
+import { getProducts } from '@/lib/appwrite';
+import { useQuery } from '@tanstack/react-query';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { MouseEvent, useRef } from 'react';
+import { MouseEvent, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 /* ─── Google Fonts injected once ─────────────────────────────────── */
@@ -57,11 +59,12 @@ const COLLECTIONS = [
   },
 ];
 
-const STATS = [
-  { value: '2,400+', label: 'Designs' },
-  { value: '18', label: 'Years of craft' },
-  { value: '99%', label: 'Happy brides' },
-];
+const STATS_LABELS = {
+  DESIGNS: 'Designs',
+  YEARS: 'Years of craft',
+  HAPPY: 'Happy brides'
+};
+
 
 /* ─── Marquee ─────────────────────────────────────────────────────── */
 const MARQUEE_TEXT = Array(8)
@@ -319,8 +322,38 @@ function TiltCard({
 
 /* ─── Main component ──────────────────────────────────────────────── */
 export default function FeaturedCollections() {
+  const { data: products = [] } = useQuery({
+    queryKey: ['products-all'],
+    queryFn: () => getProducts(),
+  });
+
+  // Calculate real counts per category
+  const counts = useMemo(() => {
+    return {
+      Bridal: products.filter(p => p.category === 'Bridal').length,
+      Engagement: products.filter(p => p.category === 'Engagement').length,
+      Reception: products.filter(p => p.category === 'Reception' || p.category === 'Party Wear').length,
+      Total: products.length
+    };
+  }, [products]);
+
+  // Merge counts into COLLECTIONS data
+  const dynamicCollections = useMemo(() => {
+    return COLLECTIONS.map(col => ({
+      ...col,
+      pieces: `${counts[col.id as keyof typeof counts] || 0} Pieces`
+    }));
+  }, [counts]);
+
+  const dynamicStats = useMemo(() => [
+    { value: `${counts.Total}+`, label: STATS_LABELS.DESIGNS },
+    { value: '18', label: STATS_LABELS.YEARS },
+    { value: '99%', label: STATS_LABELS.HAPPY },
+  ], [counts.Total]);
+
   return (
     <>
+
       <FontInjector />
 
       <section
@@ -442,7 +475,7 @@ export default function FeaturedCollections() {
               borderBottom: '1px solid rgba(212,175,55,0.1)',
             }}
           >
-            {STATS.map((stat, i) => (
+            {dynamicStats.map((stat, i) => (
               <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, y: 20 }}
@@ -489,7 +522,7 @@ export default function FeaturedCollections() {
               marginBottom: '5rem',
             }}
           >
-            {COLLECTIONS.map((col, i) => (
+            {dynamicCollections.map((col, i) => (
               <TiltCard key={col.id} col={col} index={i} />
             ))}
           </div>

@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquareQuote, Plus, Trash2, Star, User, Loader2, X } from "lucide-react";
-import { getTestimonials, createTestimonial, deleteTestimonial, Testimonial } from "@/lib/appwrite";
+import { getTestimonials, createTestimonial, deleteTestimonial, Testimonial, uploadProductImage, getImageUrl } from "@/lib/appwrite";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { ImagePlus, Upload } from "lucide-react";
 
 export default function AdminTestimonials() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -19,6 +20,8 @@ export default function AdminTestimonials() {
     rating: 5,
     avatar_url: "",
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTestimonials();
@@ -40,15 +43,39 @@ export default function AdminTestimonials() {
 
     setIsSaving(true);
     try {
-      await createTestimonial(form);
+      let avatarUrl = form.avatar_url;
+      
+      if (selectedFile) {
+        avatarUrl = await uploadProductImage(selectedFile);
+      }
+
+      await createTestimonial({
+        ...form,
+        avatar_url: avatarUrl
+      });
+      
       toast.success("Testimonial added successfully!");
       setIsModalOpen(false);
       setForm({ name: "", content: "", rating: 5, avatar_url: "" });
+      setSelectedFile(null);
+      setPreviewUrl(null);
       fetchTestimonials();
     } catch (error) {
       toast.error("Failed to save testimonial.");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image must be less than 5MB");
+        return;
+      }
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
     }
   };
 
@@ -103,8 +130,8 @@ export default function AdminTestimonials() {
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
-                    {t.avatar_url ? <img src={t.avatar_url} className="w-full h-full object-cover rounded-full" /> : <User className="w-5 h-5" />}
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20 overflow-hidden">
+                    {t.avatar_url ? <img src={getImageUrl(t.avatar_url)} className="w-full h-full object-cover" /> : <User className="w-5 h-5" />}
                   </div>
                   <div>
                     <h4 className="font-heading text-lg">{t.name}</h4>
@@ -146,6 +173,26 @@ export default function AdminTestimonials() {
                 <button onClick={() => setIsModalOpen(false)} className="text-muted-foreground hover:text-white transition-colors"><X className="w-6 h-6" /></button>
               </div>
               <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                      {previewUrl ? (
+                        <img src={previewUrl} className="w-full h-full object-cover" />
+                      ) : (
+                        <ImagePlus className="w-8 h-8 text-white/20" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block mb-2">Client Photo</label>
+                      <label className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition-colors w-max">
+                        <Upload className="w-4 h-4 text-primary" />
+                        <span className="text-xs font-medium">Select Image</span>
+                        <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mr-1">Client Name</label>
                   <Input 

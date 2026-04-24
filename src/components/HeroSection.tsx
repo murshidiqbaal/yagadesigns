@@ -2,6 +2,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { getWhatsAppUrl } from '@/lib/constants';
 
 export default function HeroSection() {
   const { scrollY } = useScroll();
@@ -14,12 +15,12 @@ export default function HeroSection() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Fade in CTAs at the very end of the 400vh scroll animation
-  const ctaOpacity = useTransform(scrollY, [vh * 2.8, vh * 3], [0, 1]);
-  const ctaPointerEvents = useTransform(scrollY, (val) => (val > vh * 2.8 ? 'auto' : 'none'));
+  // Fade in CTAs before the animation finishes (around 3.2vh to 3.5vh)
+  const ctaOpacity = useTransform(scrollY, [vh * 3.2, vh * 3.5], [0, 1], { clamp: true });
+  const ctaPointerEvents = useTransform(scrollY, (val) => (val > vh * 3.2 ? 'auto' : 'none'));
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-transparent">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-transparent sticky top-0 z-50">
       {/* ── Atmospheric Background ─────────────────────────────── */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Deep radial gradient */}
@@ -108,17 +109,19 @@ export default function HeroSection() {
         >
           <Link
             to="/collections"
-            id="hero-explore-cta"
+            id="hero-view-collection"
             className="px-10 py-4 bg-[#D4AF37] text-black text-sm font-bold uppercase tracking-widest rounded-full hover:bg-[#FFFBD5] hover:shadow-[0_0_40px_rgba(212,175,55,0.45)] transition-all duration-300"
           >
-            Explore Collection
+            View Collection
           </Link>
-          <Link
-            to="/about"
+          <a
+            href={getWhatsAppUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
             className="px-10 py-4 border border-white/15 text-white/70 text-sm font-bold uppercase tracking-widest rounded-full hover:border-[#D4AF37]/40 hover:text-[#D4AF37] transition-all duration-300"
           >
-            Our Story
-          </Link>
+            Enquiry Now
+          </a>
         </motion.div>
       </div>
 

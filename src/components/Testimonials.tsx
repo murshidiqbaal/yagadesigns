@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, MessageSquareQuote, ChevronLeft, ChevronRight, User } from "lucide-react";
-import { getTestimonials, Testimonial } from "@/lib/appwrite";
+import { getTestimonials, Testimonial, getImageUrl } from "@/lib/appwrite";
 import { Button } from "./ui/button";
 
 export default function Testimonials() {
@@ -101,7 +101,7 @@ export default function Testimonials() {
                 <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 p-1">
                    <div className="w-full h-full rounded-full bg-primary/10 flex items-center justify-center text-primary overflow-hidden">
                       {current.avatar_url ? (
-                        <img src={current.avatar_url} className="w-full h-full object-cover" />
+                        <img src={getImageUrl(current.avatar_url)} className="w-full h-full object-cover" />
                       ) : (
                         <User className="w-8 h-8 opacity-40" />
                       )}
