@@ -11,7 +11,7 @@ import Testimonials from '@/components/Testimonials';
 
 export default function Index() {
   return (
-    <div className="site-shell min-h-screen">
+    <div className="site-shell min-h-screen overflow-x-hidden">
       <OffersPopup />
       <Header />
       <main>

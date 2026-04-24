@@ -27,12 +27,12 @@ const STEPS = [
 
 function ProcessSection() {
   return (
-    <section style={{ padding: "7rem 0", background: "#060606", position: "relative" }}>
+    <section style={{ padding: "7rem 0", background: "#060606", position: "relative", overflow: "hidden" }}>
       {/* bg accent */}
       <div style={{
         position: "absolute", top: "50%", left: "50%",
         transform: "translate(-50%,-50%)",
-        width: 700, height: 400,
+        width: "min(700px, 150%)", height: "min(400px, 100%)",
         background: "radial-gradient(ellipse, rgba(212,175,55,0.03) 0%, transparent 65%)",
         pointerEvents: "none",
       }} />

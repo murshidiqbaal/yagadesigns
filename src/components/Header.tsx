@@ -31,24 +31,28 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
-          ? 'bg-black/10 backdrop-blur-md border-b border-white/10 py-4 shadow-sm'
-          : 'bg-transparent py-6'
+      className={`fixed z-50 transition-all duration-700 ease-in-out ${scrolled
+        ? 'top-4 left-1/2 -translate-x-1/2 w-fit max-w-[95vw] bg-black/40 backdrop-blur-xl border border-white/10 rounded-full py-2 px-8 shadow-2xl'
+        : 'top-0 left-0 right-0 w-full bg-transparent py-6'
         }`}
     >
-      <div className="container flex items-center justify-between">
+      <div className={`flex items-center justify-between transition-all duration-500 ${scrolled ? 'gap-10' : 'container'
+        }`}>
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <div className="relative h-10 w-10 overflow-hidden flex items-center justify-center rounded-sm">
+          <div className={`relative overflow-hidden flex items-center justify-center rounded-sm transition-all duration-500 ${scrolled ? 'h-7 w-7' : 'h-10 w-10'
+            }`}>
             <img
               src={logoImg}
               alt="Yaga Designs"
-              className="absolute top-[-6px] h-12 w-auto max-w-none mix-blend-screen opacity-95 group-hover:opacity-100 transition-opacity duration-300"
+              className={`absolute h-auto max-w-none mix-blend-screen opacity-95 group-hover:opacity-100 transition-all duration-500 ${scrolled ? 'top-[-4px] h-8' : 'top-[-6px] h-12'
+                }`}
             />
           </div>
-          <div className="flex flex-col justify-center mt-1">
+          <div className="flex flex-col justify-center">
             <span
-              className="text-[28px] leading-none uppercase font-normal"
+              className={`leading-none uppercase font-normal transition-all duration-500 ${scrolled ? 'text-lg' : 'text-[28px]'
+                }`}
               style={{
                 fontFamily: '"Optima", "Segoe UI", "Helvetica Neue", sans-serif',
                 background: 'linear-gradient(180deg, #FBF5B7 0%, #D4AF37 45%, #8B6914 100%)',
@@ -59,7 +63,8 @@ export default function Header() {
             >
               Yaga
             </span>
-            <div className="w-full flex justify-between items-center mt-[2px] px-[1px]">
+            <div className={`w-full flex justify-between items-center transition-all duration-500 overflow-hidden ${scrolled ? 'h-0 opacity-0' : 'h-2 mt-[2px] px-[1px] opacity-100'
+              }`}>
               {"DESIGNING STUDIO".split('').map((char, i) => (
                 <span
                   key={i}
@@ -79,13 +84,14 @@ export default function Header() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className={`hidden md:flex items-center transition-all duration-500 ${scrolled ? 'gap-6' : 'gap-8'
+          }`}>
           {NAV_LINKS.map(link => (
             <Link
               key={link.to}
               to={link.to}
-              className={`text-xs font-bold uppercase tracking-widest transition-colors duration-300 relative group ${isActive(link.to) ? 'text-[#D4AF37]' : 'text-white/60 hover:text-white'
-                }`}
+              className={`font-bold uppercase tracking-widest transition-all duration-300 relative group ${isActive(link.to) ? 'text-[#D4AF37]' : 'text-white/60 hover:text-white'
+                } ${scrolled ? 'text-[10px]' : 'text-xs'}`}
             >
               {link.label}
               <span
@@ -97,7 +103,7 @@ export default function Header() {
         </nav>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-3">
+        <div className={`flex items-center transition-all duration-500 ${scrolled ? 'gap-1' : 'gap-3'}`}>
           <Link
             to="/favorites"
             id="nav-favorites"
@@ -109,7 +115,7 @@ export default function Header() {
               transition={{ duration: 0.3 }}
             >
               <Heart
-                className={`w-5 h-5 transition-all duration-300 ${favorites.length > 0
+                className={`transition-all duration-300 ${scrolled ? 'w-4 h-4' : 'w-5 h-5'} ${favorites.length > 0
                   ? 'fill-[#D4AF37] text-[#D4AF37]'
                   : 'text-white/60 group-hover:text-[#D4AF37]'
                   }`}
@@ -121,7 +127,8 @@ export default function Header() {
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0, opacity: 0 }}
-                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#D4AF37] text-black text-[10px] font-bold flex items-center justify-center leading-none"
+                  className={`absolute rounded-full bg-[#D4AF37] text-black font-bold flex items-center justify-center leading-none ${scrolled ? '-top-0.5 -right-0.5 w-3 h-3 text-[8px]' : '-top-1 -right-1 w-4 h-4 text-[10px]'
+                    }`}
                 >
                   {favorites.length}
                 </motion.span>
@@ -138,6 +145,7 @@ export default function Header() {
           </button>
         </div>
       </div>
+
 
       {/* Mobile Menu */}
       <AnimatePresence>
