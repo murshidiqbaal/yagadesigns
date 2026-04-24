@@ -1,5 +1,8 @@
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getProducts } from "@/lib/appwrite";
+import ProductCard from "./ProductCard";
 
 /* ─── Font Injection ──────────────────────────────────────────────── */
 const injectFonts = () => {
@@ -12,293 +15,7 @@ const injectFonts = () => {
   }
 };
 
-/* ─── Mock Products ───────────────────────────────────────────────── */
-const PRODUCTS = [
-  { id: "1", name: "Crimson Bridal Lehenga", category: "Bridal", price: "₹1,85,000", tag: "New Arrival", color: "from-[#3d0a0a] to-[#1a0202]", accent: "#E07070", customizable: true, variants: 3 },
-  { id: "2", name: "Ivory Pearl Anarkali", category: "Engagement", price: "₹72,000", tag: "Bestseller", color: "from-[#1e1a10] to-[#0e0c06]", accent: "#D4AF37", customizable: true, variants: 2 },
-  { id: "3", name: "Midnight Blue Sharara Set", category: "Reception", price: "₹98,500", tag: "Exclusive", color: "from-[#060d2e] to-[#020510]", accent: "#7BA7E0", customizable: false, variants: 1 },
-  { id: "4", name: "Rose Gold Tissue Saree", category: "Bridal", price: "₹1,20,000", tag: "Curated", color: "from-[#2d1a1a] to-[#120a0a]", accent: "#E8A0A0", customizable: true, variants: 4 },
-  { id: "5", name: "Emerald Velvet Lehenga", category: "Engagement", price: "₹1,42,000", tag: "New Arrival", color: "from-[#071a10] to-[#030c07]", accent: "#6EC49A", customizable: true, variants: 2 },
-  { id: "6", name: "Champagne Organza Gown", category: "Reception", price: "₹88,000", tag: "Bestseller", color: "from-[#1f1810] to-[#0e0c08]", accent: "#D4C090", customizable: false, variants: 1 },
-  { id: "7", name: "Antique Gold Gharara", category: "Bridal", price: "₹2,10,000", tag: "Limited", color: "from-[#251800] to-[#0f0b00]", accent: "#D4AF37", customizable: true, variants: 3 },
-  { id: "8", name: "Dusty Rose Palazzo Set", category: "Reception", price: "₹64,000", tag: "Curated", color: "from-[#2d1520] to-[#12090d]", accent: "#D4A0B8", customizable: true, variants: 2 },
-  { id: "9", name: "Cobalt Mirror Work Suit", category: "Engagement", price: "₹56,500", tag: "Exclusive", color: "from-[#071428] to-[#030810]", accent: "#8AB4E8", customizable: false, variants: 1 },
-  { id: "10", name: "Ombré Sunset Lehenga", category: "Bridal", price: "₹1,68,000", tag: "New Arrival", color: "from-[#2a1008] to-[#120602]", accent: "#E0A070", customizable: true, variants: 2 },
-  { id: "11", name: "Silver Tissue Anarkali", category: "Reception", price: "₹79,000", tag: "Bestseller", color: "from-[#181a1a] to-[#080a0a]", accent: "#C0C8D0", customizable: true, variants: 3 },
-  { id: "12", name: "Plum Georgette Saree", category: "Engagement", price: "₹45,000", tag: "Curated", color: "from-[#1a0a2e] to-[#0a0514]", accent: "#C084FC", customizable: false, variants: 1 },
-];
-
 const CATEGORIES = ["All", "Bridal", "Engagement", "Reception"];
-
-const TAG_COLORS = {
-  "New Arrival": { bg: "rgba(212,175,55,0.12)", text: "#D4AF37", border: "rgba(212,175,55,0.25)" },
-  "Bestseller": { bg: "rgba(110,196,154,0.1)", text: "#6EC49A", border: "rgba(110,196,154,0.2)" },
-  "Exclusive": { bg: "rgba(192,132,252,0.1)", text: "#C084FC", border: "rgba(192,132,252,0.2)" },
-  "Curated": { bg: "rgba(255,255,255,0.06)", text: "rgba(255,255,255,0.5)", border: "rgba(255,255,255,0.12)" },
-  "Limited": { bg: "rgba(224,112,112,0.1)", text: "#E07070", border: "rgba(224,112,112,0.2)" },
-};
-
-/* ─── Tilt Card ───────────────────────────────────────────────────── */
-function ProductCard({ product, index }) {
-  const [liked, setLiked] = useState(false);
-  const [hovered, setHovered] = useState(false);
-  const ref = useRef(null);
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const sx = useSpring(mx, { stiffness: 150, damping: 25 });
-  const sy = useSpring(my, { stiffness: 150, damping: 25 });
-  const rotX = useTransform(sy, [-0.5, 0.5], [5, -5]);
-  const rotY = useTransform(sx, [-0.5, 0.5], [-5, 5]);
-  const tag = TAG_COLORS[product.tag] || TAG_COLORS["Curated"];
-
-  const onMove = (e) => {
-    if (!ref.current) return;
-    const r = ref.current.getBoundingClientRect();
-    mx.set((e.clientX - r.left) / r.width - 0.5);
-    my.set((e.clientY - r.top) / r.height - 0.5);
-  };
-  const onLeave = () => { mx.set(0); my.set(0); setHovered(false); };
-
-  return (
-    <motion.div
-      ref={ref}
-      style={{ perspective: 900 }}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      onMouseEnter={() => setHovered(true)}
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.85, delay: (index % 4) * 0.1, ease: [0.22, 1, 0.36, 1] }}
-      className="cursor-pointer"
-    >
-      <motion.div style={{ rotateX: rotX, rotateY: rotY, transformStyle: "preserve-3d" }}>
-        <a href={`#/product/${product.id}`} style={{ display: "block", textDecoration: "none" }}>
-          <div style={{
-            position: "relative",
-            background: "#0A0A0A",
-            border: `1px solid ${hovered ? "rgba(212,175,55,0.2)" : "rgba(255,255,255,0.05)"}`,
-            borderRadius: 2,
-            overflow: "hidden",
-            transition: "border-color 0.5s ease",
-          }}>
-            {/* Image Area */}
-            <div style={{ position: "relative", aspectRatio: "3/4.2", overflow: "hidden" }}>
-              {/* Gradient placeholder (swap with <img> for real images) */}
-              <div style={{
-                width: "100%", height: "100%",
-                background: `radial-gradient(ellipse at 40% 30%, ${product.color.replace("from-[", "").replace("]", "").split(" to-[")[0].replace("from-", "")} 0%, ${product.color.split("to-[")[1]?.replace("]", "") || "#060606"} 100%)`,
-                transition: "transform 1s ease",
-                transform: hovered ? "scale(1.06)" : "scale(1)",
-              }}>
-                {/* Decorative inner lines */}
-                <div style={{
-                  position: "absolute", inset: 0,
-                  backgroundImage: `repeating-linear-gradient(135deg, transparent, transparent 60px, rgba(255,255,255,0.015) 60px, rgba(255,255,255,0.015) 61px)`,
-                }} />
-                {/* Center monogram */}
-                <div style={{
-                  position: "absolute", inset: 0,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <span style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: 80,
-                    fontWeight: 300,
-                    fontStyle: "italic",
-                    color: `${product.accent}08`,
-                    userSelect: "none",
-                    lineHeight: 1,
-                    letterSpacing: "-0.05em",
-                  }}>
-                    {product.name.charAt(0)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Hover overlay — slides up */}
-              <motion.div
-                initial={false}
-                animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : 12 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                style={{
-                  position: "absolute", inset: 0,
-                  background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)",
-                  display: "flex", flexDirection: "column",
-                  justifyContent: "flex-end",
-                  padding: "1.25rem",
-                }}
-              >
-                <div style={{
-                  display: "inline-flex",
-                  alignSelf: "center",
-                  alignItems: "center",
-                  gap: 8,
-                  padding: "9px 22px",
-                  border: `1px solid rgba(212,175,55,0.45)`,
-                  borderRadius: 2,
-                  background: "rgba(0,0,0,0.5)",
-                  backdropFilter: "blur(8px)",
-                }}>
-                  <span style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: 9,
-                    fontWeight: 500,
-                    letterSpacing: "0.28em",
-                    textTransform: "uppercase",
-                    color: "#D4AF37",
-                  }}>View Piece</span>
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path d="M1 6h10M7 2l4 4-4 4" stroke="#D4AF37" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-              </motion.div>
-
-              {/* Shimmer sweep */}
-              <motion.div
-                initial={{ x: "-110%", skewX: -15 }}
-                animate={hovered ? { x: "120%" } : { x: "-110%" }}
-                transition={{ duration: 0.65, ease: "easeInOut" }}
-                style={{
-                  position: "absolute", inset: 0,
-                  background: `linear-gradient(105deg, transparent 35%, ${product.accent}18 50%, transparent 65%)`,
-                  pointerEvents: "none",
-                }}
-              />
-
-              {/* Tag badge — top right */}
-              <div style={{ position: "absolute", top: 12, right: 12, zIndex: 10 }}>
-                <span style={{
-                  fontFamily: "'DM Mono', monospace",
-                  fontSize: 8,
-                  fontWeight: 400,
-                  letterSpacing: "0.2em",
-                  textTransform: "uppercase",
-                  color: tag.text,
-                  background: tag.bg,
-                  border: `1px solid ${tag.border}`,
-                  padding: "4px 9px",
-                  borderRadius: 2,
-                  backdropFilter: "blur(6px)",
-                }}>{product.tag}</span>
-              </div>
-
-              {/* Category badge — top left */}
-              <div style={{ position: "absolute", top: 12, left: 12, zIndex: 10 }}>
-                <span style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: 8,
-                  fontWeight: 400,
-                  letterSpacing: "0.18em",
-                  textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.35)",
-                  background: "rgba(0,0,0,0.5)",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                  padding: "4px 9px",
-                  borderRadius: 2,
-                  backdropFilter: "blur(6px)",
-                }}>{product.category}</span>
-              </div>
-            </div>
-
-            {/* Card Info */}
-            <div style={{ padding: "1rem 1.1rem 1.25rem" }}>
-              {/* Thin accent line */}
-              <div style={{
-                height: 1,
-                marginBottom: "0.9rem",
-                background: `linear-gradient(90deg, ${product.accent}50, transparent)`,
-                transform: hovered ? "scaleX(1)" : "scaleX(0.4)",
-                transformOrigin: "left",
-                transition: "transform 0.5s ease",
-              }} />
-
-              <h3 style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: "clamp(1rem, 1.5vw, 1.15rem)",
-                fontWeight: 400,
-                color: hovered ? "#D4AF37" : "#FFFFFF",
-                letterSpacing: "0.02em",
-                lineHeight: 1.2,
-                marginBottom: "0.65rem",
-                transition: "color 0.4s ease",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}>{product.name}</h3>
-
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{
-                    fontFamily: "'DM Mono', monospace",
-                    fontSize: 11,
-                    fontWeight: 400,
-                    letterSpacing: "0.08em",
-                    color: "#D4AF37",
-                  }}>{product.price}</span>
-                  {product.customizable && (
-                    <span style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: 8,
-                      letterSpacing: "0.15em",
-                      color: "rgba(110,196,154,0.8)",
-                      textTransform: "uppercase",
-                      background: "rgba(110,196,154,0.08)",
-                      border: "1px solid rgba(110,196,154,0.15)",
-                      padding: "2px 6px",
-                      borderRadius: 2,
-                    }}>Custom</span>
-                  )}
-                </div>
-
-                {/* Variants dots */}
-                {product.variants > 1 && (
-                  <div style={{ display: "flex", gap: 3, alignItems: "center" }}>
-                    {Array.from({ length: Math.min(product.variants, 4) }).map((_, vi) => (
-                      <div key={vi} style={{
-                        width: vi === 0 ? 5 : 4,
-                        height: vi === 0 ? 5 : 4,
-                        borderRadius: "50%",
-                        background: vi === 0 ? `${product.accent}70` : `${product.accent}30`,
-                      }} />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </a>
-
-        {/* Favorite button — outside the <a> */}
-        <button
-          onClick={() => setLiked(!liked)}
-          style={{
-            position: "absolute",
-            top: 46,
-            right: 12,
-            width: 30,
-            height: 30,
-            borderRadius: "50%",
-            background: "rgba(0,0,0,0.55)",
-            backdropFilter: "blur(8px)",
-            border: liked ? "1px solid rgba(212,175,55,0.5)" : "1px solid rgba(255,255,255,0.08)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            transition: "all 0.3s ease",
-            zIndex: 20,
-          }}
-        >
-          <svg width="13" height="13" viewBox="0 0 13 13" fill={liked ? "#D4AF37" : "none"}>
-            <path d="M6.5 11.5S1 7.8 1 4.5A2.5 2.5 0 0 1 6.5 3 2.5 2.5 0 0 1 12 4.5C12 7.8 6.5 11.5 6.5 11.5z"
-              stroke={liked ? "#D4AF37" : "rgba(255,255,255,0.4)"} strokeWidth="1" strokeLinejoin="round" />
-          </svg>
-        </button>
-      </motion.div>
-    </motion.div>
-  );
-}
 
 /* ─── Process Steps ───────────────────────────────────────────────── */
 const STEPS = [
@@ -342,14 +59,14 @@ function ProcessSection() {
         </motion.div>
 
         {/* Timeline */}
-        <div style={{ position: "relative" }}>
+        <div className="relative">
           {/* vertical line */}
-          <div style={{
-            position: "absolute", left: "50%", top: 0, bottom: 0,
-            width: 1,
-            background: "linear-gradient(to bottom, transparent, rgba(212,175,55,0.25) 15%, rgba(212,175,55,0.25) 85%, transparent)",
-            transform: "translateX(-50%)",
-          }} />
+          <div 
+            className="absolute left-4 sm:left-1/2 top-0 bottom-0 w-[1px] transform -translate-x-1/2"
+            style={{
+              background: "linear-gradient(to bottom, transparent, rgba(212,175,55,0.25) 15%, rgba(212,175,55,0.25) 85%, transparent)",
+            }} 
+          />
 
           {STEPS.map((step, i) => (
             <motion.div
@@ -358,77 +75,35 @@ function ProcessSection() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.85, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
-              style={{
-                display: "flex",
-                justifyContent: i % 2 === 0 ? "flex-start" : "flex-end",
-                marginBottom: "3.5rem",
-                position: "relative",
-              }}
+              className={`flex mb-14 relative w-full ${i % 2 === 0 ? 'justify-start' : 'sm:justify-end justify-start'}`}
             >
               {/* Dot on line */}
-              <div style={{
-                position: "absolute", left: "50%", top: "1.2rem",
-                transform: "translate(-50%,-50%)",
-                width: 10, height: 10,
-                borderRadius: "50%",
-                border: "1px solid #D4AF37",
-                background: "#060606",
-                boxShadow: "0 0 12px rgba(212,175,55,0.3)",
-                zIndex: 2,
-              }} />
+              <div 
+                className="absolute left-4 sm:left-1/2 top-5 sm:top-[1.2rem] transform -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full border border-[#D4AF37] bg-[#060606] z-[2]"
+                style={{ boxShadow: "0 0 12px rgba(212,175,55,0.3)" }}
+              />
 
-              {/* Content block — alternate sides */}
-              <div style={{ width: "43%", padding: i % 2 === 0 ? "0 3rem 0 0" : "0 0 0 3rem" }}>
-                <div style={{
-                  background: "rgba(255,255,255,0.02)",
-                  border: "1px solid rgba(212,175,55,0.1)",
-                  borderRadius: 2,
-                  padding: "1.5rem 1.75rem",
-                  position: "relative",
-                  overflow: "hidden",
-                }}>
+              {/* Content block — alternate sides on desktop, right side on mobile */}
+              <div className={`w-full sm:w-[43%] pl-10 sm:pl-0 ${i % 2 === 0 ? 'sm:pr-12' : 'sm:pl-12'}`}>
+                <div className="bg-white/[0.02] border border-[#D4AF37]/10 rounded-sm p-6 sm:p-7 relative overflow-hidden group hover:border-[#D4AF37]/30 transition-colors duration-500">
                   {/* Step number watermark */}
-                  <div style={{
-                    position: "absolute",
-                    right: i % 2 === 0 ? "-0.5rem" : "auto",
-                    left: i % 2 !== 0 ? "-0.5rem" : "auto",
-                    bottom: "-0.75rem",
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: 64,
-                    fontWeight: 300,
-                    color: "rgba(212,175,55,0.06)",
-                    lineHeight: 1,
-                    userSelect: "none",
-                    pointerEvents: "none",
-                  }}>{step.num}</div>
+                  <div 
+                    className={`absolute bottom-[-0.75rem] font-heading text-6xl font-light text-[#D4AF37]/[0.06] leading-none select-none pointer-events-none ${i % 2 === 0 ? 'right-[-0.5rem]' : 'sm:left-[-0.5rem] right-[-0.5rem]'}`}
+                  >
+                    {step.num}
+                  </div>
 
-                  <span style={{
-                    fontFamily: "'DM Mono', monospace",
-                    fontSize: 9,
-                    letterSpacing: "0.25em",
-                    color: "#D4AF37",
-                    opacity: 0.65,
-                    display: "block",
-                    marginBottom: "0.6rem",
-                  }}>{step.num}</span>
+                  <span className="font-mono text-[9px] tracking-[0.25em] text-[#D4AF37]/65 block mb-2">
+                    {step.num}
+                  </span>
 
-                  <h3 style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: "1.4rem",
-                    fontWeight: 400,
-                    color: "#FFF",
-                    letterSpacing: "0.02em",
-                    marginBottom: "0.65rem",
-                  }}>{step.title}</h3>
+                  <h3 className="font-heading text-xl font-normal text-white tracking-wide mb-2.5">
+                    {step.title}
+                  </h3>
 
-                  <p style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: 12,
-                    fontWeight: 300,
-                    color: "rgba(255,255,255,0.38)",
-                    lineHeight: 1.7,
-                    margin: 0,
-                  }}>{step.desc}</p>
+                  <p className="font-sans text-xs font-light text-white/40 leading-relaxed m-0">
+                    {step.desc}
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -440,16 +115,21 @@ function ProcessSection() {
 }
 
 /* ─── Main Page ───────────────────────────────────────────────────── */
-export default function ProductPage() {
+export default function SignatureDesigns() {
   useEffect(() => { injectFonts(); }, []);
+
+  const { data: dbProducts = [], isLoading } = useQuery({
+    queryKey: ['products-home'],
+    queryFn: () => getProducts(),
+  });
 
   const [activeCategory, setActiveCategory] = useState("All");
   const [showAll, setShowAll] = useState(false);
   const INITIAL_COUNT = 4;
 
   const filtered = activeCategory === "All"
-    ? PRODUCTS
-    : PRODUCTS.filter((p) => p.category === activeCategory);
+    ? dbProducts
+    : dbProducts.filter((p) => p.category === activeCategory);
 
   const visible = showAll ? filtered : filtered.slice(0, INITIAL_COUNT);
   const hasMore = filtered.length > INITIAL_COUNT;
@@ -563,18 +243,31 @@ export default function ProductPage() {
           </motion.div>
 
           {/* ── Product Grid ──────────────────────────────────────── */}
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-            gap: "1.5rem",
-            marginBottom: "3.5rem",
-          }}>
-            <AnimatePresence mode="popLayout">
-              {visible.map((product, i) => (
-                <ProductCard key={product.id} product={product} index={i} />
+          {isLoading ? (
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+              gap: "1.5rem",
+              marginBottom: "3.5rem",
+            }}>
+              {[...Array(INITIAL_COUNT)].map((_, i) => (
+                <div key={i} className="aspect-[4/5.5] rounded-[2.5rem] bg-[#1A1A1A] animate-pulse" />
               ))}
-            </AnimatePresence>
-          </div>
+            </div>
+          ) : (
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+              gap: "1.5rem",
+              marginBottom: "3.5rem",
+            }}>
+              <AnimatePresence mode="popLayout">
+                {visible.map((product, i) => (
+                  <ProductCard key={product.$id} product={product} index={i} />
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
 
           {/* ── View All / Show Less ───────────────────────────────── */}
           {hasMore && (
