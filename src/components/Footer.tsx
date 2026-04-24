@@ -63,14 +63,14 @@ export default function Footer() {
                 <MessageCircle className="w-4 h-4" />
                 WhatsApp Enquiry
               </a>
-              <a 
+              <a
                 href="tel:+919633270639"
                 className="flex items-center gap-3 text-sm text-white/40 px-1 mt-1 hover:text-[#D4AF37] transition-colors"
               >
                 <Phone className="w-4 h-4 text-[#D4AF37]/60" />
                 <span>+91 96332 70639</span>
               </a>
-              <a 
+              <a
                 href="https://www.instagram.com/yaga_designs/"
                 target="_blank"
                 rel="noopener noreferrer"

@@ -15,19 +15,14 @@ export default function HeroSection() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Detect if mobile to adjust scroll range multipliers
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const multiplier = isMobile ? 1.8 : 3.2;
-  const finishMultiplier = isMobile ? 2.2 : 3.5;
-
-  // Fade in CTAs before the animation finishes
-  const ctaOpacity = useTransform(scrollY, [vh * multiplier, vh * finishMultiplier], [0, 1], { clamp: true });
-  const ctaPointerEvents = useTransform(scrollY, (val) => (val > vh * multiplier ? 'auto' : 'none'));
+  // Fade in CTAs before the animation finishes (around 3.2vh to 3.5vh)
+  const ctaOpacity = useTransform(scrollY, [vh * 3.2, vh * 3.5], [0, 1], { clamp: true });
+  const ctaPointerEvents = useTransform(scrollY, (val) => (val > vh * 3.2 ? 'auto' : 'none'));
 
   return (
-    <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-transparent sticky top-0 z-50">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-transparent sticky top-0 z-50" style={{ width: '100%' }}>
       {/* ── Atmospheric Background ─────────────────────────────── */}
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {/* Deep radial gradient */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_70%_at_50%_60%,rgba(26,18,0,0.1)_0%,rgba(5,5,5,0.7)_70%)]" />
         {/* Outer edge vignette */}
@@ -38,8 +33,8 @@ export default function HeroSection() {
           transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(700px,100vw)] h-[min(700px,100vh)] rounded-full bg-[#D4AF37] blur-[140px]"
         />
-        <div className="absolute top-16 right-16 w-[min(200px,30vw)] h-[min(200px,30vw)] rounded-full bg-[#D4AF37]/5 blur-[80px]" />
-        <div className="absolute bottom-24 left-12 w-[min(150px,25vw)] h-[min(150px,25vw)] rounded-full bg-[#D4AF37]/4 blur-[60px]" />
+        <div className="absolute top-16 right-16 w-[200px] h-[200px] rounded-full bg-[#D4AF37]/5 blur-[80px]" />
+        <div className="absolute bottom-24 left-12 w-[150px] h-[150px] rounded-full bg-[#D4AF37]/4 blur-[60px]" />
         {/* Thin cross-hair lines */}
         <svg className="absolute inset-0 w-full h-full opacity-[0.04]">
           <line x1="0" y1="50%" x2="100%" y2="50%" stroke="#D4AF37" strokeWidth="0.5" />
@@ -92,8 +87,8 @@ export default function HeroSection() {
             transition={{ duration: 1.2, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="font-heading font-medium leading-[0.9] tracking-tight mb-8"
           >
-            <span className="block text-white text-[clamp(42px,12vw,130px)]">Yaga</span>
-            <span className="block text-gradient italic text-[clamp(42px,12vw,130px)]">Designs</span>
+            <span className="block text-white text-[clamp(58px,10vw,130px)]">Yaga</span>
+            <span className="block text-gradient italic text-[clamp(58px,10vw,130px)]">Designs</span>
           </motion.h1>
         </motion.div>
 

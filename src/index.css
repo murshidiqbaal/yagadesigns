@@ -115,7 +115,8 @@
   }
 
   .luxe-panel {
-    @apply rounded-[2rem] border border-white/10 bg-white/[0.03] backdrop-blur-2xl shadow-[0_24px_80px_rgba(0,0,0,0.35)];
+    @apply rounded-[2rem] border border-white/10 bg-white/[0.03] backdrop-blur-2xl;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
   }
 
   .section-kicker {

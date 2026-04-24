@@ -1,6 +1,6 @@
+import { getWhatsAppUrl } from '@/lib/constants';
 import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
-import { getWhatsAppUrl } from '@/lib/constants';
 
 export default function CTASection() {
   return (
@@ -10,11 +10,11 @@ export default function CTASection() {
         <motion.div
           animate={{ scale: [1, 1.06, 1], opacity: [0.04, 0.08, 0.04] }}
           transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-[700px] h-[500px] rounded-full bg-[#D4AF37] blur-[150px]"
+          className="w-[min(700px,100vw)] h-[min(500px,80vw)] rounded-full bg-[#D4AF37] blur-[150px]"
         />
       </div>
 
-      <div className="container relative z-10">
+      <div className="luxe-container relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}

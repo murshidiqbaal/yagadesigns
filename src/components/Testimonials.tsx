@@ -1,7 +1,7 @@
+import { getImageUrl, getTestimonials, Testimonial } from "@/lib/appwrite";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeft, ChevronRight, MessageSquareQuote, Star, User } from "lucide-react";
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Star, MessageSquareQuote, ChevronLeft, ChevronRight, User } from "lucide-react";
-import { getTestimonials, Testimonial, getImageUrl } from "@/lib/appwrite";
 import { Button } from "./ui/button";
 
 export default function Testimonials() {
@@ -40,9 +40,9 @@ export default function Testimonials() {
   return (
     <section className="py-32 relative overflow-hidden bg-[#050505]">
       {/* Decorative Background Elements */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
-      
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(800px,100vw)] h-[min(400px,50vw)] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="luxe-container relative z-10">
         <div className="text-center mb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -99,13 +99,13 @@ export default function Testimonials() {
 
               <div className="flex flex-col items-center gap-4">
                 <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 p-1">
-                   <div className="w-full h-full rounded-full bg-primary/10 flex items-center justify-center text-primary overflow-hidden">
-                      {current.avatar_url ? (
-                        <img src={getImageUrl(current.avatar_url)} className="w-full h-full object-cover" />
-                      ) : (
-                        <User className="w-8 h-8 opacity-40" />
-                      )}
-                   </div>
+                  <div className="w-full h-full rounded-full bg-primary/10 flex items-center justify-center text-primary overflow-hidden">
+                    {current.avatar_url ? (
+                      <img src={getImageUrl(current.avatar_url)} className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-8 h-8 opacity-40" />
+                    )}
+                  </div>
                 </div>
                 <div className="text-center">
                   <h4 className="text-lg font-heading tracking-wide">{current.name}</h4>
@@ -118,13 +118,13 @@ export default function Testimonials() {
           {/* Controls */}
           <div className="flex items-center justify-center gap-6 mt-12 bg-[#0A0A0A]">
             <Button
-              variant="outline" size="icon" 
+              variant="outline" size="icon"
               className="rounded-full w-14 h-14 border-white/5 hover:border-primary/50 bg-transparent transition-all"
               onClick={() => { handlePrev(); setIsAutoPlaying(false); }}
             >
               <ChevronLeft className="w-5 h-5 text-white/50" />
             </Button>
-            
+
             <div className="flex gap-2">
               {testimonials.map((_, i) => (
                 <button
@@ -136,7 +136,7 @@ export default function Testimonials() {
             </div>
 
             <Button
-              variant="outline" size="icon" 
+              variant="outline" size="icon"
               className="rounded-full w-14 h-14 border-white/5 hover:border-primary/50 bg-transparent transition-all"
               onClick={() => { handleNext(); setIsAutoPlaying(false); }}
             >

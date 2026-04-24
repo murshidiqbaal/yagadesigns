@@ -62,8 +62,8 @@ export default function HeroScrollAnimation({ children }: { children?: React.Rea
 
     // Adjust for high-DPI displays
     const dpr = window.devicePixelRatio || 1;
-    const width = document.documentElement.clientWidth;
-    const height = document.documentElement.clientHeight;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
 
     if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
       canvas.width = width * dpr;
@@ -123,13 +123,14 @@ export default function HeroScrollAnimation({ children }: { children?: React.Rea
   }, []);
 
   return (
-    <div ref={containerRef} className="relative h-[250vh] md:h-[400vh] w-full bg-[#050505] overflow-x-hidden">
-      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
+    <div ref={containerRef} className="relative h-[400vh] w-full bg-[#050505]">
+      <div className="sticky top-0 h-screen w-full overflow-hidden">
+        {/* Loading Spinner Removed */}
 
         <canvas
           ref={canvasRef}
           className="absolute inset-0 w-full h-full block z-0"
-          style={{ width: '100%', height: '100%' }}
+          style={{ width: '100vw', height: '100vh' }}
         />
 
         {/* Foreground Content */}
