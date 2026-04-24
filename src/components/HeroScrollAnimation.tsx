@@ -1,11 +1,11 @@
+import { useMotionValueEvent, useScroll, useTransform } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
-import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
 
 const FRAME_COUNT = 232;
 // Helper to pad the frame index
 const getFramePath = (index: number) => {
   const paddedIndex = index.toString().padStart(3, '0');
-  return `/src/assets/frames/ezgif-frame-${paddedIndex}.webp`;
+  return `/frames/ezgif-frame-${paddedIndex}.webp`;
 };
 
 export default function HeroScrollAnimation({ children }: { children?: React.ReactNode }) {
@@ -100,14 +100,14 @@ export default function HeroScrollAnimation({ children }: { children?: React.Rea
     const scaleFactor = 1.15;
     const zoomedWidth = drawWidth * scaleFactor;
     const zoomedHeight = drawHeight * scaleFactor;
-    
+
     // Recalculate offsets to keep it centered
     const zoomedOffsetX = offsetX - (zoomedWidth - drawWidth) / 2;
     const zoomedOffsetY = offsetY - (zoomedHeight - drawHeight) / 2;
 
     // Draw image
     ctx.drawImage(img, zoomedOffsetX, zoomedOffsetY, zoomedWidth, zoomedHeight);
-    
+
     // Add a very subtle dark overlay for better text readability
     ctx.fillStyle = 'rgba(5, 5, 5, 0.4)';
     ctx.fillRect(0, 0, width, height);
@@ -132,7 +132,7 @@ export default function HeroScrollAnimation({ children }: { children?: React.Rea
           className="absolute inset-0 w-full h-full block z-0"
           style={{ width: '100vw', height: '100vh' }}
         />
-        
+
         {/* Foreground Content */}
         <div className="absolute inset-0 z-10 pointer-events-none">
           <div className="pointer-events-auto h-full w-full">
