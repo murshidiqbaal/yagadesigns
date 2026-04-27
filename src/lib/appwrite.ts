@@ -8,6 +8,7 @@ export const appwriteConfig = {
   portfolioCollectionId: import.meta.env.VITE_APPWRITE_PORTFOLIO_COLLECTION_ID || 'portfolio',
   testimonialsCollectionId: import.meta.env.VITE_APPWRITE_TESTIMONIALS_COLLECTION_ID || 'testimonials',
   offersCollectionId: import.meta.env.VITE_APPWRITE_OFFERS_COLLECTION_ID || 'offers',
+  collectionContentId: import.meta.env.VITE_APPWRITE_CONTENT_COLLECTION_ID || 'content',
   storageId: import.meta.env.VITE_APPWRITE_BUCKET_ID || 'product-images',
 };
 
