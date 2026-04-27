@@ -4,12 +4,15 @@ import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import HeroScrollAnimation from '@/components/HeroScrollAnimation';
 import HeroSection from '@/components/HeroSection';
+import MobileCTASection from '@/components/MobileCTASection';
+import MobileFeaturedCollections from '@/components/MobileFeaturedCollections';
 import MobileHeroSection from '@/components/MobileHeroSection';
+import MobileSignatureDesigns from '@/components/MobileSignatureDesigns';
+import MobileTestimonials from '@/components/MobileTestimonials';
 import OffersPopup from '@/components/OffersPopup';
 import SignatureDesigns from '@/components/SignatureDesigns';
 import Testimonials from '@/components/Testimonials';
 import { useEffect, useState } from 'react';
-// import WhyChooseSection from '@/components/WhyChooseSection';\
 
 /** Returns true when the viewport is narrower than 768px (mobile). */
 function useIsMobile() {
@@ -35,20 +38,26 @@ export default function Index() {
       <Header />
       <main>
         {isMobile ? (
-          /* ── Mobile: simple static hero, no canvas animation ── */
-          <MobileHeroSection />
+          <>
+            {/* ── Mobile layout ──────────────────────────── */}
+            <MobileHeroSection />
+            <MobileFeaturedCollections />
+            <MobileSignatureDesigns />
+            <MobileTestimonials />
+            <MobileCTASection />
+          </>
         ) : (
-          /* ── Desktop: cinematic scroll-driven animation ── */
-          <HeroScrollAnimation>
-            <HeroSection />
-          </HeroScrollAnimation>
+          <>
+            {/* ── Desktop layout ─────────────────────────── */}
+            <HeroScrollAnimation>
+              <HeroSection />
+            </HeroScrollAnimation>
+            <FeaturedCollections />
+            <SignatureDesigns />
+            <Testimonials />
+            <CTASection />
+          </>
         )}
-        <FeaturedCollections />
-        {/* <InstagramShowcaseSection /> */}
-        <SignatureDesigns />
-        {/* <WhyChooseSection /> */}
-        <Testimonials />
-        <CTASection />
       </main>
       <Footer />
     </div>

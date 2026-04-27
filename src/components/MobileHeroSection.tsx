@@ -14,8 +14,8 @@ const fadeUp = (delay = 0) => ({
 export default function MobileHeroSection() {
   return (
     <section
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#050505]"
-      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-x-hidden bg-[#050505]"
+      style={{ paddingTop: 'env(safe-area-inset-top)', maxWidth: '100vw' }}
     >
       {/* ── Atmospheric Background ──────────────────────────────────── */}
       <div className="absolute inset-0 pointer-events-none">
@@ -55,11 +55,11 @@ export default function MobileHeroSection() {
       </div>
 
       {/* ── Content ──────────────────────────────────────────────────── */}
-      <div className="relative z-10 flex flex-col items-center text-center px-6 w-full max-w-sm mx-auto">
+      <div className="relative z-10 flex flex-col items-center text-center px-5 w-full" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
 
         {/* Eyebrow badge */}
-        <motion.div {...fadeUp(STAGGER * 0)} className="mb-8">
-          <span className="inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.5em] text-[#D4AF37] border border-[#D4AF37]/25 px-5 py-2 rounded-full bg-[#D4AF37]/5">
+        <motion.div {...fadeUp(STAGGER * 0)} className="mb-8 max-w-full">
+          <span className="inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.3em] text-[#D4AF37] border border-[#D4AF37]/25 px-4 py-2 rounded-full bg-[#D4AF37]/5">
             <Gem className="w-2.5 h-2.5" />
             Luxury Bridal Atelier
             <Gem className="w-2.5 h-2.5" />
@@ -129,7 +129,7 @@ export default function MobileHeroSection() {
         {/* Trust chips */}
         <motion.div
           {...fadeUp(STAGGER * 5)}
-          className="flex items-center justify-center gap-4 mt-8"
+          className="flex flex-wrap items-center justify-center gap-3 mt-8"
         >
           {['Royal Weddings', 'Premium Couture', 'Kerala\'s Finest'].map((label) => (
             <span
@@ -147,7 +147,7 @@ export default function MobileHeroSection() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.6 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5"
+        className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-1.5 pointer-events-none"
       >
         <span className="text-[8px] text-white/20 uppercase tracking-[0.4em]">Scroll</span>
         <motion.div
