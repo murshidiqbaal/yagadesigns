@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion';
+import { appwriteConfig, databases } from '@/lib/appwrite';
 import { useQuery } from '@tanstack/react-query';
-import { databases, appwriteConfig } from '@/lib/appwrite';
-import { Heart, Globe, Briefcase, Sparkles, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Briefcase, Globe, Heart, Sparkles } from 'lucide-react';
 
 const serviceIcons = [Heart, Globe, Briefcase, Sparkles];
 
@@ -27,7 +27,7 @@ export default function ServicesSection() {
         }
         return null;
       } catch (error) {
-        return null; // Document likely doesn't exist yet
+        return null;
       }
     }
   });
@@ -74,7 +74,7 @@ export default function ServicesSection() {
                 {/* Image darkening gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/60 to-transparent z-[-1]" />
                 <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-0" />
-                
+
                 <div className="relative z-10 mt-auto">
                   <Icon className="stroke-[1px] w-12 h-12 text-[#D4AF37] mb-8 group-hover:scale-110 transition-transform duration-700" aria-hidden="true" />
                   <h3 className="font-heading text-3xl mb-4 tracking-tighter italic text-[#F5F5F5]">{s.title}</h3>

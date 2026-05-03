@@ -1,10 +1,10 @@
+import { useFavorites } from '@/hooks/useFavorites';
 import { getImageUrl, getProducts, Product } from '@/lib/appwrite';
 import { useQuery } from '@tanstack/react-query';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Heart, ChevronDown } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ChevronDown, Heart } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useFavorites } from '@/hooks/useFavorites';
 
 const CATEGORIES = ['All', 'Bridal', 'Engagement', 'Reception'];
 
@@ -28,10 +28,11 @@ function MobileProductCard({ product, index }: { product: Product; index: number
       exit={{ opacity: 0, scale: 0.96 }}
       transition={{ duration: 0.5, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
       layout
+      className="w-full min-w-0"
     >
-      <Link to={`/product/${product.$id}`} className="block relative group">
+      <Link to={`/product/${product.$id}`} className="group flex h-full min-w-0 flex-col">
         {/* Image */}
-        <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[#1A1A1A] mb-2.5">
+        <div className="relative mb-2.5 aspect-[3/4] w-full overflow-hidden rounded-2xl bg-[#1A1A1A]">
           {imageUrl && (
             <img
               src={imageUrl}
@@ -59,15 +60,15 @@ function MobileProductCard({ product, index }: { product: Product; index: number
         </div>
 
         {/* Info */}
-        <div>
+        <div className="min-w-0 px-0.5">
           <h3
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
-            className="text-[1rem] font-light text-white leading-snug mb-0.5 truncate"
+            className="line-clamp-2 min-h-[2.8rem] text-[1rem] font-light leading-snug text-white"
           >
             {product.name}
           </h3>
           {product.price && (
-            <p className="text-[11px] text-[#D4AF37] font-medium tracking-wide">{product.price}</p>
+            <p className="mt-1 text-[11px] font-medium tracking-wide text-[#D4AF37]">{product.price}</p>
           )}
         </div>
       </Link>
@@ -249,18 +250,16 @@ export default function MobileSignatureDesigns() {
 
           {/* ── Product Grid (2-col) ─────────────────────────── */}
           {isLoading ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', marginBottom: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.85rem', marginBottom: '2rem', width: '100%', alignItems: 'start' }}>
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="aspect-[3/4] rounded-2xl bg-[#1A1A1A] animate-pulse" />
               ))}
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', marginBottom: '2rem' }}>
-              <AnimatePresence mode="popLayout">
-                {visible.map((product, i) => (
-                  <MobileProductCard key={product.$id} product={product} index={i} />
-                ))}
-              </AnimatePresence>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.85rem', marginBottom: '2rem', width: '100%', alignItems: 'start' }}>
+              {visible.map((product, i) => (
+                <MobileProductCard key={product.$id} product={product} index={i} />
+              ))}
             </div>
           )}
 
@@ -316,8 +315,8 @@ export default function MobileSignatureDesigns() {
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)', marginBottom: '2rem' }}>
             Book a Private Consultation
           </p>
-          <a
-            href="#/consult"
+          <Link
+            to="/collections"
             style={{
               fontFamily: "'DM Sans', sans-serif",
               fontSize: 10, fontWeight: 500,
@@ -328,7 +327,7 @@ export default function MobileSignatureDesigns() {
             }}
           >
             Begin Your Journey
-          </a>
+          </Link>
         </motion.div>
       </section>
     </div>

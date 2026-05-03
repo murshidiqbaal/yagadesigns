@@ -73,55 +73,66 @@ export default function Favorites() {
                       transition={{ duration: 0.4, delay: i * 0.06 }}
                       className="group relative overflow-hidden rounded-2xl bg-[#1A1A1A]/60 border border-white/5 hover:border-[#D4AF37]/30 transition-all duration-500"
                     >
-                      {/* Image */}
-                      <div className="aspect-[3/4] overflow-hidden">
-                        {product.image_url ? (
-                          <img
-                            src={product.image_url}
-                            alt={product.name}
-                            loading="lazy"
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-[#1A1A1A] to-[#2A1A0A] flex items-center justify-center">
-                            <span className="text-[80px] font-heading italic text-[#D4AF37]/10 select-none">
-                              Y
-                            </span>
-                          </div>
-                        )}
-                      </div>
+                      <Link to={`/product/${product.$id}`} className="block h-full cursor-pointer">
+                        {/* Image */}
+                        <div className="aspect-[3/4] overflow-hidden">
+                          {product.image_url ? (
+                            <img
+                              src={product.image_url}
+                              alt={product.name}
+                              loading="lazy"
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-[#1A1A1A] to-[#2A1A0A] flex items-center justify-center">
+                              <span className="text-[80px] font-heading italic text-[#D4AF37]/10 select-none">
+                                Y
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Category Badge */}
+                        <div className="absolute top-4 left-4 z-10">
+                          <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-black/70 backdrop-blur-sm border border-[#D4AF37]/25 text-[#D4AF37]">
+                            {product.category}
+                          </span>
+                        </div>
+
+                        {/* Info */}
+                        <div className="p-5">
+                          <h3 className="font-heading text-lg text-white leading-snug mb-1">
+                            {product.name}
+                          </h3>
+                          {product.description && (
+                            <p className="text-xs text-white/35 mb-4 line-clamp-1">
+                              {product.description}
+                            </p>
+                          )}
+                        </div>
+                      </Link>
 
                       {/* Remove Button */}
                       <button
-                        onClick={() => removeFavorite(product.$id)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          removeFavorite(product.$id);
+                        }}
                         id={`remove-fav-${product.$id}`}
                         title="Remove from favorites"
-                        className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/70 backdrop-blur-sm flex items-center justify-center border border-white/10 hover:border-red-400/60 hover:bg-red-500/20 transition-all z-10"
+                        className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/70 backdrop-blur-sm flex items-center justify-center border border-white/10 hover:border-red-400/60 hover:bg-red-500/20 transition-all z-20"
                       >
                         <X className="w-4 h-4 text-white/70 hover:text-red-400" />
                       </button>
 
-                      {/* Category Badge */}
-                      <div className="absolute top-4 left-4 z-10">
-                        <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-black/70 backdrop-blur-sm border border-[#D4AF37]/25 text-[#D4AF37]">
-                          {product.category}
-                        </span>
-                      </div>
-
-                      {/* Info + Enquire */}
-                      <div className="p-5">
-                        <h3 className="font-heading text-lg text-white leading-snug mb-1">
-                          {product.name}
-                        </h3>
-                        {product.description && (
-                          <p className="text-xs text-white/35 mb-4 line-clamp-1">
-                            {product.description}
-                          </p>
-                        )}
+                      {/* Enquire Button */}
+                      <div className="px-5 pb-5 relative z-10">
                         <a
                           href={getWhatsAppUrl(product.name)}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
                           className="w-full flex items-center justify-center gap-2 py-3 bg-[#25D366]/10 border border-[#25D366]/30 text-[#25D366] rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-[#25D366]/20 hover:border-[#25D366]/60 transition-all duration-300"
                         >
                           <MessageCircle className="w-3.5 h-3.5" />

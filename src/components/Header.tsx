@@ -40,15 +40,12 @@ export default function Header() {
         }`}>
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <div className={`relative overflow-hidden flex items-center justify-center rounded-sm transition-all duration-500 ${scrolled ? 'h-7 w-7' : 'h-10 w-10'
-            }`}>
-            <img
-              src={logoImg}
-              alt="Yaga Designs"
-              className={`absolute h-auto max-w-none mix-blend-screen opacity-95 group-hover:opacity-100 transition-all duration-500 ${scrolled ? 'top-[-4px] h-8' : 'top-[-6px] h-12'
-                }`}
-            />
-          </div>
+          <img
+            src={logoImg}
+            alt="Yaga Designs"
+            className={`transition-all duration-500 group-hover:scale-105 ${scrolled ? 'h-8' : 'h-12'}`}
+            style={{ width: 'auto', mixBlendMode: 'screen' }}
+          />
           <div className="flex flex-col justify-center">
             <span
               className={`leading-none uppercase font-normal transition-all duration-500 ${scrolled ? 'text-lg' : 'text-[28px]'

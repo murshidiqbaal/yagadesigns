@@ -9,12 +9,14 @@ import CursorParticles from "./components/CursorParticles.tsx";
 import FloatingWhatsApp from "./components/FloatingWhatsApp.tsx";
 import MobileBottomNav from "./components/MobileBottomNav.tsx";
 import SmoothScroll from "./components/SmoothScroll.tsx";
+import ScrollToTop from "./components/ScrollToTop.tsx";
 import { AuthProvider } from "./hooks/useAuth.tsx";
 import { FavoritesProvider } from "./context/FavoritesContext.tsx";
 import About from "./pages/About.tsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
 import AdminLogin from "./pages/admin/AdminLogin.tsx";
 import AdminProducts from "./pages/admin/AdminProducts.tsx";
+import AdminProductForm from "./pages/admin/AdminProductForm.tsx";
 import AdminTestimonials from "./pages/admin/AdminTestimonials.tsx";
 import AdminOffers from "./pages/admin/AdminOffers.tsx";
 import Collections from "./pages/Collections.tsx";
@@ -35,6 +37,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <HashRouter>
+              <ScrollToTop />
               <KeyboardShortcuts />
               <CursorParticles />
               <MobileBottomNav />
@@ -54,6 +57,8 @@ const App = () => (
                   <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
                   <Route path="/admin/dashboard" element={<AdminDashboard />} />
                   <Route path="/admin/products" element={<AdminProducts />} />
+                  <Route path="/admin/products/new" element={<AdminProductForm />} />
+                  <Route path="/admin/products/:id/edit" element={<AdminProductForm />} />
                   <Route path="/admin/testimonials" element={<AdminTestimonials />} />
                   <Route path="/admin/offers" element={<AdminOffers />} />
                 </Route>

@@ -47,6 +47,8 @@ export interface Product {
   occasion?: string;
   is_customizable?: boolean;
   variants?: string | ProductVariant[]; // Stored as JSON string in DB
+  enquiry_count?: number;
+  like_count?: number;
   created_at: string;
 }
 
@@ -138,6 +140,33 @@ export async function updateProduct(id: string, data: Partial<Omit<Product, '$id
 
 export async function deleteProduct(id: string): Promise<void> {
   await databases.deleteDocument(DATABASE_ID, PRODUCTS_COLLECTION, id);
+}
+
+export async function trackProductEnquiry(id: string): Promise<void> {
+  try {
+    const product = await getProductById(id);
+    if (!product) return;
+    const currentCount = product.enquiry_count || 0;
+    await databases.updateDocument(DATABASE_ID, PRODUCTS_COLLECTION, id, {
+      enquiry_count: currentCount + 1
+    });
+  } catch (error) {
+    console.error('Failed to track enquiry:', error);
+  }
+}
+
+export async function trackProductLike(id: string, increment: boolean): Promise<void> {
+  try {
+    const product = await getProductById(id);
+    if (!product) return;
+    const currentCount = product.like_count || 0;
+    const newCount = increment ? currentCount + 1 : Math.max(0, currentCount - 1);
+    await databases.updateDocument(DATABASE_ID, PRODUCTS_COLLECTION, id, {
+      like_count: newCount
+    });
+  } catch (error) {
+    console.error('Failed to track like:', error);
+  }
 }
 
 // ─── Portfolio ────────────────────────────────────────────────────────────────

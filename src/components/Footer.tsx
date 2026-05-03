@@ -1,6 +1,6 @@
 import logoImg from '@/assets/logo.png';
 import { getWhatsAppUrl, SITE_NAME } from '@/lib/constants';
-import { Heart, Instagram, MessageCircle, Phone } from 'lucide-react';
+import { Heart, Instagram, MapPin, MessageCircle, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const NAV = [
@@ -78,6 +78,15 @@ export default function Footer() {
               >
                 <Instagram className="w-4 h-4 text-[#D4AF37]/60" />
                 <span>@yaga_designs</span>
+              </a>
+              <a
+                href="https://maps.app.goo.gl/AyYuAfzZPCLgD9jz7"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 text-sm text-white/40 px-1 hover:text-[#D4AF37] transition-colors"
+              >
+                <MapPin className="w-4 h-4 text-[#D4AF37]/60" />
+                <span>Visit Us in Kothamangalam</span>
               </a>
             </div>
           </div>

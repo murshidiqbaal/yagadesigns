@@ -85,28 +85,55 @@ export default function ContactSection() {
                   <p className="text-[#F5F5F5] text-lg font-light">info@yagadesigns.in</p>
                 </div>
               </div>
-              <div className="flex items-center gap-8 group cursor-pointer">
-                <div className="w-14 h-14 rounded-full border border-[#D4AF37]/20 flex items-center justify-center group-hover:bg-[#D4AF37] transition-all duration-700">
-                  <MapPin className="w-5 h-5 text-[#D4AF37] group-hover:text-[#0B0B0B] transition-colors duration-700" />
-                </div>
-                <div>
-                  <p className="text-[#D4AF37] text-[10px] tracking-[0.3em] uppercase mb-1">Estate</p>
-                  <p className="text-[#F5F5F5] text-lg font-light">Kothamangalam, Ernakulam, Kerala</p>
-                </div>
-              </div>
-            </div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={inView ? { opacity: 1, scale: 1 } : {}}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="group relative overflow-hidden rounded-[2rem] bg-white/[0.03] border border-white/5 hover:border-[#D4AF37]/30 transition-all duration-700"
+              >
+                <div className="p-8">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="w-12 h-12 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/20 group-hover:scale-110 transition-transform duration-700">
+                      <MapPin className="w-5 h-5 text-[#D4AF37]" />
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[#D4AF37] text-[10px] tracking-[0.3em] uppercase mb-1 font-bold">Location</p>
+                      <p className="text-white/40 text-[9px] uppercase tracking-widest">Kothamangalam, Kerala</p>
+                    </div>
+                  </div>
 
-            <div className="mt-12 overflow-hidden border border-[#D4AF37]/20">
-              <iframe
-                title="Yaga Designs location"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d62788.37!2d76.59!3d10.06!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b07e3a1f2b8c8f7%3A0x2e5b8a3d2c2f9a1b!2sKothamangalam%2C%20Kerala!5e0!3m2!1sen!2sin!4v1680000000000!5m2!1sen!2sin"
-                width="100%"
-                height="200"
-                style={{ border: 0, filter: 'grayscale(1) invert(1) contrast(0.8)' }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
+                  <h4 className="font-heading text-2xl text-white mb-4 italic">Our Atelier</h4>
+                  <p className="text-white/60 text-sm font-light leading-relaxed mb-8 max-w-[280px]">
+                    Yaga Designs, Ground Floor,<br />
+                    Royal Plaza, Kothamangalam,<br />
+                    Ernakulam, Kerala - 686691
+                  </p>
+
+                  <a
+                    href="https://maps.app.goo.gl/AyYuAfzZPCLgD9jz7"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-3 px-6 py-3 bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#D4AF37] hover:text-black transition-all duration-500"
+                  >
+                    Get Directions
+                    <Send className="w-3 h-3" />
+                  </a>
+                </div>
+
+                {/* Map Overlay/Background effect */}
+                <div className="h-48 w-full mt-4 border-t border-white/5 overflow-hidden">
+                  <iframe
+                    title="Yaga Designs location"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.329244018175!2d76.6133636750311!3d10.067074171801826!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b07e77f0a5d4c29%3A0xb292593a71bfabe1!2sYaga%20Designs!5e0!3m2!1sen!2sin!4v1745733362141!5m2!1sen!2sin"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0, filter: 'grayscale(1) invert(1) contrast(0.8) opacity(0.6)' }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+              </motion.div>
             </div>
           </motion.div>
 

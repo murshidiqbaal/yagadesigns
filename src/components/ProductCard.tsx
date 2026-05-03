@@ -1,5 +1,6 @@
+import { Link } from 'react-router-dom';
 import { useFavorites } from '@/hooks/useFavorites';
-import { Product, getImageUrl } from '@/lib/appwrite';
+import { Product, getImageUrl, trackProductLike } from '@/lib/appwrite';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 
@@ -21,8 +22,8 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
       className="group relative overflow-hidden rounded-[2.5rem] bg-[#0A0A0A] border border-white/5 hover:border-[#D4AF37]/20 transition-all duration-700 cursor-pointer"
     >
       {/* Image Area */}
-      <a
-        href={`#/product/${product.$id}`}
+      <Link
+        to={`/product/${product.$id}`}
         className="block"
         id={`product-${product.$id}`}
       >
@@ -47,11 +48,15 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             </div>
           </div>
         </div>
-      </a>
+      </Link>
 
       {/* Favorite Button */}
       <button
-        onClick={() => toggleFavorite(product)}
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleFavorite(product);
+          trackProductLike(product.$id, !liked);
+        }}
         id={`fav-${product.$id}`}
         className="absolute top-5 right-5 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/5 hover:border-[#D4AF37]/50 transition-all z-10 group/heart"
         title={liked ? 'Remove from favorites' : 'Save to favorites'}
@@ -87,7 +92,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
           <div className="flex items-center gap-2">
             {product.price && (
               <span className="text-xs font-bold tracking-[0.15em] text-[#D4AF37]">
-                {product.price}
+                {product.price ? (product.price.startsWith("₹") ? product.price : `₹${product.price}`) : "Price on enquiry"}
               </span>
             )}
             {product.is_customizable !== false && (

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Package, Tag, Clock, ArrowUpRight, Plus, Sparkles } from "lucide-react";
+import { Package, Tag, Clock, ArrowUpRight, Plus, Sparkles, MessageCircle, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { getProducts, checkSystemStatus } from "@/lib/appwrite";
+import { getProducts, checkSystemStatus, getImageUrl, Product } from "@/lib/appwrite";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ export default function AdminDashboard() {
     categories: 0,
     lastUpdate: "—",
   });
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -26,6 +27,7 @@ export default function AdminDashboard() {
 
         if (status.database) {
           const products = await getProducts();
+          setAllProducts(products);
           const cats = new Set(products.map(p => p.category)).size;
           const latest = products[0]
             ? new Date(products[0].created_at).toLocaleDateString("en-IN", {
@@ -57,122 +59,206 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-10">
-      {/* ── Welcome ───────────────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col md:flex-row md:items-end justify-between gap-4"
-      >
-        <div>
-          <h1 className="text-4xl md:text-5xl font-heading mb-1">
-            Welcome back,
-          </h1>
-          <p className="text-xl text-primary font-heading italic tracking-tight lowercase">
-            {user?.email?.split("@")[0] ?? "admin"}
-          </p>
-        </div>
-        <Button asChild className="w-fit gap-2">
-          <Link to="/admin/products">
-            <Plus className="w-4 h-4" /> Add Product
-          </Link>
-        </Button>
-      </motion.div>
-
-      {/* ── DB Status Banner ─────────────────────────────────── */}
-      {dbOnline === false && (
-        <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex gap-4 items-start">
-          <span className="text-2xl">⚠️</span>
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="lg:col-span-8 space-y-10">
+        {/* ── Welcome ───────────────────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col md:flex-row md:items-end justify-between gap-4"
+        >
           <div>
-            <p className="text-sm font-bold text-amber-400 uppercase tracking-widest mb-1">
-              Database Not Found
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Create a database <code className="text-primary">yaga_designs_db</code> with a{" "}
-              <code className="text-primary">products</code> collection in your{" "}
-              <a className="text-primary underline" href="https://cloud.appwrite.io" target="_blank" rel="noreferrer">
-                Appwrite console
-              </a>
-              , then refresh.
+            <h1 className="text-4xl md:text-5xl font-heading mb-1">
+              Welcome back,
+            </h1>
+            <p className="text-xl text-primary font-heading italic tracking-tight lowercase">
+              {user?.email?.split("@")[0] ?? "admin"}
             </p>
           </div>
-        </div>
-      )}
+          <Button asChild className="w-fit gap-2">
+            <Link to="/admin/products/new">
+              <Plus className="w-4 h-4" /> Add Product
+            </Link>
+          </Button>
+        </motion.div>
 
-      {/* ── Stat Cards ───────────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-        className="grid grid-cols-1 sm:grid-cols-3 gap-6"
-      >
-        <StatCard
-          icon={Package}
-          label="Total Products"
-          value={stats.totalProducts}
-          sub="In your collection"
-          color="text-primary"
-          link="/admin/products"
-        />
-        <StatCard
-          icon={Tag}
-          label="Categories"
-          value={stats.categories}
-          sub="Distinct styles"
-          color="text-blue-400"
-        />
-        <StatCard
-          icon={Clock}
-          label="Last Upload"
-          value={stats.lastUpdate}
-          sub="Most recent product"
-          color="text-emerald-400"
-        />
-      </motion.div>
-
-      {/* ── Quick Actions ─────────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25 }}
-      >
-        <h3 className="text-xs font-bold uppercase tracking-[0.25em] text-muted-foreground mb-4 flex items-center gap-2">
-          <Sparkles className="w-3.5 h-3.5 text-primary" /> Quick Actions
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Link
-            to="/admin/products"
-            className="group flex items-center gap-4 p-5 rounded-xl bg-white/5 border border-white/5 hover:border-primary/30 hover:bg-white/8 transition-all"
-          >
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-all">
-              <Package className="w-5 h-5" />
-            </div>
+        {/* ── DB Status Banner ─────────────────────────────────── */}
+        {dbOnline === false && (
+          <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex gap-4 items-start">
+            <span className="text-2xl">⚠️</span>
             <div>
-              <p className="text-sm font-bold uppercase tracking-widest group-hover:text-primary transition-colors">
-                Manage Products
+              <p className="text-sm font-bold text-amber-400 uppercase tracking-widest mb-1">
+                Database Not Found
               </p>
-              <p className="text-xs text-muted-foreground">Add, edit or remove designs</p>
+              <p className="text-sm text-muted-foreground">
+                Create a database <code className="text-primary">yaga_designs_db</code> with a{" "}
+                <code className="text-primary">products</code> collection in your{" "}
+                <a className="text-primary underline" href="https://cloud.appwrite.io" target="_blank" rel="noreferrer">
+                  Appwrite console
+                </a>
+                , then refresh.
+              </p>
             </div>
-            <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 ml-auto transition-opacity" />
-          </Link>
+          </div>
+        )}
 
-          <a
-            href="/#/collections"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex items-center gap-4 p-5 rounded-xl bg-white/5 border border-white/5 hover:border-primary/30 hover:bg-white/8 transition-all"
-          >
-            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-black transition-all">
-              <ArrowUpRight className="w-5 h-5" />
+        {/* ── Stat Cards ───────────────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="grid grid-cols-1 sm:grid-cols-3 gap-6"
+        >
+          <StatCard
+            icon={Package}
+            label="Total Products"
+            value={stats.totalProducts}
+            sub="In your collection"
+            color="text-primary"
+            link="/admin/products"
+          />
+          <StatCard
+            icon={Tag}
+            label="Categories"
+            value={stats.categories}
+            sub="Distinct styles"
+            color="text-blue-400"
+          />
+          <StatCard
+            icon={Clock}
+            label="Last Upload"
+            value={stats.lastUpdate}
+            sub="Most recent product"
+            color="text-emerald-400"
+          />
+        </motion.div>
+
+        {/* ── Quick Actions ─────────────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+        >
+          <h3 className="text-xs font-bold uppercase tracking-[0.25em] text-muted-foreground mb-4 flex items-center gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-primary" /> Quick Actions
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Link
+              to="/admin/products"
+              className="group flex items-center gap-4 p-5 rounded-xl bg-white/5 border border-white/5 hover:border-primary/30 hover:bg-white/8 transition-all"
+            >
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-all">
+                <Package className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm font-bold uppercase tracking-widest group-hover:text-primary transition-colors">
+                  Manage Products
+                </p>
+                <p className="text-xs text-muted-foreground">Add, edit or remove designs</p>
+              </div>
+              <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 ml-auto transition-opacity" />
+            </Link>
+
+            <a
+              href="/#/collections"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-4 p-5 rounded-xl bg-white/5 border border-white/5 hover:border-primary/30 hover:bg-white/8 transition-all"
+            >
+              <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-black transition-all">
+                <ArrowUpRight className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm font-bold uppercase tracking-widest group-hover:text-primary transition-colors">
+                  View Live Site
+                </p>
+                <p className="text-xs text-muted-foreground">See how the public sees your store</p>
+              </div>
+            </a>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* ── Sidebar Analytics ─────────────────────────────────── */}
+      <div className="lg:col-span-4 space-y-6">
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+          className="space-y-6"
+        >
+          {/* Top Enquiries Card */}
+          <Card className="glass border-white/5 bg-[#0A0A0A] overflow-hidden">
+            <div className="p-5 border-b border-white/5 bg-primary/5 flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                <MessageCircle className="w-4 h-4 text-primary" /> Top Enquiries
+              </h3>
+              <span className="text-[10px] text-muted-foreground bg-white/5 px-2 py-0.5 rounded-full">Global</span>
             </div>
-            <div>
-              <p className="text-sm font-bold uppercase tracking-widest group-hover:text-primary transition-colors">
-                View Live Site
-              </p>
-              <p className="text-xs text-muted-foreground">See how the public sees your store</p>
+            <CardContent className="p-0">
+              <div className="divide-y divide-white/5">
+                {[...allProducts]
+                  .sort((a, b) => (b.enquiry_count || 0) - (a.enquiry_count || 0))
+                  .slice(0, 5)
+                  .map((product, idx) => (
+                    <div key={product.$id} className="p-4 flex items-center gap-4 hover:bg-white/[0.02] transition-colors group">
+                      <div className="w-10 h-12 rounded bg-white/5 overflow-hidden flex-shrink-0">
+                        {product.image_url && (
+                          <img src={getImageUrl(product.image_url)} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium truncate text-white/80">{product.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{product.category}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-heading text-primary">{product.enquiry_count || 0}</p>
+                        <p className="text-[8px] uppercase tracking-tighter text-muted-foreground">Clicks</p>
+                      </div>
+                    </div>
+                  ))}
+                {allProducts.length === 0 && <p className="p-10 text-center text-xs text-muted-foreground">No data available</p>}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Most Liked Card */}
+          <Card className="glass border-white/5 bg-[#0A0A0A] overflow-hidden">
+            <div className="p-5 border-b border-white/5 bg-rose-500/5 flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                <Heart className="w-4 h-4 text-rose-400" /> Most Liked
+              </h3>
+              <span className="text-[10px] text-muted-foreground bg-white/5 px-2 py-0.5 rounded-full">Global</span>
             </div>
-          </a>
-        </div>
-      </motion.div>
+            <CardContent className="p-0">
+              <div className="divide-y divide-white/5">
+                {[...allProducts]
+                  .sort((a, b) => (b.like_count || 0) - (a.like_count || 0))
+                  .slice(0, 5)
+                  .map((product, idx) => (
+                    <div key={product.$id} className="p-4 flex items-center gap-4 hover:bg-white/[0.02] transition-colors group">
+                      <div className="w-10 h-12 rounded bg-white/5 overflow-hidden flex-shrink-0">
+                        {product.image_url && (
+                          <img src={getImageUrl(product.image_url)} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium truncate text-white/80">{product.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{product.category}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-heading text-rose-400">{product.like_count || 0}</p>
+                        <p className="text-[8px] uppercase tracking-tighter text-muted-foreground">Saves</p>
+                      </div>
+                    </div>
+                  ))}
+                {allProducts.length === 0 && <p className="p-10 text-center text-xs text-muted-foreground">No data available</p>}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    </div>
     </div>
   );
 }

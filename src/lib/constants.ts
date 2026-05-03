@@ -3,7 +3,7 @@ export const SITE_NAME = 'Yaga Designs';
 // ✅ Update this with the real WhatsApp number (country code + number, no spaces or +)
 export const WHATSAPP_NUMBER = '919633270639';
 
-export const CATEGORIES = ['All', 'Bridal', 'Engagement', 'Reception', 'Party Wear'] as const;
+export const CATEGORIES = ['All', 'Bridal', 'Engagement', 'Reception', 'Party Wear', 'Lehenga', 'Saree'];
 export type Category = typeof CATEGORIES[number];
 
 export function getWhatsAppUrl(productName?: string): string {

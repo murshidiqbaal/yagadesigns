@@ -2,6 +2,7 @@ import { getProducts } from "@/lib/appwrite";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import ProductCard from "./ProductCard";
 
 /* ─── Font Injection ──────────────────────────────────────────────── */
@@ -357,7 +358,7 @@ export default function SignatureDesigns() {
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.2)", marginBottom: "2.5rem" }}>
             Book a Private Consultation
           </p>
-          <a href="#/consult" style={{
+          <Link to="/collections" style={{
             fontFamily: "'DM Sans', sans-serif",
             fontSize: 10,
             fontWeight: 500,
@@ -375,7 +376,7 @@ export default function SignatureDesigns() {
             onMouseLeave={e => e.currentTarget.style.opacity = "1"}
           >
             Begin Your Journey
-          </a>
+          </Link>
         </motion.div>
       </section>
     </div>

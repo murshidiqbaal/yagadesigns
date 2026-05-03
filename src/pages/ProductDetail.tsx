@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useFavorites } from "@/hooks/useFavorites";
-import { getImageUrl, getProductById, ProductVariant } from "@/lib/appwrite";
+import { getImageUrl, getProductById, ProductVariant, trackProductEnquiry, trackProductLike } from "@/lib/appwrite";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
 import { useQuery } from "@tanstack/react-query";
 import useEmblaCarousel from "embla-carousel-react";
@@ -9,6 +9,7 @@ import { ChevronLeft, Heart, MessageCircle, Plus, Scissors, Share2, ShieldCheck,
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
+import { Maximize2, X as CloseIcon } from "lucide-react";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -29,6 +30,7 @@ export default function ProductDetail() {
 
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isZoomed, setIsZoomed] = useState(false);
 
   // Set initial variant
   useEffect(() => {
@@ -80,6 +82,7 @@ Please share customization options and final pricing.`;
 
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
+    trackProductEnquiry(product.$id);
   };
 
   const handleShare = () => {
@@ -132,7 +135,10 @@ Please share customization options and final pricing.`;
             <Share2 className="w-5 h-5" />
           </button>
           <button
-            onClick={() => toggleFavorite(product)}
+            onClick={() => {
+              toggleFavorite(product);
+              trackProductLike(product.$id, !liked);
+            }}
             className="w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center"
           >
             <Heart className={`w-5 h-5 transition-colors ${liked ? "fill-primary text-primary" : "text-white"}`} />
@@ -152,8 +158,9 @@ Please share customization options and final pricing.`;
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4 }}
-                className="overflow-hidden md:rounded-3xl"
+                className="overflow-hidden md:rounded-3xl relative cursor-zoom-in"
                 ref={emblaRef}
+                onClick={() => setIsZoomed(true)}
               >
                 <div className="flex">
                   {images.map((img, idx) => (
@@ -167,7 +174,58 @@ Please share customization options and final pricing.`;
                     </div>
                   ))}
                 </div>
+                <div className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Maximize2 className="w-5 h-5" />
+                </div>
               </motion.div>
+            </AnimatePresence>
+
+            {/* ── Zoom / Lightbox ───────────────────────────────────── */}
+            <AnimatePresence>
+              {isZoomed && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 md:p-10"
+                  onClick={() => setIsZoomed(false)}
+                >
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white z-[110]"
+                    onClick={() => setIsZoomed(false)}
+                  >
+                    <CloseIcon className="w-6 h-6" />
+                  </motion.button>
+
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    className="relative max-w-5xl w-full h-full flex items-center justify-center"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <img
+                      src={getImageUrl(images[activeIndex])}
+                      alt={product.name}
+                      className="max-w-full max-h-full object-contain rounded-xl shadow-2xl"
+                    />
+                  </motion.div>
+
+                  <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-4">
+                    {images.length > 1 && images.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={(e) => { e.stopPropagation(); scrollTo(idx); }}
+                        className={`w-12 h-16 rounded-lg overflow-hidden border-2 transition-all ${idx === activeIndex ? "border-primary scale-110" : "border-white/10 opacity-40 hover:opacity-100"}`}
+                      >
+                        <img src={getImageUrl(images[idx])} className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
             </AnimatePresence>
 
             {/* Pagination / Dots */}
@@ -218,7 +276,7 @@ Please share customization options and final pricing.`;
                 <span className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Investment</span>
                 <div className="text-2xl md:text-4xl font-heading text-primary flex items-baseline gap-2">
                   <span className="text-lg md:text-xl font-sans text-white/40 font-medium">Starting from</span>
-                  {product.price || "₹45,000"}
+                  {product.price ? (product.price.startsWith("₹") ? product.price : `₹${product.price}`) : "₹45,000"}
                 </div>
                 <p className="text-[10px] text-white/30 italic mt-1">*Final price depends on customization and measure</p>
               </div>
@@ -345,7 +403,10 @@ Please share customization options and final pricing.`;
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => toggleFavorite(product)}
+                onClick={() => {
+                  toggleFavorite(product);
+                  trackProductLike(product.$id, !liked);
+                }}
                 className={`w-20 h-20 rounded-2xl border-white/10 transition-all ${liked ? "bg-primary/10 border-primary/30" : "hover:bg-white/5"}`}
               >
                 <Heart className={`w-8 h-8 ${liked ? "fill-primary text-primary" : "text-white/60"}`} />
