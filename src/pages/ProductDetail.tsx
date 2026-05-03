@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Maximize2, X as CloseIcon } from "lucide-react";
+import SEO from "@/components/SEO";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -119,6 +120,13 @@ Please share customization options and final pricing.`;
 
   return (
     <div className="min-h-screen bg-[#050505] text-white overflow-x-hidden">
+      <SEO 
+        title={`${product.name} - Luxury Bridal Wear in Kerala | Yaga Designs`}
+        description={`Custom ${product.category} ${product.name} by Yaga Designs. Handcrafted luxury bridal couture available in Kothamangalam, Ernakulam, and throughout Kerala.`}
+        keywords={`${product.name}, bridal ${product.category}, custom wedding wear Kerala, bridal boutique Ernakulam`}
+        canonical={`https://yagadesigns.in/product/${product.$id}`}
+        ogImage={getImageUrl(product.image_url)}
+      />
       {/* ── Navigation Header (Mobile Only) ─────────────────────────── */}
       <div className="fixed top-20 left-4 right-4 z-40 flex justify-between items-center md:hidden">
         <button

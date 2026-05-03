@@ -9,7 +9,7 @@ export default function FloatingWhatsApp() {
   if (pathname?.startsWith("/admin")) return null;
 
   const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || "919633270639";
-  const defaultText = "Hello Yaga Designs, I would like to know more about your collection.";
+  const defaultText = "Hello Yaga Designs, I'm interested in your luxury bridal collections. Could you please share more details about your custom design services and availability?";
   const href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(defaultText)}`;
 
   return (

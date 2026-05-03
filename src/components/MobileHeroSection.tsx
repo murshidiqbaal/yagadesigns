@@ -1,16 +1,13 @@
-'use client';
-
+import { getWhatsAppUrl } from '@/lib/constants';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Gem } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /* ─────────────────────────────────────────────────────────────
    CONSTANTS & HELPERS
 ───────────────────────────────────────────────────────────── */
 
-const WHATSAPP_URL = 'https://wa.me/1234567890'; // Replace with your actual WhatsApp link
-
-// Rotating hero images
+// Rotating hero images (replace with your Appwrite/CDN URLs)
 const HERO_IMAGES = [
   'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=800&q=85&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&q=85&auto=format&fit=crop',
@@ -183,53 +180,12 @@ function CornerFlouish({ side }: { side: 'left' | 'right' }) {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   COUNT-UP COMPONENT
-───────────────────────────────────────────────────────────── */
-function CountUp({ target, delay }: { target: string; delay: number }) {
-  const num = parseInt(target);
-  const suffix = target.replace(/[0-9]/g, '');
-  const [display, setDisplay] = useState(0);
-  const started = useRef(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      started.current = true;
-      let start = 0;
-      const steps = 30;
-      const step = num / steps;
-      const interval = setInterval(() => {
-        start += step;
-        if (start >= num) { setDisplay(num); clearInterval(interval); }
-        else setDisplay(Math.floor(start));
-      }, 40);
-      return () => clearInterval(interval);
-    }, delay * 1000);
-    return () => clearTimeout(timer);
-  }, [num, delay]);
-
-  return (
-    <span
-      className="text-[22px] font-serif font-medium text-white/90 leading-none"
-      style={{
-        background: 'linear-gradient(135deg, #C9A43B 0%, #F0D875 50%, #B8820A 100%)',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-      }}
-    >
-      {display}{suffix}
-    </span>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────
    MAIN COMPONENT
 ───────────────────────────────────────────────────────────── */
 export default function MobileHeroSection() {
   const [showTitle, setShowTitle] = useState(true);
 
   useEffect(() => {
-    // Optional: Hide the main title after 5 seconds to show the background better. 
-    // You can remove this useEffect if you want the title to stay permanently.
     const timer = setTimeout(() => {
       setShowTitle(false);
     }, 5000);
@@ -280,16 +236,18 @@ export default function MobileHeroSection() {
         <div className="flex-1 flex flex-col items-center justify-center w-full">
 
           {/* ── Brand headline ── */}
+          <h1 className="sr-only">Luxury Bridal Designs in Kothamangalam - Yaga Designs</h1>
           <AnimatePresence>
             {showTitle && (
               <motion.div 
                 className="mb-4 w-full overflow-hidden"
                 initial={{ opacity: 1, height: 'auto', marginBottom: '1rem' }}
-                exit={{ opacity: 0, height: 'auto', marginBottom: '1rem' }}
+                exit={{ opacity: 0, height: 0, marginBottom: 0, scale: 0.95 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                aria-hidden="true"
               >
                 {/* YAGA */}
-                <div className="leading-[0.85] tracking-[-0.02em] font-serif" style={{ fontSize: 'clamp(88px, 26vw, 130px)' }}>
+                <div className="leading-[0.85] tracking-[-0.02em] font-heading" style={{ fontSize: 'clamp(88px, 26vw, 130px)' }}>
                   <SplitWord
                     word="Yaga"
                     delay={0.2}
@@ -298,11 +256,11 @@ export default function MobileHeroSection() {
                 </div>
 
                 {/* DESIGNS — gold shimmer gradient */}
-                <div className="leading-[0.85] tracking-[-0.02em] font-serif" style={{ fontSize: 'clamp(88px, 26vw, 130px)' }}>
+                <div className="leading-[0.85] tracking-[-0.02em] font-heading" style={{ fontSize: 'clamp(88px, 26vw, 130px)' }}>
                   <SplitWord
                     word="Designs"
                     delay={0.48}
-                    className="italic block gold-text"
+                    className="italic block"
                   />
                 </div>
 
@@ -338,8 +296,8 @@ export default function MobileHeroSection() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 1.0, ease }}
-            className="text-white/40 text-[13px] leading-[1.9] tracking-wide max-w-[240px] mx-auto mb-10 font-sans"
-            style={{ fontWeight: 300 }}
+            className="text-white/40 text-[13px] leading-[1.9] tracking-wide max-w-[240px] mx-auto mb-10"
+            style={{ fontFamily: '"DM Sans", sans-serif', fontWeight: 300 }}
           >
             Where dreams are woven into silk — handcrafted couture for your most&nbsp;cherished&nbsp;moments.
           </motion.p>
@@ -362,7 +320,7 @@ export default function MobileHeroSection() {
 
             {/* Secondary — outlined */}
             <a
-              href={WHATSAPP_URL}
+              href={getWhatsAppUrl()}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-[14px] rounded-full text-[10px] font-bold uppercase tracking-[0.35em] text-[#D4AF37] flex items-center justify-center border border-[#D4AF37]/25 transition-colors duration-300 active:scale-[0.97]"
@@ -390,7 +348,8 @@ export default function MobileHeroSection() {
                 className={`flex flex-col items-center py-4 px-2 ${i < 2 ? 'border-r border-white/[0.06]' : ''}`}
               >
                 <CountUp target={s.num} delay={1.4 + i * 0.12} />
-                <span className="text-[8px] uppercase tracking-[0.25em] text-white/25 mt-0.5 font-sans">
+                <span className="text-[8px] uppercase tracking-[0.25em] text-white/25 mt-0.5"
+                  style={{ fontFamily: '"DM Sans", sans-serif' }}>
                   {s.label}
                 </span>
               </div>
@@ -427,5 +386,44 @@ export default function MobileHeroSection() {
         </motion.div>
       </div>
     </section>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
+   COUNT-UP COMPONENT
+───────────────────────────────────────────────────────────── */
+function CountUp({ target, delay }: { target: string; delay: number }) {
+  const num = parseInt(target);
+  const suffix = target.replace(/[0-9]/g, '');
+  const [display, setDisplay] = useState(0);
+  const started = useRef(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      started.current = true;
+      let start = 0;
+      const steps = 30;
+      const step = num / steps;
+      const interval = setInterval(() => {
+        start += step;
+        if (start >= num) { setDisplay(num); clearInterval(interval); }
+        else setDisplay(Math.floor(start));
+      }, 40);
+      return () => clearInterval(interval);
+    }, delay * 1000);
+    return () => clearTimeout(timer);
+  }, [num, delay]);
+
+  return (
+    <span
+      className="text-[22px] font-heading font-medium text-white/90 leading-none"
+      style={{
+        background: 'linear-gradient(135deg, #C9A43B 0%, #F0D875 50%, #B8820A 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+      }}
+    >
+      {display}{suffix}
+    </span>
   );
 }

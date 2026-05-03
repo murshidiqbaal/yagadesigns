@@ -8,6 +8,7 @@ import { CATEGORIES } from '@/lib/constants';
 import ProductCard from '@/components/ProductCard';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 
 export default function Collections() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -42,6 +43,12 @@ export default function Collections() {
 
   return (
     <div className="site-shell min-h-screen">
+      <SEO 
+        title={`${activeCategory === 'All' ? 'Bridal Collections Kerala' : activeCategory + ' in Kerala'} | Yaga Designs`}
+        description={`Explore our exclusive ${activeCategory === 'All' ? 'bridal lehengas, engagement wear, and reception outfits' : activeCategory} at Yaga Designs, the premier bridal boutique in Kerala.`}
+        keywords={`bridal ${activeCategory.toLowerCase()}, wedding wear Kerala, ${activeCategory.toLowerCase()} boutique Kothamangalam`}
+        canonical={`https://yagadesigns.in/collections${activeCategory !== 'All' ? '?category=' + activeCategory : ''}`}
+      />
       <Header />
       <main className="pt-28 pb-24">
         <div className="container">
@@ -56,10 +63,10 @@ export default function Collections() {
               Browse
             </span>
             <h1 className="font-heading text-5xl md:text-7xl font-medium text-white">
-              Collections
+              {activeCategory === 'All' ? 'Bridal Collections' : activeCategory} in Kerala
             </h1>
             <p className="text-white/40 mt-4 max-w-md mx-auto text-sm">
-              Discover handcrafted bridal designs for every special occasion
+              Discover handcrafted bridal designs for every special occasion in Kothamangalam & Ernakulam.
             </p>
           </motion.div>
 

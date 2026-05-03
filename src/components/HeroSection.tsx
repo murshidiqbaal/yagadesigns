@@ -81,15 +81,17 @@ export default function HeroSection() {
 
         {/* Main Heading */}
         <motion.div style={{ opacity: fadeOutOpacity }}>
-          <motion.h1
+          <h1 className="sr-only">Luxury Bridal Designs in Kothamangalam - Yaga Designs</h1>
+          <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="font-heading font-medium leading-[0.9] tracking-tight mb-8"
+            aria-hidden="true"
           >
             <span className="block text-white text-[clamp(58px,10vw,130px)]">Yaga</span>
             <span className="block text-gradient italic text-[clamp(58px,10vw,130px)]">Designs</span>
-          </motion.h1>
+          </motion.div>
         </motion.div>
 
         {/* Tagline */}

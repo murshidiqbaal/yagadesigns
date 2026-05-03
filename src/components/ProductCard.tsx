@@ -31,7 +31,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
           {product.image_url ? (
             <img
               src={getImageUrl(product.image_url)}
-              alt={product.name}
+              alt={`${product.name} - Luxury Bridal Wear in Kerala`}
               loading="lazy"
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
             />
