@@ -1,14 +1,14 @@
-import { motion } from 'framer-motion';
-import { Sparkles, Heart, Star } from 'lucide-react';
-import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import { motion } from 'framer-motion';
+import { Heart, Sparkles, Star } from 'lucide-react';
 
 const PILLARS = [
   {
     icon: Sparkles,
     title: 'Our Vision',
     description:
-      "To become India's most loved bridal design house — where every bride leaves with confidence, elegance, and a piece of art she will cherish forever.",
+      "To become India's most loved bridal design house   where every bride leaves with confidence, elegance, and a piece of art she will cherish forever.",
   },
   {
     icon: Heart,
@@ -55,7 +55,7 @@ export default function About() {
                 <span className="text-gradient italic">Bride's Dream</span>
               </h1>
               <p className="text-white/45 max-w-2xl mx-auto text-base md:text-lg leading-relaxed">
-                Yaga Designs was founded with a single belief — that every bride deserves to feel
+                Yaga Designs was founded with a single belief   that every bride deserves to feel
                 extraordinary on her most special day.
               </p>
             </motion.div>
@@ -89,7 +89,7 @@ export default function About() {
                       "Crafting dreams, one stitch at a time."
                     </p>
                     <p className="text-xs text-[#D4AF37]/60 uppercase tracking-widest mt-2">
-                      — Yaga Designs
+                      Yaga Designs
                     </p>
                   </div>
                 </div>
@@ -108,7 +108,7 @@ export default function About() {
                     The Brand Story
                   </h2>
                   <p className="text-white/45 leading-relaxed">
-                    Yaga Designs began as a passion project — born out of a founder's desire to create
+                    Yaga Designs began as a passion project   born out of a founder's desire to create
                     bridal wear that speaks to the soul. We saw brides compromising on their vision due
                     to limited choices, and we decided to change that.
                   </p>
@@ -116,7 +116,7 @@ export default function About() {
                 <p className="text-white/45 leading-relaxed">
                   Today, every piece we create is a labour of love. From the first sketch to the final
                   fitting, we walk alongside each bride to ensure her outfit is nothing short of
-                  perfection — because you deserve nothing less.
+                  perfection   because you deserve nothing less.
                 </p>
 
                 {/* Stats */}

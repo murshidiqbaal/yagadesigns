@@ -1,3 +1,4 @@
+import mobileHeroImg from '@/assets/mobile hero.jpeg';
 import { getWhatsAppUrl } from '@/lib/constants';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Gem } from 'lucide-react';
@@ -8,11 +9,8 @@ import { useEffect, useRef, useState } from 'react';
 ───────────────────────────────────────────────────────────── */
 
 // Rotating hero images (replace with your Appwrite/CDN URLs)
-const HERO_IMAGES = [
-  'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=800&q=85&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&q=85&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=85&auto=format&fit=crop',
-];
+// Hero image
+const HERO_IMAGES = [mobileHeroImg];
 
 const MARQUEE_ITEMS = [
   'Royal Weddings', '✦', 'Handcrafted Silk', '✦',
@@ -119,6 +117,7 @@ function HeroBg() {
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
+    if (HERO_IMAGES.length <= 1) return;
     const t = setInterval(() => setIdx(p => (p + 1) % HERO_IMAGES.length), 5500);
     return () => clearInterval(t);
   }, []);
@@ -216,7 +215,7 @@ export default function MobileHeroSection() {
 
         {/* ── Top: corner decorations + eyebrow ── */}
         <div className="w-full flex items-start justify-between mb-6">
-          <CornerFlouish side="left" />
+          <div className="w-[52px]" />
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -229,7 +228,7 @@ export default function MobileHeroSection() {
               <Gem className="w-2 h-2 fill-[#D4AF37]/50 text-[#D4AF37]/50" />
             </span>
           </motion.div>
-          <CornerFlouish side="right" />
+          <div className="w-[52px]" />
         </div>
 
         {/* ── Spacer pushes headline to visual center ── */}
@@ -237,45 +236,43 @@ export default function MobileHeroSection() {
 
           {/* ── Brand headline ── */}
           <h1 className="sr-only">Luxury Bridal Designs in Kothamangalam - Yaga Designs</h1>
-          <AnimatePresence>
-            {showTitle && (
-              <motion.div 
-                className="mb-4 w-full overflow-hidden"
-                initial={{ opacity: 1, height: 'auto', marginBottom: '1rem' }}
-                exit={{ opacity: 0, height: 0, marginBottom: 0, scale: 0.95 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                aria-hidden="true"
-              >
-                {/* YAGA */}
-                <div className="leading-[0.85] tracking-[-0.02em] font-heading" style={{ fontSize: 'clamp(88px, 26vw, 130px)' }}>
-                  <SplitWord
-                    word="Yaga"
-                    delay={0.2}
-                    className="text-white font-medium block"
-                  />
-                </div>
+          <div className="mb-4 w-full relative" style={{ minHeight: '180px' }}>
+            <motion.div
+              className="w-full overflow-hidden"
+              initial={{ opacity: 1, scale: 1 }}
+              animate={{ opacity: showTitle ? 1 : 0, scale: showTitle ? 1 : 0.95 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              aria-hidden="true"
+            >
+              {/* YAGA */}
+              <div className="leading-tight tracking-[0.15em] uppercase" style={{ fontSize: 'clamp(56px, 18vw, 84px)', fontFamily: '"Tenor Sans", "Optima", sans-serif' }}>
+                <SplitWord
+                  word="Yaga"
+                  delay={0.2}
+                  className="text-white font-normal block"
+                />
+              </div>
 
-                {/* DESIGNS — gold shimmer gradient */}
-                <div className="leading-[0.85] tracking-[-0.02em] font-heading" style={{ fontSize: 'clamp(88px, 26vw, 130px)' }}>
-                  <SplitWord
-                    word="Designs"
-                    delay={0.48}
-                    className="italic block"
-                  />
-                </div>
+              {/* DESIGNS   gold shimmer gradient */}
+              <div className="leading-tight tracking-[0.15em] uppercase" style={{ fontSize: 'clamp(56px, 18vw, 84px)', fontFamily: '"Tenor Sans", "Optima", sans-serif' }}>
+                <SplitWord
+                  word="Designs"
+                  delay={0.48}
+                  className="block opacity-90"
+                />
+              </div>
 
-                {/* Gold gradient mask on "Designs" text */}
-                <style>{`
-                  .gold-text {
-                    background: linear-gradient(135deg, #C9A84C 0%, #F5E6A3 40%, #D4AF37 60%, #A8782A 100%);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
-                  }
-                `}</style>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              {/* Gold gradient mask on "Designs" text */}
+              <style>{`
+                .gold-text {
+                  background: linear-gradient(135deg, #C9A84C 0%, #F5E6A3 40%, #D4AF37 60%, #A8782A 100%);
+                  -webkit-background-clip: text;
+                  -webkit-text-fill-color: transparent;
+                  background-clip: text;
+                }
+              `}</style>
+            </motion.div>
+          </div>
 
           {/* Ornamental divider */}
           <motion.div
@@ -296,47 +293,56 @@ export default function MobileHeroSection() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 1.0, ease }}
-            className="text-white/40 text-[13px] leading-[1.9] tracking-wide max-w-[240px] mx-auto mb-10"
-            style={{ fontFamily: '"DM Sans", sans-serif', fontWeight: 300 }}
+            className="text-white/70 text-[13px] leading-[1.8] tracking-wide max-w-[320px] mx-auto mb-12 px-6 py-4 rounded-2xl"
+            style={{
+              fontFamily: '"DM Sans", sans-serif',
+              fontWeight: 300,
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              backdropFilter: 'blur(8px)'
+            }}
           >
-            Where dreams are woven into silk — handcrafted couture for your most&nbsp;cherished&nbsp;moments.
+            Where dreams are woven into silk handcrafted couture for your most&nbsp;cherished&nbsp;moments.
           </motion.p>
 
           {/* ── CTA Buttons ── */}
           <motion.div
-            className="flex flex-col gap-3 w-full"
+            className="flex flex-row gap-2 w-full"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 1.15, ease }}
           >
-            {/* Primary — shimmer gold */}
+            {/* Primary   shimmer gold */}
             <ShimmerButton
               href="/collections"
-              className="w-full py-[14px] rounded-full text-[10px] font-bold uppercase tracking-[0.35em] text-[#1a1200] flex items-center justify-center"
-              style={{ background: 'linear-gradient(120deg, #C9A43B 0%, #F0D875 45%, #B8820A 100%)' }}
+              className="flex-1 py-[16px] rounded-full text-[9px] font-bold uppercase tracking-[0.15em] text-[#1a1200] flex items-center justify-center shadow-lg whitespace-nowrap"
+              style={{
+                background: 'linear-gradient(120deg, rgba(201,164,59,0.9) 0%, rgba(240,216,117,0.95) 45%, rgba(184,130,10,0.9) 100%)',
+                backdropFilter: 'blur(10px)'
+              }}
             >
               View Collection
             </ShimmerButton>
 
-            {/* Secondary — outlined */}
+            {/* Secondary   outlined */}
             <a
               href={getWhatsAppUrl()}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-[14px] rounded-full text-[10px] font-bold uppercase tracking-[0.35em] text-[#D4AF37] flex items-center justify-center border border-[#D4AF37]/25 transition-colors duration-300 active:scale-[0.97]"
-              style={{ background: 'rgba(212,175,55,0.05)', backdropFilter: 'blur(8px)' }}
+              className="flex-1 py-[16px] rounded-full text-[9px] font-bold uppercase tracking-[0.15em] text-[#D4AF37] flex items-center justify-center border border-[#D4AF37]/30 transition-all duration-300 active:scale-[0.97] whitespace-nowrap"
+              style={{ background: 'rgba(212,175,55,0.03)', backdropFilter: 'blur(20px)' }}
             >
-              Book Consultation
+              Consult Now
             </a>
           </motion.div>
 
           {/* Stats row */}
           <motion.div
-            className="grid grid-cols-3 gap-0 mt-10 w-full border border-white/[0.06] rounded-2xl overflow-hidden"
+            className="grid grid-cols-3 gap-0 mt-12 w-full border border-white/[0.08] rounded-3xl overflow-hidden"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 1.3, ease }}
-            style={{ background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(12px)' }}
+            style={{ background: 'rgba(255,255,255,0.01)', backdropFilter: 'blur(24px)' }}
           >
             {[
               { num: '500+', label: 'Brides' },
@@ -345,10 +351,10 @@ export default function MobileHeroSection() {
             ].map((s, i) => (
               <div
                 key={i}
-                className={`flex flex-col items-center py-4 px-2 ${i < 2 ? 'border-r border-white/[0.06]' : ''}`}
+                className={`flex flex-col items-center py-6 px-2 ${i < 2 ? 'border-r border-white/[0.08]' : ''}`}
               >
                 <CountUp target={s.num} delay={1.4 + i * 0.12} />
-                <span className="text-[8px] uppercase tracking-[0.25em] text-white/25 mt-0.5"
+                <span className="text-[9px] uppercase tracking-[0.25em] text-white/30 mt-1"
                   style={{ fontFamily: '"DM Sans", sans-serif' }}>
                   {s.label}
                 </span>
@@ -392,6 +398,7 @@ export default function MobileHeroSection() {
 /* ─────────────────────────────────────────────────────────────
    COUNT-UP COMPONENT
 ───────────────────────────────────────────────────────────── */
+
 function CountUp({ target, delay }: { target: string; delay: number }) {
   const num = parseInt(target);
   const suffix = target.replace(/[0-9]/g, '');
@@ -416,7 +423,7 @@ function CountUp({ target, delay }: { target: string; delay: number }) {
 
   return (
     <span
-      className="text-[22px] font-heading font-medium text-white/90 leading-none"
+      className="text-[24px] font-heading font-medium text-white/90 leading-none"
       style={{
         background: 'linear-gradient(135deg, #C9A43B 0%, #F0D875 50%, #B8820A 100%)',
         WebkitBackgroundClip: 'text',

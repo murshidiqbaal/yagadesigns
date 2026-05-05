@@ -4,9 +4,9 @@
 // import { getTestimonials, type Testimonial } from '@/lib/appwrite';
 
 // const fallbackTestimonials: Testimonial[] = [
-//   { $id: '1', name: 'Priya & Arjun', message: 'Yaga Designs created the most breathtaking bridal lehenga for us. Every single detail was perfection — truly the best bridal designers we could have chosen!', rating: 5 },
+//   { $id: '1', name: 'Priya & Arjun', message: 'Yaga Designs created the most breathtaking bridal lehenga for us. Every single detail was perfection   truly the best bridal designers we could have chosen!', rating: 5 },
 //   { $id: '2', name: 'Meera & Rahul', message: 'We searched for premium bridal wear and found Yaga Designs. Their attention to detail and creativity exceeded all our expectations. Truly world-class craftsmanship.', rating: 5 },
-//   { $id: '3', name: 'Ananya & Dev', message: 'My bridal gown from Yaga Designs was absolutely breathtaking. The team handled everything flawlessly — the best luxury bridal designers I have ever worked with.', rating: 5 },
+//   { $id: '3', name: 'Ananya & Dev', message: 'My bridal gown from Yaga Designs was absolutely breathtaking. The team handled everything flawlessly   the best luxury bridal designers I have ever worked with.', rating: 5 },
 // ];
 
 // export default function TestimonialsSection() {

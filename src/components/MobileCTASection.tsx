@@ -5,7 +5,7 @@ import { MessageCircle } from 'lucide-react';
 export default function MobileCTASection() {
   return (
     <section className="py-20 bg-[#050505] relative" style={{ overflowX: 'hidden', width: '100%', maxWidth: '100vw' }}>
-      {/* Lightweight static glow — no animation for mobile perf */}
+      {/* Lightweight static glow   no animation for mobile perf */}
       <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
         <div className="w-[80vw] h-[50vw] rounded-full bg-[#D4AF37]/6 blur-[90px]" />
       </div>
@@ -43,7 +43,7 @@ export default function MobileCTASection() {
           </h2>
 
           <p className="text-white/40 text-[13px] leading-relaxed mb-10 max-w-xs mx-auto">
-            Let us create the outfit you've always dreamed of. Reach out for a personal consultation — no obligation.
+            Let us create the outfit you've always dreamed of. Reach out for a personal consultation   no obligation.
           </p>
 
           <a

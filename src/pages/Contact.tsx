@@ -1,9 +1,9 @@
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
+import SEO from '@/components/SEO';
 import { getWhatsAppUrl } from '@/lib/constants';
 import { motion } from 'framer-motion';
 import { Clock, Instagram, MapPin, MessageCircle, Phone } from 'lucide-react';
-import SEO from '@/components/SEO';
 
 const CONTACT_ITEMS = [
   {
@@ -51,7 +51,7 @@ const CONTACT_ITEMS = [
 export default function Contact() {
   return (
     <div className="site-shell min-h-screen">
-      <SEO 
+      <SEO
         title="Contact Yaga Designs | Best Bridal Boutique in Kothamangalam"
         description="Book a consultation with Yaga Designs in Kothamangalam. We offer premium bridal styling and custom lehengas in Ernakulam, Muvattupuzha, and nearby areas."
         keywords="contact bridal designer Kerala, bridal studio Kothamangalam, wedding designer Ernakulam"
@@ -74,7 +74,7 @@ export default function Contact() {
               Contact Us
             </h1>
             <p className="text-white/35 mt-4 max-w-md mx-auto text-sm leading-relaxed">
-              We'd love to hear about your dream bridal look. Reach out to us anytime — we're here to help.
+              We'd love to hear about your dream bridal look. Reach out to us anytime   we're here to help.
             </p>
           </motion.div>
 
@@ -95,7 +95,7 @@ export default function Contact() {
               </div>
               <div className="flex-1">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-[#25D366]/70 mb-1">
-                  WhatsApp — Preferred
+                  WhatsApp   Preferred
                 </p>
                 <p className="font-heading text-2xl text-white group-hover:text-[#25D366] transition-colors duration-300">
                   Chat with us
@@ -149,13 +149,13 @@ export default function Contact() {
               transition={{ delay: 0.5 }}
               className="mt-12 rounded-2xl overflow-hidden border border-white/10 h-80 grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-700"
             >
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15712.964406184518!2d76.6138676554199!3d10.058782399999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b07e5399c54e539%3A0x954e539c54e539c5!2sKothamangalam%2C%20Kerala!5e0!3m2!1sen!2sin!4v1714763134512!5m2!1sen!2sin" 
-                width="100%" 
-                height="100%" 
-                style={{ border: 0 }} 
-                allowFullScreen={true} 
-                loading="lazy" 
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15712.964406184518!2d76.6138676554199!3d10.058782399999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b07e5399c54e539%3A0x954e539c54e539c5!2sKothamangalam%2C%20Kerala!5e0!3m2!1sen!2sin!4v1714763134512!5m2!1sen!2sin"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen={true}
+                loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Yaga Designs Location"
               ></iframe>

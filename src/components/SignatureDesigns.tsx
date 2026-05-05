@@ -84,7 +84,7 @@ function ProcessSection() {
                 style={{ boxShadow: "0 0 12px rgba(212,175,55,0.3)" }}
               />
 
-              {/* Content block — alternate sides on desktop, right side on mobile */}
+              {/* Content block   alternate sides on desktop, right side on mobile */}
               <div className={`w-full sm:w-[43%] pl-10 sm:pl-0 ${i % 2 === 0 ? 'sm:pr-12' : 'sm:pl-12'}`}>
                 <div className="bg-white/[0.02] border border-[#D4AF37]/10 rounded-sm p-6 sm:p-7 relative overflow-hidden group hover:border-[#D4AF37]/30 transition-colors duration-500">
                   {/* Step number watermark */}

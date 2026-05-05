@@ -49,6 +49,7 @@ export interface Product {
   variants?: string | ProductVariant[]; // Stored as JSON string in DB
   enquiry_count?: number;
   like_count?: number;
+  instagram_reel_link?: string;
   created_at: string;
 }
 

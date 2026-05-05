@@ -16,7 +16,7 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { user, loading, checkAuth } = useAuth();
-  
+
   // Auto-redirect if already logged in
   useEffect(() => {
     if (user && !loading) {
@@ -54,7 +54,7 @@ export default function AdminLogin() {
     setIsLoading(true);
     try {
       await account.create("unique()", email, password);
-      
+
       // Clear any existing session before creating a new one
       try {
         await account.deleteSession("current");
@@ -99,7 +99,7 @@ export default function AdminLogin() {
             </div>
           </div>
           <p className="text-white/35 text-sm uppercase tracking-widest text-xs">
-            Admin Console — Restricted Access
+            Admin Console   Restricted Access
           </p>
         </div>
 

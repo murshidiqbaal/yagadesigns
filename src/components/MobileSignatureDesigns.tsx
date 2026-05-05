@@ -212,7 +212,7 @@ export default function MobileSignatureDesigns() {
             </p>
           </motion.div>
 
-          {/* ── Category pills — horizontal scroll ──────────── */}
+          {/* ── Category pills   horizontal scroll ──────────── */}
           <div style={{
             display: 'flex', gap: 7, overflowX: 'auto', overflowY: 'hidden',
             paddingBottom: '1rem', marginBottom: '1.5rem',

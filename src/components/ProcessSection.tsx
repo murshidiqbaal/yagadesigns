@@ -4,7 +4,7 @@ import { useRef } from 'react';
 const steps = [
   { num: '01', title: 'Discovery', desc: 'We listen to your vision, dreams, and every detail that matters to you.' },
   { num: '02', title: 'Design', desc: 'Our team crafts a bespoke concept that reflects your unique style and story.' },
-  { num: '03', title: 'Planning', desc: 'Every element is meticulously coordinated — from venue to florals to lighting.' },
+  { num: '03', title: 'Planning', desc: 'Every element is meticulously coordinated   from venue to florals to lighting.' },
   { num: '04', title: 'Execution', desc: 'We bring your vision to life flawlessly, so you can enjoy every moment.' },
 ];
 
@@ -35,9 +35,8 @@ export default function ProcessSection() {
               initial={{ opacity: 0, y: 40 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: i * 0.2 }}
-              className={`relative flex items-start gap-8 mb-16 ${
-                i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
-              }`}
+              className={`relative flex items-start gap-8 mb-16 ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
+                }`}
             >
               <div className="absolute left-8 md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full border-2 border-primary bg-background z-10" />
               <div className={`ml-20 md:ml-0 md:w-1/2 ${i % 2 === 0 ? 'md:pr-16 md:text-right' : 'md:pl-16'}`}>

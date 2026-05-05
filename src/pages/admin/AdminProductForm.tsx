@@ -1,24 +1,6 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import {
-  Plus, Trash2, Upload, X, ArrowUp, ArrowDown,
-  Scissors, CheckCircle2, ChevronLeft, Save, Loader2
-} from "lucide-react";
-import { toast } from "sonner";
-import {
-  getProducts,
-  addProduct,
-  updateProduct,
-  uploadProductImage,
-  Product,
-  ProductVariant,
-  getImageUrl,
-} from "@/lib/appwrite";
-import { CATEGORIES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -26,9 +8,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Product,
+  addProduct,
+  getImageUrl,
+  getProducts,
+  updateProduct,
+  uploadProductImage
+} from "@/lib/appwrite";
+import { CATEGORIES } from "@/lib/constants";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import {
+  ArrowDown,
+  ArrowUp,
+  CheckCircle2, ChevronLeft,
+  Loader2,
+  Plus,
+  Save,
+  Scissors,
+  Trash2, Upload, X
+} from "lucide-react";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
 
 const BASE_FORM_CATEGORIES = CATEGORIES.filter((c) => c !== "All");
 const CUSTOM_CAT_KEY = "__custom__";
@@ -49,6 +54,7 @@ interface FormData {
   embroidery: string;
   occasion: string;
   is_customizable: boolean;
+  instagram_reel_link: string;
   variants: VariantFormData[];
 }
 
@@ -62,6 +68,7 @@ const DEFAULT_FORM: FormData = {
   embroidery: "",
   occasion: "",
   is_customizable: true,
+  instagram_reel_link: "",
   variants: [],
 };
 
@@ -93,6 +100,7 @@ export default function AdminProductForm() {
         embroidery: existingProduct.embroidery || "",
         occasion: existingProduct.occasion || "",
         is_customizable: existingProduct.is_customizable ?? true,
+        instagram_reel_link: existingProduct.instagram_reel_link || "",
         variants: (existingProduct.variants as VariantFormData[]) || [],
       };
     }
@@ -113,6 +121,7 @@ export default function AdminProductForm() {
       embroidery: existingProduct.embroidery || "",
       occasion: existingProduct.occasion || "",
       is_customizable: existingProduct.is_customizable ?? true,
+      instagram_reel_link: existingProduct.instagram_reel_link || "",
       variants: (existingProduct.variants as VariantFormData[]) || [],
     });
   }
@@ -245,6 +254,10 @@ export default function AdminProductForm() {
     if (!form.name.trim()) { toast.error("Product name is required"); return; }
     if (!form.category) { toast.error("Please select a category"); return; }
     if (form.variants.length === 0) { toast.error("Add at least one color variant"); return; }
+    if (form.instagram_reel_link && !form.instagram_reel_link.includes("instagram.com/reel")) {
+      toast.error("Instagram Reel link must contain 'instagram.com/reel'");
+      return;
+    }
 
     setUploading(true);
     try {
@@ -275,6 +288,7 @@ export default function AdminProductForm() {
         occasion: form.occasion,
         is_customizable: form.is_customizable,
         image_url: mainImageUrl,
+        instagram_reel_link: form.instagram_reel_link.trim() || undefined,
         variants: updatedVariants,
         created_at: existingProduct?.created_at || new Date().toISOString(),
       };
@@ -427,6 +441,23 @@ export default function AdminProductForm() {
               className="bg-white/5 border-white/10 rounded-3xl min-h-[120px] resize-none p-6"
             />
           </div>
+
+          <div className="space-y-2">
+            <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40 flex items-center gap-2">
+              Instagram Reel Link <span className="text-white/20 font-normal lowercase">(Optional)</span>
+            </label>
+            <Input
+              value={form.instagram_reel_link}
+              onChange={(e) => setForm((f) => ({ ...f, instagram_reel_link: e.target.value }))}
+              placeholder="https://www.instagram.com/reel/..."
+              className="bg-white/5 border-white/10 focus:border-[#E1306C]/50 rounded-2xl h-14 text-white placeholder:text-white/20"
+            />
+            {form.instagram_reel_link && form.instagram_reel_link.includes("instagram.com/reel") && (
+              <p className="text-[10px] text-green-500 mt-1 pl-1 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" /> Valid Reel Link
+              </p>
+            )}
+          </div>
         </section>
 
         {/* Variant Manager */}
@@ -443,7 +474,7 @@ export default function AdminProductForm() {
 
           {form.variants.length === 0 && (
             <div className="text-center py-16 border-2 border-dashed border-white/5 rounded-3xl">
-              <p className="text-white/20 text-sm">No variants yet — add at least one color.</p>
+              <p className="text-white/20 text-sm">No variants yet   add at least one color.</p>
             </div>
           )}
 

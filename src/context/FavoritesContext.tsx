@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { Product } from '@/lib/appwrite';
+import React, { createContext, useCallback, useContext, useState } from 'react';
 
 const STORAGE_KEY = 'yaga_favorites';
 
@@ -25,7 +25,7 @@ function writeToStorage(items: Product[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   } catch {
-    // Storage quota exceeded — silent fail
+    // Storage quota exceeded   silent fail
   }
 }
 

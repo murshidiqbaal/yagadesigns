@@ -1,4 +1,4 @@
-import { getTestimonials, getImageUrl, Testimonial } from '@/lib/appwrite';
+import { getImageUrl, getTestimonials, Testimonial } from '@/lib/appwrite';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, MessageSquareQuote, Star, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -30,7 +30,7 @@ export default function MobileTestimonials() {
 
   return (
     <section className="py-20 relative bg-[#050505]" style={{ overflowX: 'hidden', width: '100%', maxWidth: '100vw' }}>
-      {/* Background glow — lightweight on mobile */}
+      {/* Background glow   lightweight on mobile */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[40vw] bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
 
       <div className="relative z-10 px-5" style={{ width: '100%', boxSizing: 'border-box' }}>

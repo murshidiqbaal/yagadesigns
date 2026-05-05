@@ -5,7 +5,7 @@ import { WHATSAPP_NUMBER } from "@/lib/constants";
 import { useQuery } from "@tanstack/react-query";
 import useEmblaCarousel from "embla-carousel-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, Heart, MessageCircle, Plus, Scissors, Share2, ShieldCheck, Zap } from "lucide-react";
+import { ChevronLeft, Heart, MessageCircle, Plus, Scissors, Share2, ShieldCheck, Zap, Play } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -73,13 +73,13 @@ export default function ProductDetail() {
   // ── WhatsApp Logic ─────────────────────────────────────────────────
   const handleWhatsAppEnquiry = () => {
     if (!product) return;
-    const text = `Hello Yaga Designs,
-
-I am interested in:
-Product: ${product.name}
-${selectedVariant ? `Color: ${selectedVariant.color}` : ""}
-
-Please share customization options and final pricing.`;
+    let text = `Hello Yaga Designs,\n\nI am interested in:\nProduct: ${product.name}\n${selectedVariant ? `Color: ${selectedVariant.color}\n` : ""}`;
+    if (product.instagram_reel_link) {
+      text += `Reel: ${product.instagram_reel_link}\n\n`;
+    } else {
+      text += `\n`;
+    }
+    text += `Please share customization options and final pricing.`;
 
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
@@ -185,6 +185,20 @@ Please share customization options and final pricing.`;
                 <div className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
                   <Maximize2 className="w-5 h-5" />
                 </div>
+                {product.instagram_reel_link && (
+                  <a
+                    href={product.instagram_reel_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="absolute top-4 left-4 z-10 w-10 h-10 rounded-full flex items-center justify-center text-white shadow-lg transition-transform hover:scale-110"
+                    style={{
+                      background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)'
+                    }}
+                  >
+                    <Play className="w-4 h-4 fill-white ml-0.5" />
+                  </a>
+                )}
               </motion.div>
             </AnimatePresence>
 
@@ -400,25 +414,42 @@ Please share customization options and final pricing.`;
             </div>
 
             {/* Action Buttons (Desktop Only) */}
-            <div className="hidden md:flex gap-4 pt-12">
-              <Button
-                onClick={handleWhatsAppEnquiry}
-                className="flex-1 py-10 rounded-2xl text-xl gap-3 font-bold bg-primary hover:bg-primary/90 text-black shadow-[0_20px_40px_rgba(212,175,55,0.15)] transition-all hover:-translate-y-1 active:scale-[0.98]"
-              >
-                <MessageCircle className="w-6 h-6 fill-black" />
-                Enquire via WhatsApp
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => {
-                  toggleFavorite(product);
-                  trackProductLike(product.$id, !liked);
-                }}
-                className={`w-20 h-20 rounded-2xl border-white/10 transition-all ${liked ? "bg-primary/10 border-primary/30" : "hover:bg-white/5"}`}
-              >
-                <Heart className={`w-8 h-8 ${liked ? "fill-primary text-primary" : "text-white/60"}`} />
-              </Button>
+            <div className="hidden md:flex flex-col gap-4 pt-12">
+              <div className="flex gap-4">
+                <Button
+                  onClick={handleWhatsAppEnquiry}
+                  className="flex-1 py-10 rounded-2xl text-xl gap-3 font-bold bg-primary hover:bg-primary/90 text-black shadow-[0_20px_40px_rgba(212,175,55,0.15)] transition-all hover:-translate-y-1 active:scale-[0.98]"
+                >
+                  <MessageCircle className="w-6 h-6 fill-black" />
+                  Enquire via WhatsApp
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    toggleFavorite(product);
+                    trackProductLike(product.$id, !liked);
+                  }}
+                  className={`w-20 h-20 rounded-2xl border-white/10 transition-all ${liked ? "bg-primary/10 border-primary/30" : "hover:bg-white/5"}`}
+                >
+                  <Heart className={`w-8 h-8 ${liked ? "fill-primary text-primary" : "text-white/60"}`} />
+                </Button>
+              </div>
+
+              {product.instagram_reel_link && (
+                <a
+                  href={product.instagram_reel_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-5 rounded-2xl text-lg font-bold text-white flex items-center justify-center gap-3 transition-all hover:-translate-y-1 active:scale-[0.98] shadow-lg"
+                  style={{
+                    background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)'
+                  }}
+                >
+                  <Play className="w-5 h-5 fill-white" />
+                  Watch Reel on Instagram
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -429,15 +460,31 @@ Please share customization options and final pricing.`;
         <motion.div
           initial={{ y: 100 }}
           animate={{ y: 0 }}
-          className="bg-primary p-1 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.7)]"
+          className="flex flex-col gap-3"
         >
-          <Button
-            onClick={handleWhatsAppEnquiry}
-            className="w-full py-9 rounded-[2.25rem] bg-black text-white hover:bg-[#111] border-none text-lg font-bold gap-3 active:scale-[0.98] transition-transform"
-          >
-            <MessageCircle className="w-6 h-6 text-primary fill-primary" />
-            Enquire on WhatsApp
-          </Button>
+          {product.instagram_reel_link && (
+            <a
+               href={product.instagram_reel_link}
+               target="_blank"
+               rel="noopener noreferrer"
+               className="w-full py-4 rounded-[2rem] text-white flex items-center justify-center gap-2 font-bold text-sm shadow-lg active:scale-[0.98] transition-transform"
+               style={{
+                 background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)'
+               }}
+            >
+              <Play className="w-4 h-4 fill-white" />
+              Watch Instagram Reel
+            </a>
+          )}
+          <div className="bg-primary p-1 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.7)]">
+            <Button
+              onClick={handleWhatsAppEnquiry}
+              className="w-full py-9 rounded-[2.25rem] bg-black text-white hover:bg-[#111] border-none text-lg font-bold gap-3 active:scale-[0.98] transition-transform"
+            >
+              <MessageCircle className="w-6 h-6 text-primary fill-primary" />
+              Enquire on WhatsApp
+            </Button>
+          </div>
         </motion.div>
       </div>
     </div>

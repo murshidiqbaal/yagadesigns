@@ -41,7 +41,7 @@ export default function CTASection() {
           </h2>
 
           <p className="text-white/45 max-w-md mx-auto text-base md:text-lg leading-relaxed mb-12">
-            Let us create the outfit you've always dreamed of. Reach out for a personal consultation — no obligation.
+            Let us create the outfit you've always dreamed of. Reach out for a personal consultation   no obligation.
           </p>
 
           <a

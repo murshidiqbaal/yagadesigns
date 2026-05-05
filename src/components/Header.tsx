@@ -1,9 +1,10 @@
 import logoImg from '@/assets/logoyaga.png';
 import { useFavorites } from '@/hooks/useFavorites';
+import useLongPress from '@/hooks/useLongPress';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Heart, Menu, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const NAV_LINKS = [
   { label: 'Home', to: '/' },
@@ -17,6 +18,18 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { favorites } = useFavorites();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLongPress = useCallback(() => {
+    console.log('Long press triggered!');
+    if ('vibrate' in navigator) navigator.vibrate(200);
+    navigate('/admin');
+  }, [navigate]);
+
+  const { isPressing, ...longPressProps } = useLongPress({
+    onLongPress: handleLongPress,
+    delay: 5000,
+  });
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -39,7 +52,42 @@ export default function Header() {
       <div className={`flex items-center justify-between transition-all duration-500 ${scrolled ? 'gap-10' : 'container'
         }`}>
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 group">
+        <Link
+          to="/"
+          className="flex items-center gap-2 group relative"
+          {...longPressProps}
+        >
+          {/* Progress Ring for Long Press */}
+          <AnimatePresence>
+            {isPressing && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="absolute -inset-2 z-[-1]"
+              >
+                <svg className="w-full h-full rotate-[-90deg]">
+                  <motion.circle
+                    cx="50%"
+                    cy="50%"
+                    r="45%"
+                    fill="none"
+                    stroke="#D4AF37"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    pathLength="100"
+                    strokeDasharray="100"
+                    initial={{ strokeDashoffset: 100 }}
+                    animate={{ strokeDashoffset: 0 }}
+                    transition={{ duration: 5, ease: "linear" }}
+                    className="opacity-50"
+                  />
+                </svg>
+                <div className="absolute inset-0 bg-[#D4AF37]/10 blur-xl rounded-full animate-pulse" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <img
             src={logoImg}
             alt="Yaga Designs"
