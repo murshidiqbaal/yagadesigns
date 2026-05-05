@@ -264,19 +264,101 @@ export default function ProductDetail() {
               </div>
             )}
 
-            {/* Large Screen Thumbnails */}
-            <div className="hidden md:flex gap-4 mt-6">
-              {images.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => scrollTo(idx)}
-                  className={`w-20 h-24 rounded-xl overflow-hidden border-2 transition-all ${idx === activeIndex ? "border-primary opacity-100 scale-105" : "border-transparent opacity-50 hover:opacity-80"
-                    }`}
-                >
-                  <img src={getImageUrl(img)} className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
+            {/* Lar            {/* ── Instagram Reel Cards — Desktop Left Column (9:16 ratio) ── */}
+            {Array.isArray(product.reels) && product.reels.length > 0 && (
+              <div className="hidden md:flex flex-col gap-8 mt-10">
+                {product.reels.map((reel, idx) => (
+                  reel.thumbnail && (
+                    <motion.a
+                      key={idx}
+                      href={reel.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="relative rounded-2xl overflow-hidden group cursor-pointer w-full shadow-2xl"
+                      style={{ aspectRatio: '9 / 16', width: '200px' }}
+                    >
+                      <img
+                        src={reel.thumbnail}
+                        alt={`Instagram Reel ${idx + 1}`}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      {/* Dark overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/60 group-hover:from-black/5 group-hover:via-black/10 group-hover:to-black/50 transition-all duration-500" />
+                      {/* Hover border glow */}
+                      <div
+                        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                        style={{ boxShadow: 'inset 0 0 0 2px rgba(220,39,67,0.8)' }}
+                      />
+                      {/* Center play button */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div
+                          className="w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-transform duration-300 group-hover:scale-110"
+                          style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
+                        >
+                          <Play className="w-6 h-6 fill-white ml-0.5" />
+                        </div>
+                      </div>
+                      {/* Top Instagram badge */}
+                      <div className="absolute top-3 left-3 flex items-center gap-2">
+                        <div
+                          className="w-7 h-7 rounded-full flex items-center justify-center"
+                          style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
+                        >
+                          <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-white">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                          </svg>
+                        </div>
+                        <span className="text-white text-[10px] font-bold tracking-wider uppercase bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">Reel</span>
+                      </div>
+                      {/* Bottom label */}
+                      <div className="absolute bottom-0 left-0 right-0 px-5 py-5 bg-gradient-to-t from-black/80 to-transparent">
+                        <p className="text-white font-bold text-xs">Watch on Instagram</p>
+                      </div>
+                    </motion.a>
+                  )
+                ))}
+              </div>
+            )}
+
+            {/* Backward compatibility for single reel if no array exists */}
+            {!Array.isArray(product.reels) && product.instagram_reel_link && product.reel_thumbnail && (
+              <a
+                href={product.instagram_reel_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden md:block relative mt-6 rounded-2xl overflow-hidden group cursor-pointer"
+                style={{ aspectRatio: '9 / 16', width: '180px' }}
+              >
+                <img
+                  src={product.reel_thumbnail}
+                  alt="Instagram Reel"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/60" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-transform duration-300 group-hover:scale-110"
+                    style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
+                  >
+                    <Play className="w-6 h-6 fill-white ml-0.5" />
+                  </div>
+                </div>
+              </a>
+            )}
+          </div>     </svg>
+                  </div>
+                  <span className="text-white text-xs font-bold tracking-wider uppercase bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full">Reel</span>
+                </div>
+                {/* Bottom label */}
+                <div className="absolute bottom-0 left-0 right-0 px-5 py-5 bg-gradient-to-t from-black/80 to-transparent">
+                  <p className="text-white font-bold text-sm">Watch Reel on Instagram</p>
+                  <p className="text-white/50 text-[11px] mt-0.5">Tap to open in Instagram</p>
+                </div>
+              </a>
+            )}
           </div>
 
           {/* ── Right Column: Info ──────────────────────────────────── */}
@@ -436,7 +518,27 @@ export default function ProductDetail() {
                 </Button>
               </div>
 
-              {product.instagram_reel_link && (
+              {/* Reel buttons — shown only when no thumbnails in the new reels array */}
+              {Array.isArray(product.reels) && product.reels.map((reel, idx) => (
+                !reel.thumbnail && reel.link && (
+                  <a
+                    key={idx}
+                    href={reel.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-5 rounded-2xl text-lg font-bold text-white flex items-center justify-center gap-3 transition-all hover:-translate-y-1 active:scale-[0.98] shadow-lg mb-4"
+                    style={{
+                      background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)'
+                    }}
+                  >
+                    <Play className="w-5 h-5 fill-white" />
+                    Watch Reel {idx + 1}
+                  </a>
+                )
+              ))}
+
+              {/* Backward compatibility single reel button */}
+              {!Array.isArray(product.reels) && product.instagram_reel_link && !product.reel_thumbnail && (
                 <a
                   href={product.instagram_reel_link}
                   target="_blank"
@@ -455,26 +557,134 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      {/* ── Sticky Mobile CTA ────────────────────────────────────────── */}
       <div className="md:hidden fixed bottom-8 left-6 right-6 z-50">
         <motion.div
           initial={{ y: 100 }}
           animate={{ y: 0 }}
           className="flex flex-col gap-3"
         >
-          {product.instagram_reel_link && (
-            <a
-               href={product.instagram_reel_link}
-               target="_blank"
-               rel="noopener noreferrer"
-               className="w-full py-4 rounded-[2rem] text-white flex items-center justify-center gap-2 font-bold text-sm shadow-lg active:scale-[0.98] transition-transform"
-               style={{
-                 background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)'
-               }}
-            >
-              <Play className="w-4 h-4 fill-white" />
-              Watch Instagram Reel
-            </a>
+          {Array.isArray(product.reels) && product.reels.length > 0 && (
+            <div className="flex flex-col gap-3 max-h-[30vh] overflow-y-auto no-scrollbar">
+              {product.reels.map((reel, idx) => (
+                reel.thumbnail ? (
+                  /* ── Mobile Reel Preview Card (9:16) ─── */
+                  <a
+                    key={idx}
+                    href={reel.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative block rounded-2xl overflow-hidden group w-full shrink-0"
+                    style={{ aspectRatio: '9 / 16', maxHeight: '35vh' }}
+                  >
+                    <img
+                      src={reel.thumbnail}
+                      alt={`Instagram Reel ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
+                    
+                    {/* Instagram badge */}
+                    <div className="absolute top-3 left-3 flex items-center gap-2">
+                      <div
+                        className="w-7 h-7 rounded-full flex items-center justify-center"
+                        style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
+                      >
+                        <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-white">
+                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                        </svg>
+                      </div>
+                      <span className="text-white text-[10px] font-bold tracking-wider uppercase bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">Reel</span>
+                    </div>
+
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div
+                        className="w-12 h-12 rounded-full flex items-center justify-center shadow-2xl"
+                        style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
+                      >
+                        <Play className="w-5 h-5 fill-white ml-0.5" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-gradient-to-t from-black/90 to-transparent">
+                      <span className="text-white text-xs font-bold">Watch Reel {idx + 1}</span>
+                    </div>
+                  </a>
+                ) : (
+                  <a
+                    key={idx}
+                    href={reel.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-4 rounded-[2rem] text-white flex items-center justify-center gap-2 font-bold text-sm shadow-lg active:scale-[0.98] transition-transform"
+                    style={{
+                      background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)'
+                    }}
+                  >
+                    <Play className="w-4 h-4 fill-white" />
+                    Watch Instagram Reel {idx + 1}
+                  </a>
+                )
+              ))}
+            </div>
+          )}
+
+          {/* Fallback for single reel link (backward compatibility) */}
+          {!Array.isArray(product.reels) && product.instagram_reel_link && (
+            product.reel_thumbnail ? (
+              /* ── Mobile Reel Preview Card (9:16) ─── */
+              <a
+                href={product.instagram_reel_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative block rounded-2xl overflow-hidden group w-full mb-2"
+                style={{ aspectRatio: '9 / 16', maxHeight: '40vh' }}
+              >
+                <img
+                  src={product.reel_thumbnail}
+                  alt="Instagram Reel preview"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
+                
+                {/* Instagram badge */}
+                <div className="absolute top-3 left-3 flex items-center gap-2">
+                  <div
+                    className="w-7 h-7 rounded-full flex items-center justify-center"
+                    style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
+                  >
+                    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-white">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                    </svg>
+                  </div>
+                  <span className="text-white text-[10px] font-bold tracking-wider uppercase bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">Reel</span>
+                </div>
+
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center shadow-2xl"
+                    style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
+                  >
+                    <Play className="w-5 h-5 fill-white ml-0.5" />
+                  </div>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-gradient-to-t from-black/90 to-transparent">
+                  <span className="text-white text-xs font-bold">Watch Reel on Instagram</span>
+                </div>
+              </a>
+            ) : (
+              /* ── Mobile Gradient Button Fallback ─── */
+              <a
+                href={product.instagram_reel_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-4 rounded-[2rem] text-white flex items-center justify-center gap-2 font-bold text-sm shadow-lg active:scale-[0.98] transition-transform"
+                style={{
+                  background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)'
+                }}
+              >
+                <Play className="w-4 h-4 fill-white" />
+                Watch Instagram Reel
+              </a>
+            )
           )}
           <div className="bg-primary p-1 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.7)]">
             <Button

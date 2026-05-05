@@ -37,9 +37,9 @@ export default function Index() {
   return (
     <div className="site-shell min-h-screen">
       <SEO 
-        title="Luxury Bridal Designer in Kothamangalam | Yaga Designs"
-        description="Yaga Designs offers premium bridal lehengas, custom wedding dresses, and luxury bridal styling in Kothamangalam & Ernakulam. Enquire on WhatsApp."
-        keywords="bridal designer Kothamangalam, bridal boutique Ernakulam, wedding lehenga Kerala, custom bridal wear India"
+        title="Yaga Designs | Best Bridal Designer in Kothamangalam & Ernakulam"
+        description="Looking for the best bridal designer in Kothamangalam or bridal lehenga in Kothamangalam? Yaga Designs offers custom wedding dresses, nighty wholesale in Ernakulam, and bridal blouse stitching near me."
+        keywords="bridal designer in Kothamangalam, bridal boutique Ernakulam, custom bridal dress Kothamangalam, affordable bridal boutique near me, nighty wholesale shop Ernakulam, best lehenga shop near Kottayam, where to buy bridal lehenga in Kerala, who makes wedding dresses in Kothamangalam"
       />
       <LocalBusinessSchema />
       <OffersPopup />

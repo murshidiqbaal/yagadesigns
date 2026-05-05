@@ -49,8 +49,11 @@ export default function AboutSection() {
             <p className="text-[#F5F5F5]/70 leading-relaxed mb-6 text-base md:text-lg font-light tracking-wide">
               At yaga designgns, we craft more than just garments; we curate legacies. Our philosophy is rooted in cinematic precision, royal elegance, and a deep love for bridal artistry.
             </p>
-            <p className="text-[#F5F5F5]/70 leading-relaxed mb-12 text-base md:text-lg font-light tracking-wide">
-              Every detail is a brushstroke in a masterpiece uniquely yours, ensuring that your story is told with the grandeur it deserves across the stunning landscapes of Kerala.
+            <p className="text-[#F5F5F5]/70 leading-relaxed mb-6 text-base md:text-lg font-light tracking-wide">
+              Every detail is a brushstroke in a masterpiece uniquely yours, ensuring that your story is told with the grandeur it deserves. As the leading bridal designer in Kothamangalam, we help you understand how to choose a bridal lehenga in Kerala style that perfectly matches your silhouette and ceremony.
+            </p>
+            <p className="text-[#F5F5F5]/50 leading-relaxed mb-12 text-sm font-light tracking-wide italic">
+              Whether you are looking for an affordable bridal boutique near me or a custom bridal dress in Kothamangalam, our expertise ensures you find the best bridal designer near Ernakulam for your special day.
             </p>
 
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-8">

@@ -53,24 +53,10 @@ interface FormData {
   fabric: string;
   embroidery: string;
   occasion: string;
-  is_customizable: boolean;
-  instagram_reel_link: string;
-  variants: VariantFormData[];
+interface Reel {
+  link: string;
+  thumbnail: string;
 }
-
-const DEFAULT_FORM: FormData = {
-  name: "",
-  description: "",
-  category: "",
-  image_url: "",
-  price: "",
-  fabric: "",
-  embroidery: "",
-  occasion: "",
-  is_customizable: true,
-  instagram_reel_link: "",
-  variants: [],
-};
 
 export default function AdminProductForm() {
   const navigate = useNavigate();
@@ -101,6 +87,7 @@ export default function AdminProductForm() {
         occasion: existingProduct.occasion || "",
         is_customizable: existingProduct.is_customizable ?? true,
         instagram_reel_link: existingProduct.instagram_reel_link || "",
+        reel_thumbnail: existingProduct.reel_thumbnail || "",
         variants: (existingProduct.variants as VariantFormData[]) || [],
       };
     }
@@ -122,12 +109,14 @@ export default function AdminProductForm() {
       occasion: existingProduct.occasion || "",
       is_customizable: existingProduct.is_customizable ?? true,
       instagram_reel_link: existingProduct.instagram_reel_link || "",
+      reel_thumbnail: existingProduct.reel_thumbnail || "",
       variants: (existingProduct.variants as VariantFormData[]) || [],
     });
   }
 
   const [variantNewFiles, setVariantNewFiles] = useState<Record<number, File[]>>({});
   const [uploading, setUploading] = useState(false);
+  const [uploadingThumbnail, setUploadingThumbnail] = useState<number | null>(null);
   const [customCategories, setCustomCategories] = useState<string[]>([]);
   const [showCustomCatInput, setShowCustomCatInput] = useState(false);
   const [newCatName, setNewCatName] = useState("");
@@ -183,6 +172,48 @@ export default function AdminProductForm() {
   });
 
   const isSaving = addMut.isPending || editMut.isPending || uploading;
+
+  // ── Reel Helpers ──────────────────────────────────────────────────
+  const addReel = () => {
+    setForm(f => ({
+      ...f,
+      reels: [...(Array.isArray(f.reels) ? f.reels : []), { link: "", thumbnail: "" }]
+    }));
+  };
+
+  const removeReel = (index: number) => {
+    setForm(f => ({
+      ...f,
+      reels: (Array.isArray(f.reels) ? f.reels : []).filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateReel = (index: number, data: Partial<Reel>) => {
+    setForm(f => ({
+      ...f,
+      reels: (Array.isArray(f.reels) ? f.reels : []).map((r, i) => i === index ? { ...r, ...data } : r)
+    }));
+  };
+
+  // ── Reel Thumbnail Upload ──────────────────────────────────────────
+  const handleReelThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
+    if (file.size > 10 * 1024 * 1024) { toast.error("Image must be under 10MB"); return; }
+    
+    setUploadingThumbnail(index);
+    try {
+      const url = await uploadProductImage(file);
+      updateReel(index, { thumbnail: url });
+      toast.success("Thumbnail uploaded and optimized!");
+    } catch (err) {
+      toast.error("Failed to upload thumbnail");
+    } finally {
+      setUploadingThumbnail(null);
+      if (e.target) e.target.value = "";
+    }
+  };
 
   // ── Variant Helpers ────────────────────────────────────────────────
   const addVariant = () =>
@@ -289,6 +320,7 @@ export default function AdminProductForm() {
         is_customizable: form.is_customizable,
         image_url: mainImageUrl,
         instagram_reel_link: form.instagram_reel_link.trim() || undefined,
+        reel_thumbnail: form.reel_thumbnail.trim() || undefined,
         variants: updatedVariants,
         created_at: existingProduct?.created_at || new Date().toISOString(),
       };
@@ -408,7 +440,7 @@ export default function AdminProductForm() {
             </div>
 
             <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">Fabric</label>
                   <Input value={form.fabric} onChange={(e) => setForm((f) => ({ ...f, fabric: e.target.value }))} placeholder="Pure Georgette" className="bg-white/5 border-white/10 rounded-2xl h-14" />
@@ -416,6 +448,10 @@ export default function AdminProductForm() {
                 <div className="space-y-2">
                   <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">Work Type</label>
                   <Input value={form.embroidery} onChange={(e) => setForm((f) => ({ ...f, embroidery: e.target.value }))} placeholder="Hand Zari" className="bg-white/5 border-white/10 rounded-2xl h-14" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">Occasion</label>
+                  <Input value={form.occasion} onChange={(e) => setForm((f) => ({ ...f, occasion: e.target.value }))} placeholder="Bridal, Reception…" className="bg-white/5 border-white/10 rounded-2xl h-14" />
                 </div>
               </div>
               <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10 h-14">
@@ -442,22 +478,132 @@ export default function AdminProductForm() {
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40 flex items-center gap-2">
-              Instagram Reel Link <span className="text-white/20 font-normal lowercase">(Optional)</span>
-            </label>
-            <Input
-              value={form.instagram_reel_link}
-              onChange={(e) => setForm((f) => ({ ...f, instagram_reel_link: e.target.value }))}
-              placeholder="https://www.instagram.com/reel/..."
-              className="bg-white/5 border-white/10 focus:border-[#E1306C]/50 rounded-2xl h-14 text-white placeholder:text-white/20"
-            />
-            {form.instagram_reel_link && form.instagram_reel_link.includes("instagram.com/reel") && (
-              <p className="text-[10px] text-green-500 mt-1 pl-1 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" /> Valid Reel Link
-              </p>
-            )}
+          {/* Instagram Reels Section */}
+          <div className="p-6 rounded-3xl border border-white/5 bg-white/[0.02] space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
+                >
+                  <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white/70">Instagram Reels</h3>
+                  <p className="text-[10px] text-white/30">Add multiple reels to showcase this design</p>
+                </div>
+              </div>
+              <Button
+                type="button"
+                onClick={addReel}
+                variant="outline"
+                className="rounded-xl h-9 px-4 border-white/10 hover:bg-white/5 text-xs font-bold gap-2"
+              >
+                <Plus className="w-3.5 h-3.5" /> Add Reel
+              </Button>
+            </div>
+
+            <div className="space-y-8">
+              {(Array.isArray(form.reels) ? form.reels : []).map((reel, index) => (
+                <div key={index} className="p-5 rounded-2xl border border-white/5 bg-white/[0.01] relative group animate-in fade-in slide-in-from-top-4 duration-300">
+                  <button
+                    type="button"
+                    onClick={() => removeReel(index)}
+                    className="absolute top-4 right-4 w-7 h-7 rounded-full bg-black/40 flex items-center justify-center text-white hover:bg-red-500 transition-colors z-10"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">Reel Link</label>
+                      <Input
+                        value={reel.link}
+                        onChange={(e) => updateReel(index, { link: e.target.value })}
+                        placeholder="https://www.instagram.com/reel/..."
+                        className="bg-white/5 border-white/10 focus:border-[#E1306C]/50 rounded-xl h-11 text-sm"
+                      />
+                      {reel.link.includes("instagram.com/reel") && (
+                        <p className="text-[10px] text-green-500 mt-1 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" /> Valid Reel Link
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">Reel Thumbnail (WebP Optimized)</label>
+                      {!reel.thumbnail ? (
+                        <div className="space-y-3">
+                          <button
+                            type="button"
+                            disabled={uploadingThumbnail === index}
+                            onClick={() => (document.getElementById(`reel-thumb-${index}`) as HTMLInputElement)?.click()}
+                            className="w-full h-24 rounded-xl border-2 border-dashed border-white/10 hover:border-[#E1306C]/30 flex flex-col items-center justify-center gap-2 text-white/20 hover:text-white/40 transition-all disabled:opacity-50"
+                          >
+                            {uploadingThumbnail === index ? (
+                              <Loader2 className="w-6 h-6 animate-spin text-[#E1306C]" />
+                            ) : (
+                              <>
+                                <Upload className="w-4 h-4" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider">Upload Thumbnail</span>
+                              </>
+                            )}
+                          </button>
+                          <input
+                            id={`reel-thumb-${index}`}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handleReelThumbnailUpload(e, index)}
+                          />
+                          <Input
+                            value={reel.thumbnail}
+                            onChange={(e) => updateReel(index, { thumbnail: e.target.value })}
+                            placeholder="...or paste URL"
+                            className="bg-white/5 border-white/10 rounded-xl h-10 text-xs"
+                          />
+                        </div>
+                      ) : (
+                        <div className="relative rounded-xl overflow-hidden border border-white/10 aspect-video">
+                          <img
+                            src={reel.thumbnail}
+                            alt={`Reel ${index + 1} thumbnail`}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/20" />
+                          <button
+                            type="button"
+                            onClick={() => updateReel(index, { thumbnail: "" })}
+                            className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 rounded-md text-[9px] font-bold uppercase text-white hover:bg-red-500 transition-colors"
+                          >
+                            Change
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {(Array.isArray(form.reels) ? form.reels : []).length === 0 && (
+                <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-3xl">
+                  <Play className="w-8 h-8 text-white/10 mb-3" />
+                  <p className="text-sm text-white/20 font-medium">No reels added yet</p>
+                  <Button
+                    type="button"
+                    onClick={addReel}
+                    variant="link"
+                    className="text-primary text-xs font-bold uppercase tracking-widest mt-2"
+                  >
+                    + Add your first reel
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
+
         </section>
 
         {/* Variant Manager */}

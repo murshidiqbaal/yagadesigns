@@ -17,9 +17,9 @@ interface SEOProps {
 }
 
 const SEO: React.FC<SEOProps> = ({
-  title = "Yaga Designs | Luxury Bridal Designer in Kothamangalam",
-  description = "Yaga Designs offers premium bridal lehengas, custom wedding dresses, and luxury bridal styling in Kothamangalam & Ernakulam. Enquire on WhatsApp.",
-  keywords = "bridal designer Kothamangalam, bridal boutique Ernakulam, wedding lehenga Kerala, custom bridal wear India",
+  title = "Yaga Designs | Best Bridal Designer in Kothamangalam & Ernakulam",
+  description = "Yaga Designs is the premier bridal boutique in Ernakulam and Kothamangalam. We specialize in custom bridal lehengas, wedding dresses, and wholesale nighties in Kerala. Visit us for custom stitching in Perumbavoor.",
+  keywords = "bridal designer in Kothamangalam, bridal boutique Ernakulam, bridal lehenga Kothamangalam, bridal shop near Muvattupuzha, wedding dress designer Kerala, nighty shop Kothamangalam, nighty wholesale Ernakulam, custom stitching Perumbavoor, lehenga shop Aluva, ladies clothing store Kerala",
   canonical = "https://yagadesigns.in",
   ogTitle,
   ogDescription,

@@ -48,9 +48,10 @@ const LocalBusinessSchema: React.FC = () => {
       "Perumbavoor",
       "Aluva",
       "Thodupuzha",
-      "Kottayam"
+      "Kottayam",
+      "Kerala"
     ],
-    "description": "Luxury Bridal Designer in Kothamangalam offering premium bridal lehengas, custom wedding dresses, and luxury bridal styling in Kerala."
+    "description": "Yaga Designs is a premier bridal designer in Kothamangalam and bridal boutique in Ernakulam. We offer custom bridal lehengas, wedding dresses, and high-quality nighty wholesale in Kerala. Best lehenga shop near Kottayam and Muvattupuzha."
   };
 
   return (

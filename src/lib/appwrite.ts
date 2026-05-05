@@ -3,7 +3,7 @@ import { Account, Client, Databases, ID, Query, Storage } from 'appwrite';
 export const appwriteConfig = {
   endpoint: import.meta.env.VITE_APPWRITE_ENDPOINT || 'https://sgp.cloud.appwrite.io/v1',
   projectId: import.meta.env.VITE_APPWRITE_PROJECT_ID || '69d72e170037ae85ba57',
-  databaseId: import.meta.env.VITE_APPWRITE_DATABASE_ID || 'yaga_designs_db',
+  databaseId: import.meta.env.VITE_APPWRITE_DATABASE_ID || 'yaga-db',
   productsCollectionId: import.meta.env.VITE_APPWRITE_PRODUCTS_COLLECTION_ID || 'products',
   portfolioCollectionId: import.meta.env.VITE_APPWRITE_PORTFOLIO_COLLECTION_ID || 'portfolio',
   testimonialsCollectionId: import.meta.env.VITE_APPWRITE_TESTIMONIALS_COLLECTION_ID || 'testimonials',
@@ -33,6 +33,11 @@ export interface ProductVariant {
   thumbnail?: string;
 }
 
+export interface Reel {
+  link: string;
+  thumbnail: string;
+}
+
 export interface Product {
   $id: string;
   name: string;
@@ -49,7 +54,9 @@ export interface Product {
   variants?: string | ProductVariant[]; // Stored as JSON string in DB
   enquiry_count?: number;
   like_count?: number;
-  instagram_reel_link?: string;
+  instagram_reel_link?: string; // Kept for backward compatibility
+  reel_thumbnail?: string;      // Kept for backward compatibility
+  reels?: string | Reel[];      // Stored as JSON string
   created_at: string;
 }
 
@@ -85,6 +92,17 @@ export interface Offer {
 
 // ─── Product CRUD ────────────────────────────────────────────────────────────
 
+/**
+ * Remove keys with undefined/null values so Appwrite doesn't reject the payload.
+ * Appwrite will throw "Unknown attribute" if you send a key it doesn't recognise,
+ * and may throw on explicit `undefined` values too.
+ */
+function stripUndefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, v]) => v !== undefined && v !== null)
+  ) as Partial<T>;
+}
+
 export async function getProducts(category?: string): Promise<Product[]> {
   try {
     const queries: string[] = [Query.orderDesc('created_at'), Query.limit(100)];
@@ -93,10 +111,11 @@ export async function getProducts(category?: string): Promise<Product[]> {
     }
     const response = await databases.listDocuments(DATABASE_ID, PRODUCTS_COLLECTION, queries);
     
-    // Parse variants if they are stringified
+    // Parse JSON strings
     return response.documents.map((doc: any) => ({
       ...doc,
-      variants: typeof doc.variants === 'string' ? JSON.parse(doc.variants) : doc.variants
+      variants: typeof doc.variants === 'string' ? JSON.parse(doc.variants) : doc.variants,
+      reels: typeof doc.reels === 'string' ? JSON.parse(doc.reels) : doc.reels
     })) as Product[];
   } catch (error) {
     console.error('Failed to fetch products:', error);
@@ -110,7 +129,8 @@ export async function getProductById(id: string): Promise<Product | null> {
     const doc = response as any;
     return {
       ...doc,
-      variants: typeof doc.variants === 'string' ? JSON.parse(doc.variants) : doc.variants
+      variants: typeof doc.variants === 'string' ? JSON.parse(doc.variants) : doc.variants,
+      reels: typeof doc.reels === 'string' ? JSON.parse(doc.reels) : doc.reels
     } as Product;
   } catch (error) {
     console.error(`Failed to fetch product with ID ${id}:`, error);
@@ -120,11 +140,12 @@ export async function getProductById(id: string): Promise<Product | null> {
 
 export async function addProduct(product: Omit<Product, '$id'>): Promise<Product> {
   console.log('Final Product Payload:', product);
-  const payload = { 
-    ...product, 
+  const payload = stripUndefined({
+    ...product,
     created_at: product.created_at || new Date().toISOString(),
-    variants: typeof product.variants === 'object' ? JSON.stringify(product.variants) : product.variants
-  };
+    variants: typeof product.variants === 'object' ? JSON.stringify(product.variants) : product.variants,
+    reels: typeof product.reels === 'object' ? JSON.stringify(product.reels) : product.reels
+  });
   return databases.createDocument(
     DATABASE_ID, PRODUCTS_COLLECTION, ID.unique(),
     payload
@@ -132,10 +153,11 @@ export async function addProduct(product: Omit<Product, '$id'>): Promise<Product
 }
 
 export async function updateProduct(id: string, data: Partial<Omit<Product, '$id'>>): Promise<Product> {
-  const payload = {
+  const payload = stripUndefined({
     ...data,
-    variants: typeof data.variants === 'object' ? JSON.stringify(data.variants) : data.variants
-  };
+    variants: typeof data.variants === 'object' ? JSON.stringify(data.variants) : data.variants,
+    reels: typeof data.reels === 'object' ? JSON.stringify(data.reels) : data.reels
+  });
   return databases.updateDocument(DATABASE_ID, PRODUCTS_COLLECTION, id, payload) as unknown as Product;
 }
 
@@ -248,8 +270,59 @@ export async function deleteOffer(id: string): Promise<void> {
 
 // ─── Storage ─────────────────────────────────────────────────────────────────
 
+/**
+ * Converts a File (image) to WebP format using a Canvas.
+ * This ensures all uploads are optimized.
+ */
+async function convertToWebP(file: File): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Failed to get canvas context'));
+          return;
+        }
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            reject(new Error('Failed to convert to WebP'));
+            return;
+          }
+          const webpFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
+            type: "image/webp",
+            lastModified: Date.now()
+          });
+          resolve(webpFile);
+        }, 'image/webp', 0.8); // 0.8 quality for good balance
+      };
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+}
+
 export async function uploadProductImage(file: File): Promise<string> {
-  const response = await storage.createFile(appwriteConfig.storageId, ID.unique(), file);
+  let finalFile = file;
+
+  // Convert to WebP if it's an image
+  if (file.type.startsWith('image/')) {
+    try {
+      console.log('Optimizing image to WebP...');
+      finalFile = await convertToWebP(file);
+    } catch (e) {
+      console.error('WebP conversion failed, uploading original:', e);
+    }
+  }
+
+  const response = await storage.createFile(appwriteConfig.storageId, ID.unique(), finalFile);
 
   // Construct a standard, clean view URL. 
   // We use the view URL (with project ID) which is most compatible with <img> tags.

@@ -92,6 +92,19 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Local SEO Anchor Text */}
+        <div className="py-8 text-[10px] text-white/10 flex flex-wrap justify-center gap-x-6 gap-y-2 uppercase tracking-[0.2em] text-center border-b border-white/5">
+          <span>Bridal Designer in Kothamangalam</span>
+          <span>Bridal Boutique Ernakulam</span>
+          <span>Bridal Lehenga Kothamangalam</span>
+          <span>Bridal Shop near Muvattupuzha</span>
+          <span>Nighty Wholesale Ernakulam</span>
+          <span>Custom Stitching Perumbavoor</span>
+          <span>Lehenga Shop Aluva</span>
+          <span>Best Lehenga Shop near Kottayam</span>
+          <span>Wedding Dress Designer Kerala</span>
+        </div>
+
         {/* Bottom Bar */}
         <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-white/25 uppercase tracking-widest">
