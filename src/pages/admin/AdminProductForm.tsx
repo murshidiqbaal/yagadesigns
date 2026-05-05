@@ -26,6 +26,7 @@ import {
   ArrowUp,
   CheckCircle2, ChevronLeft,
   Loader2,
+  Play,
   Plus,
   Save,
   Scissors,
@@ -44,6 +45,11 @@ interface VariantFormData {
   thumbnail: string;
 }
 
+interface Reel {
+  link: string;
+  thumbnail: string;
+}
+
 interface FormData {
   name: string;
   description: string;
@@ -53,10 +59,28 @@ interface FormData {
   fabric: string;
   embroidery: string;
   occasion: string;
-interface Reel {
-  link: string;
-  thumbnail: string;
+  is_customizable: boolean;
+  variants: VariantFormData[];
+  reels: Reel[];
+  instagram_reel_link?: string; // legacy
+  reel_thumbnail?: string;      // legacy
 }
+
+const DEFAULT_FORM: FormData = {
+  name: "",
+  description: "",
+  category: "",
+  image_url: "",
+  price: "",
+  fabric: "",
+  embroidery: "",
+  occasion: "",
+  is_customizable: true,
+  variants: [],
+  reels: [],
+  instagram_reel_link: "",
+  reel_thumbnail: "",
+};
 
 export default function AdminProductForm() {
   const navigate = useNavigate();
@@ -77,6 +101,7 @@ export default function AdminProductForm() {
   const [form, setForm] = useState<FormData>(() => {
     if (existingProduct) {
       return {
+        ...existingProduct,
         name: existingProduct.name,
         description: existingProduct.description,
         category: existingProduct.category,
@@ -89,6 +114,7 @@ export default function AdminProductForm() {
         instagram_reel_link: existingProduct.instagram_reel_link || "",
         reel_thumbnail: existingProduct.reel_thumbnail || "",
         variants: (existingProduct.variants as VariantFormData[]) || [],
+        reels: (existingProduct.reels as Reel[]) || [],
       };
     }
     return DEFAULT_FORM;
@@ -111,6 +137,7 @@ export default function AdminProductForm() {
       instagram_reel_link: existingProduct.instagram_reel_link || "",
       reel_thumbnail: existingProduct.reel_thumbnail || "",
       variants: (existingProduct.variants as VariantFormData[]) || [],
+      reels: (existingProduct.reels as Reel[]) || [],
     });
   }
 
@@ -201,7 +228,7 @@ export default function AdminProductForm() {
     if (!file) return;
     if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
     if (file.size > 10 * 1024 * 1024) { toast.error("Image must be under 10MB"); return; }
-    
+
     setUploadingThumbnail(index);
     try {
       const url = await uploadProductImage(file);
@@ -319,9 +346,10 @@ export default function AdminProductForm() {
         occasion: form.occasion,
         is_customizable: form.is_customizable,
         image_url: mainImageUrl,
-        instagram_reel_link: form.instagram_reel_link.trim() || undefined,
-        reel_thumbnail: form.reel_thumbnail.trim() || undefined,
+        instagram_reel_link: form.instagram_reel_link?.trim() || undefined,
+        reel_thumbnail: form.reel_thumbnail?.trim() || undefined,
         variants: updatedVariants,
+        reels: form.reels,
         created_at: existingProduct?.created_at || new Date().toISOString(),
       };
 
@@ -586,7 +614,7 @@ export default function AdminProductForm() {
                   </div>
                 </div>
               ))}
-              
+
               {(Array.isArray(form.reels) ? form.reels : []).length === 0 && (
                 <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-3xl">
                   <Play className="w-8 h-8 text-white/10 mb-3" />
