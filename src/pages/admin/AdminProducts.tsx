@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Plus, Pencil, Trash2, Package, ImageOff, PlusCircle, Palette, Scissors } from "lucide-react";
+import { Plus, Pencil, Trash2, Package, ImageOff, PlusCircle, Palette, Scissors, Crown, Gem, Flame } from "lucide-react";
 import { toast } from "sonner";
 import {
   getProducts,
@@ -101,6 +101,14 @@ export default function AdminProducts() {
                   {product.is_customizable !== false && (
                     <Badge variant="outline" className="border-green-500/20 bg-green-500/5 text-green-500 text-[9px] px-2 py-0 gap-1">
                       <Scissors className="w-2 h-2" /> Custom
+                    </Badge>
+                  )}
+                  {product.is_exclusive && (
+                    <Badge variant="outline" className="border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#D4AF37] text-[9px] px-2 py-0 gap-1 flex items-center">
+                      {product.exclusive_badge === 'Exclusive Design' && <Crown className="w-2.5 h-2.5 text-[#D4AF37]" />}
+                      {product.exclusive_badge === 'Limited Bridal Collection' && <Gem className="w-2.5 h-2.5 text-[#D4AF37]" />}
+                      {product.exclusive_badge === 'Trending Bridal Choice' && <Flame className="w-2.5 h-2.5 text-[#D4AF37]" />}
+                      {product.exclusive_badge || "Exclusive"}
                     </Badge>
                   )}
                 </div>

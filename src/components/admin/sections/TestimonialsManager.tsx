@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  addTestimonial, deleteTestimonial,
+  createTestimonial, deleteTestimonial,
   getTestimonials,
   Testimonial
 } from "@/lib/appwrite";
@@ -34,7 +34,11 @@ export default function TestimonialsManager() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await addTestimonial(newItem);
+      await createTestimonial({
+        name: newItem.name,
+        content: newItem.message,
+        rating: newItem.rating
+      });
       toast.success("Testimonial added!");
       setNewItem({ name: "", message: "", rating: 5 });
       fetchItems();
@@ -144,7 +148,7 @@ export default function TestimonialsManager() {
                         <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">Verified Client</span>
                       </div>
                       <p className="font-heading text-lg">{t.name}</p>
-                      <p className="text-sm text-muted-foreground leading-relaxed italic">"{t.message}"</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed italic">"{t.content}"</p>
                     </div>
                     <Button
                       variant="ghost"

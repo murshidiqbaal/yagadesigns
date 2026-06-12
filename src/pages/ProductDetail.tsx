@@ -1,12 +1,27 @@
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useFavorites } from "@/hooks/useFavorites";
-import { getImageUrl, getProductById, ProductVariant, trackProductEnquiry, trackProductLike } from "@/lib/appwrite";
+import { createOrder, getImageUrl, getProductById, Order, ProductVariant, trackProductEnquiry, trackProductLike } from "@/lib/appwrite";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
 import { useQuery } from "@tanstack/react-query";
 import useEmblaCarousel from "embla-carousel-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, X as CloseIcon, Heart, Instagram, Maximize2, MessageCircle, Play, Plus, Scissors, Share2, ShieldCheck, Zap } from "lucide-react";
+import { ChevronLeft, X as CloseIcon, Copy, Crown, Flame, Gem, Heart, Maximize2, MessageCircle, Play, Plus, Scissors, Share2, ShieldCheck, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -15,6 +30,18 @@ export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isFavorite, toggleFavorite } = useFavorites();
+
+  const isMobile = useIsMobile();
+  const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
+  const [enquirySuccess, setEnquirySuccess] = useState(false);
+  const [customerName, setCustomerName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [weddingDate, setWeddingDate] = useState("");
+  const [customizationNotes, setCustomizationNotes] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lastCreatedOrder, setLastCreatedOrder] = useState<Order | null>(null);
 
   // ── Data Fetching ──────────────────────────────────────────────────
   const { data: product, isLoading, error } = useQuery({
@@ -31,6 +58,65 @@ export default function ProductDetail() {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  const getShareMessage = () => {
+    return `Hi,\n\nI found this bridal design from Yaga Designs.\n\nTake a look:\n${window.location.href}\n\nWhat do you think?`;
+  };
+
+  const trackShare = (type: 'whatsapp' | 'native' | 'copy') => {
+    try {
+      const raw = localStorage.getItem('yaga_share_analytics');
+      const analytics = raw ? JSON.parse(raw) : { totalShares: 0, whatsappShares: 0, nativeShares: 0, linkCopies: 0, shareDetails: [] };
+
+      analytics.totalShares += 1;
+      if (type === 'whatsapp') analytics.whatsappShares += 1;
+      if (type === 'native') analytics.nativeShares += 1;
+      if (type === 'copy') analytics.linkCopies += 1;
+
+      analytics.shareDetails.push({
+        type,
+        productId: product?.$id,
+        productName: product?.name,
+        timestamp: new Date().toISOString()
+      });
+
+      localStorage.setItem('yaga_share_analytics', JSON.stringify(analytics));
+      console.log(`[Analytics] Logged ${type} share for product ${product?.name}`);
+    } catch (e) {
+      console.error('Failed to log share analytics:', e);
+    }
+  };
+
+  const handleWhatsAppShare = () => {
+    const message = getShareMessage();
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
+    trackShare('whatsapp');
+    setIsShareModalOpen(false);
+  };
+
+  const handleNativeShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: product?.name,
+        text: `I found this bridal design from Yaga Designs.`,
+        url: window.location.href,
+      }).then(() => {
+        trackShare('native');
+      }).catch((err) => {
+        console.error('Native share failed:', err);
+      });
+    }
+    setIsShareModalOpen(false);
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast.success("Design link copied to clipboard!");
+    trackShare('copy');
+    setIsShareModalOpen(false);
+  };
 
   // Set initial variant
   useEffect(() => {
@@ -69,20 +155,253 @@ export default function ProductDetail() {
 
   const liked = product ? isFavorite(product.$id) : false;
 
-  // ── WhatsApp Logic ─────────────────────────────────────────────────
-  const handleWhatsAppEnquiry = () => {
-    if (!product) return;
-    let text = `Hello Yaga Designs,\n\nI am interested in:\nProduct: ${product.name}\n${selectedVariant ? `Color: ${selectedVariant.color}\n` : ""}`;
-    if (product.instagram_reel_link) {
-      text += `Reel: ${product.instagram_reel_link}\n\n`;
-    } else {
-      text += `\n`;
-    }
-    text += `Please share customization options and final pricing.`;
+  const getWhatsAppMessage = (order: Order) => {
+    return `Hi Yaga Designs,\n\nI have placed a new enquiry/order!\n\n*Order ID*: ${order.order_id}\n*Customer Name*: ${order.customer_name}\n*Phone*: ${order.phone_number}\n*Product*: ${order.product_name}\n*Color*: ${order.selected_color || "Default"}\n*Quantity*: ${order.quantity || 1}\n*Wedding Date*: ${order.wedding_date || "N/A"}\n*Notes*: ${order.customization_notes || "None"}`;
+  };
 
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  const handleOpenWhatsApp = (order: Order) => {
+    const message = getWhatsAppMessage(order);
+    const url = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
-    trackProductEnquiry(product.$id);
+  };
+
+  // ── Enquiry Form Logic ──────────────────────────────────────────────
+  const handleSubmitEnquiry = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!product) return;
+    if (!customerName.trim() || !phoneNumber.trim()) {
+      toast.error("Name and Phone Number are required.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Generate a unique order_id, e.g., YG-123456
+      const randomId = Math.floor(100000 + Math.random() * 900000);
+      const orderId = `YG-${randomId}`;
+
+      const orderData = await createOrder({
+        order_id: orderId,
+        customer_name: customerName,
+        phone_number: phoneNumber,
+        email: email || undefined,
+        wedding_date: weddingDate || undefined,
+        product_id: product.$id,
+        product_name: product.name,
+        product_image: selectedVariant?.thumbnail || product.image_url || undefined,
+        selected_color: selectedVariant?.color || undefined,
+        quantity: quantity,
+        customization_notes: customizationNotes || undefined,
+      });
+
+      // Save to localStorage so user can access it in My Orders
+      try {
+        const existingOrders = JSON.parse(localStorage.getItem("my_orders") || "[]");
+        existingOrders.push(orderData);
+        localStorage.setItem("my_orders", JSON.stringify(existingOrders));
+      } catch (e) {
+        console.error("Failed to save order to localStorage:", e);
+      }
+
+      // Track the enquiry count inside products collection
+      await trackProductEnquiry(product.$id);
+
+      setLastCreatedOrder(orderData);
+      setEnquirySuccess(true);
+      toast.success("Enquiry submitted successfully!");
+
+      // Open WhatsApp automatically
+      try {
+        const message = `Hi Yaga Designs,\n\nI have placed a new enquiry/order!\n\n*Order ID*: ${orderId}\n*Customer Name*: ${customerName}\n*Phone*: ${phoneNumber}\n*Product*: ${product.name}\n*Color*: ${selectedVariant?.color || "Default"}\n*Quantity*: ${quantity}\n*Wedding Date*: ${weddingDate || "N/A"}\n*Notes*: ${customizationNotes || "None"}`;
+        const url = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`;
+        window.open(url, "_blank");
+      } catch (waErr) {
+        console.error("Auto-open WhatsApp failed:", waErr);
+      }
+
+      // Reset form
+      setCustomerName("");
+      setPhoneNumber("");
+      setEmail("");
+      setWeddingDate("");
+      setCustomizationNotes("");
+      setQuantity(1);
+    } catch (error: any) {
+      console.error("Failed to submit enquiry:", error);
+      toast.error(error.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const renderEnquiryFormContent = () => {
+    if (enquirySuccess) {
+      return (
+        <div className="text-center py-8 space-y-5">
+          <div className="w-16 h-16 bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-full flex items-center justify-center mx-auto text-[#D4AF37] text-3xl">
+            ✓
+          </div>
+          <h3 className="font-heading text-2xl text-white">Enquiry Submitted!</h3>
+          <div className="space-y-2 max-w-sm mx-auto text-sm text-white/70 leading-relaxed">
+            <p>
+              Your enquiry has been successfully saved with ID: <strong className="text-primary font-bold">{lastCreatedOrder?.order_id}</strong>
+            </p>
+            <p className="text-xs text-white/50">
+              Please share the details with our WhatsApp team to coordinate customization & styling.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3 pt-2">
+            {lastCreatedOrder && (
+              <Button
+                onClick={() => handleOpenWhatsApp(lastCreatedOrder)}
+                className="bg-green-600 hover:bg-green-700 text-white font-bold uppercase tracking-wider rounded-xl py-4 flex items-center justify-center gap-2 text-xs transition-colors"
+              >
+                <MessageCircle className="w-4 h-4 fill-current" />
+                Send on WhatsApp
+              </Button>
+            )}
+            <Button
+              onClick={() => {
+                setIsEnquiryOpen(false);
+                setEnquirySuccess(false);
+                setLastCreatedOrder(null);
+              }}
+              variant="outline"
+              className="border-white/10 hover:bg-white/5 text-white font-bold uppercase tracking-wider rounded-xl py-4 text-xs"
+            >
+              Close
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <form onSubmit={handleSubmitEnquiry} className="space-y-5 text-left pb-6">
+        {/* Product Details Header */}
+        <div className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
+          <div className="w-16 h-20 rounded-xl overflow-hidden bg-white/5 shrink-0">
+            {product && (
+              <img
+                src={getImageUrl(selectedVariant?.thumbnail || product.image_url)}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+            )}
+          </div>
+          <div className="flex-1 min-w-0 flex flex-col justify-center">
+            <h4 className="font-heading text-lg text-white truncate">{product?.name}</h4>
+            <p className="text-xs text-primary font-bold uppercase tracking-wider mt-1">{product?.category}</p>
+            {selectedVariant?.color && (
+              <p className="text-xs text-white/50 mt-0.5">Selected Color: {selectedVariant.color}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Inputs */}
+        <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-1">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Name *</label>
+            <input
+              type="text"
+              required
+              placeholder="Your full name"
+              value={customerName}
+              onChange={e => setCustomerName(e.target.value)}
+              className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:border-[#D4AF37]/50 focus:outline-none transition-colors text-sm"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Phone Number *</label>
+            <input
+              type="tel"
+              required
+              placeholder="e.g. +91 96332 70639"
+              value={phoneNumber}
+              onChange={e => setPhoneNumber(e.target.value)}
+              className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:border-[#D4AF37]/50 focus:outline-none transition-colors text-sm"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Email (Optional)</label>
+              <input
+                type="email"
+                placeholder="your@email.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:border-[#D4AF37]/50 focus:outline-none transition-colors text-sm"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Wedding Date (Optional)</label>
+              <input
+                type="text"
+                placeholder="e.g. 15 Dec 2026"
+                value={weddingDate}
+                onChange={e => setWeddingDate(e.target.value)}
+                className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:border-[#D4AF37]/50 focus:outline-none transition-colors text-sm"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Quantity</label>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                >
+                  -
+                </button>
+                <span className="w-12 text-center text-sm font-semibold">{quantity}</span>
+                <button
+                  type="button"
+                  onClick={() => setQuantity(q => q + 1)}
+                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Selected Color</label>
+              <input
+                type="text"
+                disabled
+                value={selectedVariant?.color || "Default"}
+                className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/5 text-white/50 cursor-not-allowed text-sm font-medium"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Customization Notes</label>
+            <textarea
+              rows={3}
+              placeholder="Tell us about your preferences (e.g. measurements, sleeve length, fabric adjustments...)"
+              value={customizationNotes}
+              onChange={e => setCustomizationNotes(e.target.value)}
+              className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:border-[#D4AF37]/50 focus:outline-none transition-colors text-sm resize-none"
+            />
+          </div>
+        </div>
+
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full py-7 bg-primary text-black font-bold uppercase tracking-widest rounded-xl text-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] mt-2"
+        >
+          {isSubmitting ? "Submitting Enquiry..." : "Place Order"}
+        </Button>
+      </form>
+    );
   };
 
   const handleShare = () => {
@@ -251,7 +570,7 @@ export default function ProductDetail() {
 
             {/* Pagination / Dots */}
             {images.length > 1 && (
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 px-3 py-1.5 bg-black/40 backdrop-blur-md rounded-full">
+              <div className="flex justify-center gap-1.5 px-3 py-1.5 bg-black/40 backdrop-blur-md rounded-full max-w-max mx-auto mt-4">
                 {images.map((_, idx) => (
                   <button
                     key={idx}
@@ -263,9 +582,24 @@ export default function ProductDetail() {
               </div>
             )}
 
+            {/* Product Details Grid (Moved to Left Side) */}
+            <div className="px-6 md:px-0 grid grid-cols-2 gap-x-8 gap-y-6 pt-10 border-t border-white/5 mt-10">
+              {[
+                { label: "Fabric", value: product.fabric },
+                { label: "Embroidery", value: product.embroidery },
+                { label: "Occasion", value: product.occasion },
+                { label: "Stitching", value: "Available" }
+              ].map((item, idx) => (
+                <div key={idx} className={item.value ? "" : "opacity-30"}>
+                  <div className="text-[10px] uppercase tracking-widest text-white/40 mb-1 font-bold">{item.label}</div>
+                  <div className="text-sm font-medium text-white/80">{item.value || "Not Specified"}</div>
+                </div>
+              ))}
+            </div>
+
             {/* ── Instagram Reel Cards — Desktop Left Column (9:16 ratio) ── */}
             {Array.isArray(product.reels) && product.reels.length > 0 && (
-              <div className="hidden md:flex flex-col gap-8 mt-10">
+              <div className="hidden md:flex flex-col gap-8 mt-10 pt-10 border-t border-white/5">
                 {product.reels.map((reel, idx) => (
                   reel.thumbnail && (
                     <motion.a
@@ -324,28 +658,30 @@ export default function ProductDetail() {
 
             {/* Backward compatibility for single reel if no array exists */}
             {!Array.isArray(product.reels) && product.instagram_reel_link && product.reel_thumbnail && (
-              <a
-                href={product.instagram_reel_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden md:block relative mt-6 rounded-2xl overflow-hidden group cursor-pointer"
-                style={{ aspectRatio: '9 / 16', width: '180px' }}
-              >
-                <img
-                  src={product.reel_thumbnail}
-                  alt="Instagram Reel"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/60" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-transform duration-300 group-hover:scale-110"
-                    style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
-                  >
-                    <Play className="w-6 h-6 fill-white ml-0.5" />
+              <div className="mt-10 pt-10 border-t border-white/5">
+                <a
+                  href={product.instagram_reel_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hidden md:block relative rounded-2xl overflow-hidden group cursor-pointer"
+                  style={{ aspectRatio: '9 / 16', width: '180px' }}
+                >
+                  <img
+                    src={product.reel_thumbnail}
+                    alt="Instagram Reel"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/60" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div
+                      className="w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-transform duration-300 group-hover:scale-110"
+                      style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
+                    >
+                      <Play className="w-6 h-6 fill-white ml-0.5" />
+                    </div>
                   </div>
-                </div>
-              </a>
+                </a>
+              </div>
             )}
           </div>
 
@@ -356,6 +692,19 @@ export default function ProductDetail() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
+              {product.is_exclusive && product.exclusive_badge && (
+                <div className="mb-4 animate-in fade-in duration-500 max-w-max">
+                  <span
+                    className="text-[10px] font-heading font-normal italic tracking-[0.2em] px-3.5 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37] text-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.15)] flex items-center gap-2"
+                    style={{ textShadow: '0 0 1px rgba(212,175,55,0.4)' }}
+                  >
+                    {product.exclusive_badge === 'Exclusive Design' && <Crown className="w-3.5 h-3.5 text-[#D4AF37] fill-[#D4AF37]/20 shrink-0" />}
+                    {product.exclusive_badge === 'Limited Bridal Collection' && <Gem className="w-3.5 h-3.5 text-[#D4AF37] fill-[#D4AF37]/20 shrink-0" />}
+                    {product.exclusive_badge === 'Trending Bridal Choice' && <Flame className="w-3.5 h-3.5 text-[#D4AF37] fill-[#D4AF37]/20 shrink-0" />}
+                    {product.exclusive_badge}
+                  </span>
+                </div>
+              )}
               <div className="flex items-center gap-2 text-primary text-xs font-bold uppercase tracking-[0.2em] mb-3">
                 <span className="w-8 h-px bg-primary/40" />
                 {product.category}
@@ -414,7 +763,7 @@ export default function ProductDetail() {
 
                   {/* Custom Swatch Option */}
                   <button
-                    onClick={handleWhatsAppEnquiry}
+                    onClick={() => setIsEnquiryOpen(true)}
                     className="flex flex-col items-center justify-center w-14 h-14 rounded-full border-2 border-dashed border-white/20 hover:border-white/40 transition-all text-white/40 hover:text-white"
                   >
                     <Plus className="w-5 h-5" />
@@ -454,21 +803,6 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {/* Product Details Grid */}
-            <div className="grid grid-cols-2 gap-x-8 gap-y-6 pt-4">
-              {[
-                { label: "Fabric", value: product.fabric },
-                { label: "Embroidery", value: product.embroidery },
-                { label: "Occasion", value: product.occasion },
-                { label: "Stitching", value: "Available" }
-              ].map((item, idx) => (
-                <div key={idx} className={item.value ? "" : "opacity-30"}>
-                  <div className="text-[10px] uppercase tracking-widest text-white/40 mb-1 font-bold">{item.label}</div>
-                  <div className="text-sm font-medium text-white/80">{item.value || "Not Specified"}</div>
-                </div>
-              ))}
-            </div>
-
             {/* Features / Badges */}
             <div className="flex flex-wrap gap-3 pt-6">
               {[
@@ -484,105 +818,17 @@ export default function ProductDetail() {
             </div>
 
             {/* ── Instagram Reel Section (New Static Position) ── */}
-            {(Array.isArray(product.reels) && product.reels.length > 0) || product.instagram_reel_link ? (
-              <div className="pt-12 space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-heading text-2xl text-white">Watch in Action</h3>
-                  <div className="flex items-center gap-2 text-primary">
-                    <Instagram className="w-4 h-4" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Instagram Reels</span>
-                  </div>
-                </div>
 
-                <div className="flex flex-col gap-6">
-                  {Array.isArray(product.reels) && product.reels.length > 0 ? (
-                    product.reels.map((reel, idx) => (
-                      reel.thumbnail && (
-                        <motion.a
-                          key={idx}
-                          href={reel.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          whileHover={{ y: -5 }}
-                          className="relative rounded-3xl overflow-hidden group cursor-pointer w-full shadow-2xl border border-white/5"
-                          style={{ aspectRatio: '9 / 16' }}
-                        >
-                          <img
-                            src={reel.thumbnail}
-                            alt={`Reel ${idx + 1}`}
-                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80" />
-
-                          {/* Instagram branding */}
-                          <div className="absolute top-4 left-4 flex items-center gap-2">
-                            <div
-                              className="w-8 h-8 rounded-full flex items-center justify-center"
-                              style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
-                            >
-                              <Play className="w-4 h-4 fill-white ml-0.5" />
-                            </div>
-                            <span className="text-white text-xs font-bold tracking-wider uppercase bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full">Reel</span>
-                          </div>
-
-                          {/* Watch label */}
-                          <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
-                            <div className="flex flex-col">
-                              <p className="text-white font-bold text-lg">Watch on Instagram</p>
-                              <p className="text-white/60 text-xs mt-0.5">See the details in motion</p>
-                            </div>
-                            <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
-                              <Share2 className="w-4 h-4 text-white" />
-                            </div>
-                          </div>
-                        </motion.a>
-                      )
-                    ))
-                  ) : product.instagram_reel_link && product.reel_thumbnail && (
-                    <motion.a
-                      href={product.instagram_reel_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      whileHover={{ y: -5 }}
-                      className="relative rounded-3xl overflow-hidden group cursor-pointer w-full shadow-2xl border border-white/5"
-                      style={{ aspectRatio: '9 / 16' }}
-                    >
-                      <img
-                        src={product.reel_thumbnail}
-                        alt="Reel preview"
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80" />
-
-                      <div className="absolute top-4 left-4 flex items-center gap-2">
-                        <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center"
-                          style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
-                        >
-                          <Play className="w-4 h-4 fill-white ml-0.5" />
-                        </div>
-                        <span className="text-white text-xs font-bold tracking-wider uppercase bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full">Reel</span>
-                      </div>
-
-                      <div className="absolute bottom-6 left-6 right-6 flex flex-col">
-                        <p className="text-white font-bold text-lg">Watch on Instagram</p>
-                        <p className="text-white/60 text-xs mt-0.5">See the details in motion</p>
-                      </div>
-                    </motion.a>
-                  )}
-                </div>
-              </div>
-            ) : null}
 
             {/* Action Buttons (Desktop Only) */}
             <div className="hidden md:flex flex-col gap-4 pt-12">
               <div className="flex gap-4">
                 <Button
-                  onClick={handleWhatsAppEnquiry}
+                  onClick={() => setIsEnquiryOpen(true)}
                   className="flex-1 py-10 rounded-2xl text-xl gap-3 font-bold bg-primary hover:bg-primary/90 text-black shadow-[0_20px_40px_rgba(212,175,55,0.15)] transition-all hover:-translate-y-1 active:scale-[0.98]"
                 >
                   <MessageCircle className="w-6 h-6 fill-black" />
-                  Enquire via WhatsApp
+                  Place Order
                 </Button>
                 <Button
                   variant="outline"
@@ -596,6 +842,15 @@ export default function ProductDetail() {
                   <Heart className={`w-8 h-8 ${liked ? "fill-primary text-primary" : "text-white/60"}`} />
                 </Button>
               </div>
+
+              <Button
+                variant="outline"
+                onClick={() => setIsShareModalOpen(true)}
+                className="w-full py-6 rounded-2xl text-base gap-3 border-white/10 hover:bg-white/5 text-white/80 transition-all"
+              >
+                <Share2 className="w-5 h-5 text-primary" />
+                Share Design
+              </Button>
 
               {/* Reel buttons — shown only when no thumbnails in the new reels array */}
               {Array.isArray(product.reels) && product.reels.map((reel, idx) => (
@@ -636,23 +891,212 @@ export default function ProductDetail() {
         </div>
       </div>
 
+
       <div className="md:hidden fixed bottom-8 left-6 right-6 z-50">
         <motion.div
           initial={{ y: 100 }}
           animate={{ y: 0 }}
-          className="flex flex-col gap-3"
+          className="flex items-center gap-3"
         >
-          <div className="bg-primary p-1 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.7)]">
+          <div className="flex-1 bg-primary p-1 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.7)]">
             <Button
-              onClick={handleWhatsAppEnquiry}
+              onClick={() => setIsEnquiryOpen(true)}
               className="w-full py-9 rounded-[2.25rem] bg-black text-white hover:bg-[#111] border-none text-lg font-bold gap-3 active:scale-[0.98] transition-transform"
             >
               <MessageCircle className="w-6 h-6 text-primary fill-primary" />
-              Enquire on WhatsApp
+              Place Order
             </Button>
           </div>
+          <button
+            onClick={() => setIsShareModalOpen(true)}
+            className="w-[72px] h-[72px] rounded-full bg-black/95 backdrop-blur-md border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37] shadow-[0_20px_50px_rgba(0,0,0,0.7)] shrink-0 active:scale-[0.95] transition-transform"
+            aria-label="Share Design"
+          >
+            <Share2 className="w-6 h-6" />
+          </button>
         </motion.div>
       </div>
+
+      {/* Premium Share Modal */}
+      <Dialog open={isShareModalOpen} onOpenChange={setIsShareModalOpen}>
+        <DialogContent className="bg-[#0A0A0A] border border-[#D4AF37]/20 text-white rounded-3xl max-w-sm p-6 shadow-[0_0_50px_rgba(212,175,55,0.08)] text-center">
+          <DialogHeader className="text-center space-y-2">
+            <DialogTitle className="font-heading text-2xl text-white tracking-wide flex items-center justify-center gap-2">
+              <Share2 className="w-5 h-5 text-primary" />
+              Share With Family
+            </DialogTitle>
+            <DialogDescription className="text-xs text-white/40 max-w-xs mx-auto">
+              Involve your loved ones in designing your dream bridal outfit. Choose a channel below.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-3 pt-6">
+            {/* WhatsApp option */}
+            <button
+              onClick={handleWhatsAppShare}
+              className="flex items-center gap-4 p-4 rounded-2xl bg-[#0F0F0F] border border-white/5 hover:border-green-500/30 hover:bg-green-500/5 transition-all text-left group"
+            >
+              <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500 group-hover:scale-110 transition-transform">
+                <MessageCircle className="w-5 h-5 fill-green-500" />
+              </div>
+              <div>
+                <h4 className="text-sm font-semibold text-white group-hover:text-green-500 transition-colors">WhatsApp</h4>
+                <p className="text-[10px] text-white/40">Send directly to chat or group</p>
+              </div>
+            </button>
+
+            {/* Native share option (only show if supported) */}
+            {typeof navigator !== 'undefined' && navigator.share && (
+              <button
+                onClick={handleNativeShare}
+                className="flex items-center gap-4 p-4 rounded-2xl bg-[#0F0F0F] border border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all text-left group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                  <Share2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold text-white group-hover:text-primary transition-colors">System Share</h4>
+                  <p className="text-[10px] text-white/40">Share via System AirDrop, Messages...</p>
+                </div>
+              </button>
+            )}
+
+            {/* Copy link option */}
+            <button
+              onClick={handleCopyLink}
+              className="flex items-center gap-4 p-4 rounded-2xl bg-[#0F0F0F] border border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all text-left group"
+            >
+              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/70 group-hover:scale-110 transition-transform">
+                <Copy className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-semibold text-white group-hover:text-primary transition-colors">Copy Link</h4>
+                <p className="text-[10px] text-white/40">Copy product link to clipboard</p>
+              </div>
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Enquiry Modal / Drawer */}
+      {isMobile ? (
+        <Drawer open={isEnquiryOpen} onOpenChange={setIsEnquiryOpen}>
+          <DrawerContent className="bg-[#0A0A0A] border-t border-[#D4AF37]/20 text-white px-6 pb-8 max-h-[90vh] overflow-y-auto">
+            <DrawerHeader className="text-left px-0 pb-4">
+              <DrawerTitle className="font-heading text-2xl text-white tracking-wide">Enquire Now</DrawerTitle>
+              <DrawerDescription className="text-xs text-white/40">
+                Share your details below to enquire about custom bridal wear.
+              </DrawerDescription>
+            </DrawerHeader>
+            {renderEnquiryFormContent()}
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <Dialog open={isEnquiryOpen} onOpenChange={setIsEnquiryOpen}>
+          <DialogContent className="bg-[#0A0A0A] border border-[#D4AF37]/20 text-white rounded-3xl max-w-lg p-6 shadow-[0_0_50px_rgba(212,175,55,0.08)]">
+            <DialogHeader className="text-left space-y-1">
+              <DialogTitle className="font-heading text-2xl text-white tracking-wide">Enquire Now</DialogTitle>
+              <DialogDescription className="text-xs text-white/40">
+                Share your details below. Our bridal experts will guide you.
+              </DialogDescription>
+            </DialogHeader>
+            {renderEnquiryFormContent()}
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
+
+
+
+
+// {(Array.isArray(product.reels) && product.reels.length > 0) || product.instagram_reel_link ? (
+//               <div className="pt-12 space-y-6">
+//                 <div className="flex items-center justify-between">
+//                   <h3 className="font-heading text-2xl text-white">Watch in Action</h3>
+//                   <div className="flex items-center gap-2 text-primary">
+//                     <Instagram className="w-4 h-4" />
+//                     <span className="text-[10px] font-bold uppercase tracking-widest">Instagram Reels</span>
+//                   </div>
+//                 </div>
+
+//                 <div className="flex flex-col gap-6">
+//                   {Array.isArray(product.reels) && product.reels.length > 0 ? (
+//                     product.reels.map((reel, idx) => (
+//                       reel.thumbnail && (
+//                         <motion.a
+//                           key={idx}
+//                           href={reel.link}
+//                           target="_blank"
+//                           rel="noopener noreferrer"
+//                           whileHover={{ y: -5 }}
+//                           className="relative rounded-3xl overflow-hidden group cursor-pointer w-full shadow-2xl border border-white/5"
+//                           style={{ aspectRatio: '9 / 16' }}
+//                         >
+//                           <img
+//                             src={reel.thumbnail}
+//                             alt={`Reel ${idx + 1}`}
+//                             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+//                           />
+//                           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80" />
+
+//                           {/* Instagram branding */}
+//                           <div className="absolute top-4 left-4 flex items-center gap-2">
+//                             <div
+//                               className="w-8 h-8 rounded-full flex items-center justify-center"
+//                               style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
+//                             >
+//                               <Play className="w-4 h-4 fill-white ml-0.5" />
+//                             </div>
+//                             <span className="text-white text-xs font-bold tracking-wider uppercase bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full">Reel</span>
+//                           </div>
+
+//                           {/* Watch label */}
+//                           <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
+//                             <div className="flex flex-col">
+//                               <p className="text-white font-bold text-lg">Watch on Instagram</p>
+//                               <p className="text-white/60 text-xs mt-0.5">See the details in motion</p>
+//                             </div>
+//                             <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+//                               <Share2 className="w-4 h-4 text-white" />
+//                             </div>
+//                           </div>
+//                         </motion.a>
+//                       )
+//                     ))
+//                   ) : product.instagram_reel_link && product.reel_thumbnail && (
+//                     <motion.a
+//                       href={product.instagram_reel_link}
+//                       target="_blank"
+//                       rel="noopener noreferrer"
+//                       whileHover={{ y: -5 }}
+//                       className="relative rounded-3xl overflow-hidden group cursor-pointer w-full shadow-2xl border border-white/5"
+//                       style={{ aspectRatio: '9 / 16' }}
+//                     >
+//                       <img
+//                         src={product.reel_thumbnail}
+//                         alt="Reel preview"
+//                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+//                       />
+//                       <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80" />
+
+//                       <div className="absolute top-4 left-4 flex items-center gap-2">
+//                         <div
+//                           className="w-8 h-8 rounded-full flex items-center justify-center"
+//                           style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
+//                         >
+//                           <Play className="w-4 h-4 fill-white ml-0.5" />
+//                         </div>
+//                         <span className="text-white text-xs font-bold tracking-wider uppercase bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full">Reel</span>
+//                       </div>
+
+//                       <div className="absolute bottom-6 left-6 right-6 flex flex-col">
+//                         <p className="text-white font-bold text-lg">Watch on Instagram</p>
+//                         <p className="text-white/60 text-xs mt-0.5">See the details in motion</p>
+//                       </div>
+//                     </motion.a>
+//                   )}
+//                 </div>
+//               </div>
+//             ) : null}

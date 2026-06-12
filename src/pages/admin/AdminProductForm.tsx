@@ -30,6 +30,7 @@ import {
   Plus,
   Save,
   Scissors,
+  Sparkles,
   Trash2, Upload, X
 } from "lucide-react";
 import { useState } from "react";
@@ -64,6 +65,8 @@ interface FormData {
   reels: Reel[];
   instagram_reel_link?: string; // legacy
   reel_thumbnail?: string;      // legacy
+  is_exclusive: boolean;
+  exclusive_badge: string;
 }
 
 const DEFAULT_FORM: FormData = {
@@ -80,6 +83,8 @@ const DEFAULT_FORM: FormData = {
   reels: [],
   instagram_reel_link: "",
   reel_thumbnail: "",
+  is_exclusive: false,
+  exclusive_badge: "Exclusive Design",
 };
 
 export default function AdminProductForm() {
@@ -115,6 +120,8 @@ export default function AdminProductForm() {
         reel_thumbnail: existingProduct.reel_thumbnail || "",
         variants: (existingProduct.variants as VariantFormData[]) || [],
         reels: (existingProduct.reels as Reel[]) || [],
+        is_exclusive: existingProduct.is_exclusive ?? false,
+        exclusive_badge: existingProduct.exclusive_badge || "Exclusive Design",
       };
     }
     return DEFAULT_FORM;
@@ -138,6 +145,8 @@ export default function AdminProductForm() {
       reel_thumbnail: existingProduct.reel_thumbnail || "",
       variants: (existingProduct.variants as VariantFormData[]) || [],
       reels: (existingProduct.reels as Reel[]) || [],
+      is_exclusive: existingProduct.is_exclusive ?? false,
+      exclusive_badge: existingProduct.exclusive_badge || "Exclusive Design",
     });
   }
 
@@ -350,6 +359,8 @@ export default function AdminProductForm() {
         reel_thumbnail: form.reel_thumbnail?.trim() || undefined,
         variants: updatedVariants,
         reels: form.reels,
+        is_exclusive: form.is_exclusive,
+        exclusive_badge: form.is_exclusive ? form.exclusive_badge : undefined,
         created_at: existingProduct?.created_at || new Date().toISOString(),
       };
 
@@ -492,6 +503,40 @@ export default function AdminProductForm() {
                   checked={form.is_customizable}
                   onCheckedChange={(val) => setForm((f) => ({ ...f, is_customizable: val }))}
                 />
+              </div>
+
+              {/* Exclusive Badge Option */}
+              <div className="space-y-4 p-4 bg-white/5 rounded-2xl border border-white/10">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    <Label htmlFor="exclusive-toggle" className="text-white font-medium">Exclusive Collection Product</Label>
+                  </div>
+                  <Switch
+                    id="exclusive-toggle"
+                    checked={form.is_exclusive}
+                    onCheckedChange={(val) => setForm((f) => ({ ...f, is_exclusive: val }))}
+                  />
+                </div>
+
+                {form.is_exclusive && (
+                  <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Select Premium Badge Type</label>
+                    <Select
+                      value={form.exclusive_badge}
+                      onValueChange={(val) => setForm((f) => ({ ...f, exclusive_badge: val }))}
+                    >
+                      <SelectTrigger className="bg-black/40 border-white/10 rounded-xl h-11 text-xs">
+                        <SelectValue placeholder="Select Premium Badge Type" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#121212] border-white/10">
+                        <SelectItem value="Exclusive Design">Exclusive Design</SelectItem>
+                        <SelectItem value="Limited Bridal Collection">Limited Bridal Collection</SelectItem>
+                        <SelectItem value="Trending Bridal Choice">Trending Bridal Choice</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
             </div>
           </div>

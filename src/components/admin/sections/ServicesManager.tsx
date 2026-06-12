@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { appwriteConfig, databases, storage, ID } from "@/lib/appwrite";
+import { appwriteConfig, databases, uploadProductImage } from "@/lib/appwrite";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -58,8 +58,7 @@ export default function ServicesManager() {
         servicesData.map(async (service) => {
           let finalImageUrl = service.imageUrl;
           if (service.imageFile) {
-            const uploadedFile = await storage.createFile(appwriteConfig.storageId, ID.unique(), service.imageFile);
-            finalImageUrl = `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.storageId}/files/${uploadedFile.$id}/view?project=${appwriteConfig.projectId}`;
+            finalImageUrl = await uploadProductImage(service.imageFile);
           }
           return { id: service.id, title: service.title, desc: service.desc, imageUrl: finalImageUrl };
         })
@@ -107,8 +106,7 @@ export default function ServicesManager() {
           const blob = await response.blob();
           const file = new File([blob], `default_service_${i}.jpg`, { type: blob.type });
 
-          const uploadedFile = await storage.createFile(appwriteConfig.storageId, ID.unique(), file);
-          const finalImageUrl = `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.storageId}/files/${uploadedFile.$id}/view?project=${appwriteConfig.projectId}`;
+          const finalImageUrl = await uploadProductImage(file);
 
           return { id: service.id, title: service.title, desc: service.desc, imageUrl: finalImageUrl };
         })

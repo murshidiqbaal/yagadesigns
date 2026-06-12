@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { addPortfolioItem, appwriteConfig, deletePortfolioItem, getPortfolioItems, ID, PortfolioItem, storage } from "@/lib/appwrite";
+import { addPortfolioItem, deletePortfolioItem, getPortfolioItems, PortfolioItem, uploadProductImage } from "@/lib/appwrite";
 import { AnimatePresence, motion } from "framer-motion";
 import { Camera, Layers, Loader2, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -35,8 +35,7 @@ export default function PortfolioManager() {
     }
     setIsLoading(true);
     try {
-      const uploadedFile = await storage.createFile(appwriteConfig.storageId, ID.unique(), newItem.imageFile);
-      const imageUrl = `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.storageId}/files/${uploadedFile.$id}/view?project=${appwriteConfig.projectId}`;
+      const imageUrl = await uploadProductImage(newItem.imageFile);
 
       await addPortfolioItem({
         title: newItem.title,

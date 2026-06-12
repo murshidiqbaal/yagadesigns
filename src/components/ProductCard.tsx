@@ -1,8 +1,9 @@
-import { Link } from 'react-router-dom';
 import { useFavorites } from '@/hooks/useFavorites';
 import { Product, getImageUrl, trackProductLike } from '@/lib/appwrite';
 import { motion } from 'framer-motion';
-import { Heart } from 'lucide-react';
+import { Heart, Crown, Gem, Flame } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 interface ProductCardProps {
   product: Product;
@@ -12,6 +13,7 @@ interface ProductCardProps {
 export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const liked = isFavorite(product.$id);
+  const [isBadgeOpen, setIsBadgeOpen] = useState(false);
 
   return (
     <motion.div
@@ -67,8 +69,47 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
         />
       </button>
 
+      {/* Exclusive Premium Badge */}
+      {product.is_exclusive && product.exclusive_badge && (
+        <motion.div
+          onMouseEnter={() => setIsBadgeOpen(true)}
+          onMouseLeave={() => setIsBadgeOpen(false)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsBadgeOpen(!isBadgeOpen);
+          }}
+          animate={{ 
+            width: isBadgeOpen ? "auto" : "32px",
+            height: "32px"
+          }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute top-5 left-5 z-10 overflow-hidden flex items-center bg-[#060606]/95 backdrop-blur-md border border-[#D4AF37] text-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.25)] rounded-full cursor-pointer select-none"
+        >
+          {/* Icon Area - centered inside 32px */}
+          <div className="w-8 h-8 flex items-center justify-center shrink-0">
+            {product.exclusive_badge === 'Exclusive Design' && <Crown className="w-3.5 h-3.5 text-[#D4AF37] fill-[#D4AF37]/20" />}
+            {product.exclusive_badge === 'Limited Bridal Collection' && <Gem className="w-3.5 h-3.5 text-[#D4AF37] fill-[#D4AF37]/20" />}
+            {product.exclusive_badge === 'Trending Bridal Choice' && <Flame className="w-3.5 h-3.5 text-[#D4AF37] fill-[#D4AF37]/20" />}
+          </div>
+
+          {/* Text Area - fades and shifts in */}
+          <motion.span
+            animate={{ 
+              opacity: isBadgeOpen ? 1 : 0,
+              x: isBadgeOpen ? 0 : -10
+            }}
+            transition={{ duration: 0.25, delay: isBadgeOpen ? 0.05 : 0 }}
+            className="text-[9px] font-heading font-normal italic tracking-[0.18em] text-[#D4AF37] whitespace-nowrap pr-4 -ml-1"
+            style={{ textShadow: '0 0 1px rgba(212,175,55,0.4)' }}
+          >
+            {product.exclusive_badge}
+          </motion.span>
+        </motion.div>
+      )}
+
       {/* Category Badge */}
-      <div className="absolute top-5 left-5 z-10">
+      <div className={`absolute ${product.is_exclusive && product.exclusive_badge ? 'top-[60px]' : 'top-5'} left-5 z-10 transition-all duration-300`}>
         <span className="text-[8px] font-bold uppercase tracking-[0.25em] px-2.5 py-1 rounded-lg bg-black/40 backdrop-blur-md border border-white/5 text-white/50">
           {product.category}
         </span>

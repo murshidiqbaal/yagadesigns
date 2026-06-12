@@ -1,13 +1,15 @@
 
-import { Link, useLocation } from "react-router-dom";
-import { Home, Grid, Heart, Mail } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
+import { Grid, Heart, Home, Mail, ShoppingBag } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function MobileBottomNav() {
   const pathname = useLocation().pathname;
   const { favorites } = useFavorites();
+  const { user } = useAuth();
 
-  
+
   // Hide in Admin views
   if (pathname?.startsWith("/admin")) return null;
 
@@ -21,6 +23,10 @@ export default function MobileBottomNav() {
         <Link to="/collections" className="flex flex-col items-center gap-1 group">
           <Grid className={`w-5 h-5 transition-colors ${pathname === "/collections" ? "text-primary" : "text-muted-foreground group-hover:text-primary"}`} strokeWidth={pathname === "/collections" ? 2.5 : 2} />
           <span className={`text-[10px] font-medium tracking-wide ${pathname === "/collections" ? "text-primary" : "text-muted-foreground"}`}>Collections</span>
+        </Link>
+        <Link to="/my-orders" className="flex flex-col items-center gap-1 group">
+          <ShoppingBag className={`w-5 h-5 transition-colors ${pathname === "/my-orders" ? "text-primary" : "text-muted-foreground group-hover:text-primary"}`} strokeWidth={pathname === "/my-orders" ? 2.5 : 2} />
+          <span className={`text-[10px] font-medium tracking-wide ${pathname === "/my-orders" ? "text-primary" : "text-muted-foreground"}`}>Orders</span>
         </Link>
         <Link to="/favorites" className="flex flex-col items-center gap-1 group relative">
           <Heart className={`w-5 h-5 transition-colors ${pathname === "/favorites" ? "text-primary" : "text-muted-foreground group-hover:text-primary"}`} strokeWidth={pathname === "/favorites" ? 2.5 : 2} />

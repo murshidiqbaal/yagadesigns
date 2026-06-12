@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { appwriteConfig, databases, storage, ID } from "@/lib/appwrite";
+import { appwriteConfig, databases, ID, uploadProductImage } from "@/lib/appwrite";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -47,12 +47,7 @@ export default function HeroManager() {
       let finalImageUrl = heroData.imageUrl;
 
       if (heroData.imageFile) {
-        const uploadedFile = await storage.createFile(
-          appwriteConfig.storageId,
-          ID.unique(),
-          heroData.imageFile
-        );
-        finalImageUrl = `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.storageId}/files/${uploadedFile.$id}/view?project=${appwriteConfig.projectId}`;
+        finalImageUrl = await uploadProductImage(heroData.imageFile);
       }
 
       const dbId = appwriteConfig.databaseId;

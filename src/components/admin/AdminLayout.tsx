@@ -11,6 +11,7 @@ import {
   Menu,
   MessageSquareQuote,
   Package,
+  ShoppingBag,
   X,
   Zap,
 } from "lucide-react";
@@ -20,6 +21,7 @@ import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
 const NAV_ITEMS = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/admin/dashboard" },
   { icon: Package, label: "Products", path: "/admin/products" },
+  { icon: ShoppingBag, label: "Orders", path: "/admin/orders" },
   { icon: MessageSquareQuote, label: "Testimonials", path: "/admin/testimonials" },
   { icon: Zap, label: "Special Offers", path: "/admin/offers" },
 ];

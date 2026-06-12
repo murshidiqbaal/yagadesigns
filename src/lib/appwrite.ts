@@ -1,4 +1,4 @@
-import { Account, Client, Databases, ID, Query, Storage } from 'appwrite';
+import { Account, Client, Databases, ID, Query, Storage, Permission, Role } from 'appwrite';
 
 export const appwriteConfig = {
   endpoint: import.meta.env.VITE_APPWRITE_ENDPOINT || 'https://sgp.cloud.appwrite.io/v1',
@@ -9,10 +9,11 @@ export const appwriteConfig = {
   testimonialsCollectionId: import.meta.env.VITE_APPWRITE_TESTIMONIALS_COLLECTION_ID || 'testimonials',
   offersCollectionId: import.meta.env.VITE_APPWRITE_OFFERS_COLLECTION_ID || 'offers',
   collectionContentId: import.meta.env.VITE_APPWRITE_CONTENT_COLLECTION_ID || 'content',
+  ordersCollectionId: import.meta.env.VITE_APPWRITE_ORDERS_COLLECTION_ID || 'orders',
   storageId: import.meta.env.VITE_APPWRITE_BUCKET_ID || 'product-images',
 };
 
-const client = new Client()
+export const client = new Client()
   .setEndpoint(appwriteConfig.endpoint)
   .setProject(appwriteConfig.projectId);
 
@@ -26,6 +27,25 @@ export const PRODUCTS_COLLECTION = appwriteConfig.productsCollectionId;
 export const PORTFOLIO_COLLECTION = appwriteConfig.portfolioCollectionId;
 export const TESTIMONIALS_COLLECTION = appwriteConfig.testimonialsCollectionId;
 export const OFFERS_COLLECTION = appwriteConfig.offersCollectionId;
+export const ORDERS_COLLECTION = appwriteConfig.ordersCollectionId;
+
+export interface Order {
+  $id: string;
+  order_id: string;
+  customer_name: string;
+  phone_number: string;
+  email?: string;
+  wedding_date?: string;
+  product_id: string;
+  product_name: string;
+  product_image?: string;
+  selected_color?: string;
+  selected_size?: string;
+  quantity?: number;
+  customization_notes?: string;
+  status: 'New' | 'Contacted' | 'In Progress' | 'Completed' | 'Cancelled';
+  created_at: string;
+}
 
 export interface ProductVariant {
   color: string;
@@ -57,6 +77,8 @@ export interface Product {
   instagram_reel_link?: string; // Kept for backward compatibility
   reel_thumbnail?: string;      // Kept for backward compatibility
   reels?: string | Reel[];      // Stored as JSON string
+  is_exclusive?: boolean;
+  exclusive_badge?: string;
   created_at: string;
 }
 
@@ -140,11 +162,11 @@ export async function getProductById(id: string): Promise<Product | null> {
 
 export async function addProduct(product: Omit<Product, '$id'>): Promise<Product> {
   console.log('Final Product Payload:', product);
+  const { reels, ...rest } = product;
   const payload = stripUndefined({
-    ...product,
+    ...rest,
     created_at: product.created_at || new Date().toISOString(),
-    variants: typeof product.variants === 'object' ? JSON.stringify(product.variants) : product.variants,
-    reels: typeof product.reels === 'object' ? JSON.stringify(product.reels) : product.reels
+    variants: typeof product.variants === 'object' ? JSON.stringify(product.variants) : product.variants
   });
   return databases.createDocument(
     DATABASE_ID, PRODUCTS_COLLECTION, ID.unique(),
@@ -153,10 +175,10 @@ export async function addProduct(product: Omit<Product, '$id'>): Promise<Product
 }
 
 export async function updateProduct(id: string, data: Partial<Omit<Product, '$id'>>): Promise<Product> {
+  const { reels, ...rest } = data;
   const payload = stripUndefined({
-    ...data,
-    variants: typeof data.variants === 'object' ? JSON.stringify(data.variants) : data.variants,
-    reels: typeof data.reels === 'object' ? JSON.stringify(data.reels) : data.reels
+    ...rest,
+    variants: typeof data.variants === 'object' ? JSON.stringify(data.variants) : data.variants
   });
   return databases.updateDocument(DATABASE_ID, PRODUCTS_COLLECTION, id, payload) as unknown as Product;
 }
@@ -202,6 +224,18 @@ export async function getPortfolioItems(): Promise<PortfolioItem[]> {
     console.error('Failed to fetch portfolio items:', error);
     return [];
   }
+}
+
+export async function addPortfolioItem(item: Omit<PortfolioItem, '$id'>): Promise<PortfolioItem> {
+  const payload = {
+    ...item,
+    created_at: item.created_at || new Date().toISOString()
+  };
+  return databases.createDocument(DATABASE_ID, PORTFOLIO_COLLECTION, ID.unique(), payload) as unknown as PortfolioItem;
+}
+
+export async function deletePortfolioItem(id: string): Promise<void> {
+  await databases.deleteDocument(DATABASE_ID, PORTFOLIO_COLLECTION, id);
 }
 
 // ─── Testimonials ─────────────────────────────────────────────────────────────
@@ -312,8 +346,10 @@ async function convertToWebP(file: File): Promise<File> {
 export async function uploadProductImage(file: File): Promise<string> {
   let finalFile = file;
 
-  // Convert to WebP if it's an image
-  if (file.type.startsWith('image/')) {
+  // Convert to WebP if it's a JPEG, PNG, or BMP (avoiding SVGs, GIFs, and already WebP files)
+  const mime = file.type.toLowerCase();
+  const shouldConvert = mime === 'image/jpeg' || mime === 'image/png' || mime === 'image/bmp';
+  if (shouldConvert) {
     try {
       console.log('Optimizing image to WebP...');
       finalFile = await convertToWebP(file);
@@ -365,4 +401,54 @@ export async function checkSystemStatus() {
   } catch (e: any) {
     return { database: e.code !== 404, products: false };
   }
+}
+
+// ─── Orders CRUD ─────────────────────────────────────────────────────────────
+
+export async function createOrder(order: Omit<Order, '$id' | 'created_at' | 'status'> & { status?: string }): Promise<Order> {
+  const payload = stripUndefined({
+    ...order,
+    status: order.status || 'New',
+    created_at: new Date().toISOString()
+  });
+  return databases.createDocument(
+    DATABASE_ID,
+    ORDERS_COLLECTION,
+    ID.unique(),
+    payload,
+    [
+      Permission.read(Role.any()), // Allow public read of this document by ID
+    ]
+  ) as unknown as Order;
+}
+
+export async function getOrders(): Promise<Order[]> {
+  try {
+    const response = await databases.listDocuments(DATABASE_ID, ORDERS_COLLECTION, [
+      Query.orderDesc('created_at'),
+      Query.limit(100)
+    ]);
+    return response.documents as unknown as Order[];
+  } catch (error) {
+    console.error('Failed to fetch orders:', error);
+    return [];
+  }
+}
+
+export async function getOrderById(id: string): Promise<Order | null> {
+  try {
+    const response = await databases.getDocument(DATABASE_ID, ORDERS_COLLECTION, id);
+    return response as unknown as Order;
+  } catch (error) {
+    console.error('Failed to fetch order by ID:', error);
+    return null;
+  }
+}
+
+export async function updateOrderStatus(id: string, status: string): Promise<Order> {
+  return databases.updateDocument(DATABASE_ID, ORDERS_COLLECTION, id, { status }) as unknown as Order;
+}
+
+export async function deleteOrder(id: string): Promise<void> {
+  await databases.deleteDocument(DATABASE_ID, ORDERS_COLLECTION, id);
 }

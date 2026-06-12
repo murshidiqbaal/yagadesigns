@@ -33,7 +33,7 @@ export default function MobileCTASection() {
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
             className="text-[2.4rem] leading-[1.05] font-light text-white mb-1"
           >
-            Enquire Your
+            Order Your
           </h2>
           <h2
             style={{ fontFamily: "'Cormorant Garamond', serif" }}

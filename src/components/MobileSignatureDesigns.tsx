@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 const CATEGORIES = ['All', 'Bridal', 'Engagement', 'Reception'];
 
 const STEPS = [
-  { num: '01', title: 'Discovery', desc: 'We listen to your vision and every detail that makes your celebration singular.' },
+  { num: '01', title: 'Consultation', desc: 'We listen to your vision and every detail that makes your celebration singular.' },
   { num: '02', title: 'Design', desc: 'Our atelier crafts a bespoke concept that reflects your unique story.' },
   { num: '03', title: 'Refinement', desc: 'Meticulous fitting sessions ensure every thread falls exactly as intended.' },
   { num: '04', title: 'Delivery', desc: 'Your creation arrives in our signature packaging, ready for your moment.' },

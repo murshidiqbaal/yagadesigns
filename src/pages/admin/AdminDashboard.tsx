@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
-import { checkSystemStatus, getImageUrl, getProducts, Product } from "@/lib/appwrite";
+import { checkSystemStatus, getImageUrl, getProducts, Product, getOrders } from "@/lib/appwrite";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Clock, Heart, MessageCircle, Package, Plus, Sparkles, Tag } from "lucide-react";
+import { ArrowUpRight, Clock, Heart, MessageCircle, Package, Plus, Sparkles, Tag, ShoppingBag, Calendar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -18,6 +18,12 @@ export default function AdminDashboard() {
     lastUpdate: " ",
   });
   const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [leadStats, setLeadStats] = useState({
+    totalLeads: 0,
+    todayLeads: 0,
+    monthLeads: 0,
+  });
+  const [popularColors, setPopularColors] = useState<{ color: string; count: number }[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -37,9 +43,46 @@ export default function AdminDashboard() {
             })
             : " ";
           setStats({ totalProducts: products.length, categories: cats, lastUpdate: latest });
+
+          // Fetch orders for lead analytics
+          const orders = await getOrders();
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+          const todayLeadsCount = orders.filter(o => {
+            const date = new Date(o.created_at);
+            return date >= today;
+          }).length;
+
+          const monthLeadsCount = orders.filter(o => {
+            const date = new Date(o.created_at);
+            return date >= startOfMonth;
+          }).length;
+
+          const colorCounts: Record<string, number> = {};
+          orders.forEach(o => {
+            if (o.selected_color) {
+              const col = o.selected_color.trim().toLowerCase();
+              colorCounts[col] = (colorCounts[col] || 0) + 1;
+            }
+          });
+          const sortedColors = Object.entries(colorCounts)
+            .map(([color, count]) => ({ color, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5);
+
+          setLeadStats({
+            totalLeads: orders.length,
+            todayLeads: todayLeadsCount,
+            monthLeads: monthLeadsCount
+          });
+          setPopularColors(sortedColors);
         }
-      } catch {
-        toast.error("Could not reach Appwrite   check your connection.");
+      } catch (err) {
+        console.error("Dashboard data fetch error:", err);
+        toast.error("Could not reach Appwrite. Check your connection.");
       } finally {
         setLoading(false);
       }
@@ -130,6 +173,39 @@ export default function AdminDashboard() {
               value={stats.lastUpdate}
               sub="Most recent product"
               color="text-emerald-400"
+            />
+          </motion.div>
+
+          {/* ── Lead Stats ───────────────────────────────────────── */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="grid grid-cols-1 sm:grid-cols-3 gap-6"
+          >
+            <StatCard
+              icon={ShoppingBag}
+              label="Total Enquiries"
+              value={leadStats.totalLeads}
+              sub="Total client leads"
+              color="text-[#D4AF37]"
+              link="/admin/orders"
+            />
+            <StatCard
+              icon={Clock}
+              label="Today's Enquiries"
+              value={leadStats.todayLeads}
+              sub="Received in last 24h"
+              color="text-amber-400"
+              link="/admin/orders"
+            />
+            <StatCard
+              icon={Calendar}
+              label="Month's Enquiries"
+              value={leadStats.monthLeads}
+              sub="Received this calendar month"
+              color="text-purple-400"
+              link="/admin/orders"
             />
           </motion.div>
 
@@ -253,6 +329,35 @@ export default function AdminDashboard() {
                       </div>
                     ))}
                   {allProducts.length === 0 && <p className="p-10 text-center text-xs text-muted-foreground">No data available</p>}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Popular Colors Card */}
+            <Card className="glass border-white/5 bg-[#0A0A0A] overflow-hidden">
+              <div className="p-5 border-b border-white/5 bg-primary/5 flex items-center justify-between">
+                <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" /> Popular Colors
+                </h3>
+                <span className="text-[10px] text-muted-foreground bg-white/5 px-2 py-0.5 rounded-full">Orders</span>
+              </div>
+              <CardContent className="p-0">
+                <div className="divide-y divide-white/5">
+                  {popularColors.map((colorObj, idx) => (
+                    <div key={idx} className="p-4 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-[10px] font-bold text-primary font-mono">
+                          {idx + 1}
+                        </div>
+                        <span className="text-xs font-medium text-white/80 uppercase">{colorObj.color}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-sm font-heading text-[#D4AF37]">{colorObj.count}</span>
+                        <span className="text-[9px] text-muted-foreground ml-1">requests</span>
+                      </div>
+                    </div>
+                  ))}
+                  {popularColors.length === 0 && <p className="p-10 text-center text-xs text-muted-foreground">No data available</p>}
                 </div>
               </CardContent>
             </Card>

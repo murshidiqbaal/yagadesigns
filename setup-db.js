@@ -64,6 +64,9 @@ const COLLECTIONS = [
       { key: 'instagram_reel_link', type: 'string',  size: 1024,  required: false },
       { key: 'reel_thumbnail',     type: 'string',   size: 2048,  required: false },
       { key: 'reels',              type: 'string',   size: 5000,  required: false },
+      // Exclusivity
+      { key: 'is_exclusive',       type: 'boolean',  required: false, default: false },
+      { key: 'exclusive_badge',    type: 'string',   size: 100,   required: false },
       // Timestamps
       { key: 'created_at',         type: 'datetime', required: false },
     ],
@@ -102,6 +105,26 @@ const COLLECTIONS = [
       { key: 'link',        type: 'string',  size: 1024, required: false },
       { key: 'isActive',    type: 'boolean', required: false, default: true },
       { key: 'created_at',  type: 'datetime', required: false },
+    ],
+  },
+  {
+    id: 'orders',
+    name: 'Orders',
+    attributes: [
+      { key: 'order_id',            type: 'string',   size: 255,   required: true  },
+      { key: 'customer_name',       type: 'string',   size: 255,   required: true  },
+      { key: 'phone_number',        type: 'string',   size: 100,   required: true  },
+      { key: 'email',               type: 'string',   size: 255,   required: false },
+      { key: 'wedding_date',        type: 'string',   size: 100,   required: false },
+      { key: 'product_id',          type: 'string',   size: 255,   required: true  },
+      { key: 'product_name',        type: 'string',   size: 255,   required: true  },
+      { key: 'product_image',       type: 'string',   size: 2048,  required: false },
+      { key: 'selected_color',      type: 'string',   size: 100,   required: false },
+      { key: 'selected_size',       type: 'string',   size: 100,   required: false },
+      { key: 'quantity',            type: 'integer',  required: false, default: 1 },
+      { key: 'customization_notes', type: 'string',   size: 5000,  required: false },
+      { key: 'status',              type: 'string',   size: 100,   required: false, default: 'New' },
+      { key: 'created_at',          type: 'datetime', required: false },
     ],
   },
 ];
@@ -227,9 +250,18 @@ async function setup() {
 
     // Create collection
     try {
+      let permissions = PUBLIC_PERMISSIONS;
+      if (coll.id === 'orders') {
+        permissions = [
+          Permission.create(Role.any()),
+          Permission.read(Role.users()),
+          Permission.update(Role.users()),
+          Permission.delete(Role.users()),
+        ];
+      }
       await databases.createCollection(
         CONFIG.databaseId, coll.id, coll.name,
-        PUBLIC_PERMISSIONS
+        permissions
       );
       log('✅', 'Collection created.');
     } catch (e) {

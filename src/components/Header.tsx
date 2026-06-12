@@ -2,9 +2,10 @@ import logoImg from '@/assets/logoyaga.png';
 import { useFavorites } from '@/hooks/useFavorites';
 import useLongPress from '@/hooks/useLongPress';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Heart, Menu, X } from 'lucide-react';
+import { Heart, Menu, ShoppingBag, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 const NAV_LINKS = [
   { label: 'Home', to: '/' },
@@ -17,6 +18,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { favorites } = useFavorites();
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -150,6 +152,17 @@ export default function Header() {
         {/* Right Actions */}
         <div className={`flex items-center transition-all duration-500 ${scrolled ? 'gap-1' : 'gap-3'}`}>
           <Link
+            to="/my-orders"
+            id="nav-orders"
+            className="relative p-2 group"
+            title="My Orders"
+          >
+            <ShoppingBag
+              className={`transition-all duration-300 ${scrolled ? 'w-4 h-4' : 'w-5 h-5'} text-white/60 group-hover:text-[#D4AF37]`}
+            />
+          </Link>
+
+          <Link
             to="/favorites"
             id="nav-favorites"
             className="relative p-2 group"
@@ -213,6 +226,13 @@ export default function Header() {
                   {link.label}
                 </Link>
               ))}
+              <Link
+                to="/my-orders"
+                className="text-sm font-bold uppercase tracking-widest py-3 border-b border-white/5 text-white/60 flex items-center gap-2"
+              >
+                <ShoppingBag className="w-4 h-4 text-white/60" />
+                My Orders
+              </Link>
               <Link
                 to="/favorites"
                 className="text-sm font-bold uppercase tracking-widest py-3 text-white/60 flex items-center gap-2"

@@ -1,10 +1,10 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { Heart, X, MessageCircle, Sparkles } from 'lucide-react';
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
 import { useFavorites } from '@/hooks/useFavorites';
 import { getWhatsAppUrl } from '@/lib/constants';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Heart, MessageCircle, Sparkles, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Favorites() {
   const { favorites, removeFavorite } = useFavorites();
@@ -136,7 +136,7 @@ export default function Favorites() {
                           className="w-full flex items-center justify-center gap-2 py-3 bg-[#25D366]/10 border border-[#25D366]/30 text-[#25D366] rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-[#25D366]/20 hover:border-[#25D366]/60 transition-all duration-300"
                         >
                           <MessageCircle className="w-3.5 h-3.5" />
-                          Enquire
+                          Order
                         </a>
                       </div>
                     </motion.div>

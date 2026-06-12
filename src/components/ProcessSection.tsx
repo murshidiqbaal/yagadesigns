@@ -2,7 +2,7 @@ import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 
 const steps = [
-  { num: '01', title: 'Discovery', desc: 'We listen to your vision, dreams, and every detail that matters to you.' },
+  { num: '01', title: 'Consultation', desc: 'We listen to your vision, dreams, and every detail that matters to you.' },
   { num: '02', title: 'Design', desc: 'Our team crafts a bespoke concept that reflects your unique style and story.' },
   { num: '03', title: 'Planning', desc: 'Every element is meticulously coordinated   from venue to florals to lighting.' },
   { num: '04', title: 'Execution', desc: 'We bring your vision to life flawlessly, so you can enjoy every moment.' },
