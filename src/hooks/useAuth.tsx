@@ -1,9 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { account } from "@/lib/appwrite";
-import { Models } from "appwrite";
 
 interface AuthContextType {
-  user: Models.User<Models.Preferences> | null;
+  user: any | null;
   loading: boolean;
   checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
@@ -17,13 +15,17 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<Models.User<Models.Preferences> | null>(null);
+  const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
   const checkAuth = async () => {
     try {
-      const session = await account.get();
-      setUser(session);
+      const isClientSession = localStorage.getItem("admin_session") === "true";
+      if (isClientSession) {
+        setUser({ email: "yagadesigns2026@gmail.com" });
+      } else {
+        setUser(null);
+      }
     } catch (error) {
       setUser(null);
     } finally {
@@ -33,7 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      await account.deleteSession("current");
+      localStorage.removeItem("admin_session");
       setUser(null);
     } catch (error) {
       console.error("Logout failed:", error);

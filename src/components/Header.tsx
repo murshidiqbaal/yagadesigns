@@ -1,4 +1,4 @@
-import logoImg from '@/assets/logoyaga.png';
+// import logoImg from '@/assets/logoyaga.png';
 import { useFavorites } from '@/hooks/useFavorites';
 import useLongPress from '@/hooks/useLongPress';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -90,43 +90,31 @@ export default function Header() {
             )}
           </AnimatePresence>
 
-          <img
-            src={logoImg}
-            alt="Yaga Designs"
-            className={`transition-all duration-500 group-hover:scale-105 ${scrolled ? 'h-8' : 'h-12'}`}
-            style={{ width: 'auto', mixBlendMode: 'screen' }}
-          />
-          <div className="flex flex-col justify-center">
+          <div className="flex flex-col justify-center items-center">
             <span
-              className={`leading-none uppercase font-normal transition-all duration-500 ${scrolled ? 'text-lg' : 'text-[28px]'
-                }`}
+              className={`leading-none uppercase font-medium transition-all duration-500 ${
+                scrolled ? 'text-xl tracking-widest' : 'text-3xl tracking-[0.2em] -mr-[0.2em]'
+              }`}
               style={{
-                fontFamily: '"Optima", "Segoe UI", "Helvetica Neue", sans-serif',
-                background: 'linear-gradient(180deg, #FBF5B7 0%, #D4AF37 45%, #8B6914 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                fontFamily: '"Montserrat", sans-serif',
+                color: '#D4AF37',
                 filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))'
               }}
             >
               Yaga
             </span>
-            <div className={`w-full flex justify-between items-center transition-all duration-500 overflow-hidden ${scrolled ? 'h-0 opacity-0' : 'h-2 mt-[2px] px-[1px] opacity-100'
-              }`}>
-              {"DESIGNING STUDIO".split('').map((char, i) => (
-                <span
-                  key={i}
-                  className="text-[5px] uppercase font-semibold"
-                  style={{
-                    background: char !== ' ' ? 'linear-gradient(180deg, #FFFFFF 0%, #D4AF37 100%)' : 'none',
-                    WebkitBackgroundClip: char !== ' ' ? 'text' : 'border-box',
-                    WebkitTextFillColor: char !== ' ' ? 'transparent' : 'currentColor',
-                    filter: char !== ' ' ? 'drop-shadow(0px 1px 1px rgba(0,0,0,0.8))' : 'none'
-                  }}
-                >
-                  {char === ' ' ? '\u00A0' : char}
-                </span>
-              ))}
-            </div>
+            <span
+              className={`leading-none uppercase transition-all duration-500 overflow-hidden ${
+                scrolled ? 'h-0 opacity-0' : 'h-3 opacity-100 mt-1.5'
+              } font-light text-[7px] tracking-[0.45em] -mr-[0.45em]`}
+              style={{
+                fontFamily: '"Montserrat", sans-serif',
+                color: '#D4AF37',
+                filter: 'drop-shadow(0px 1px 1px rgba(0,0,0,0.5))'
+              }}
+            >
+              Designing Studio
+            </span>
           </div>
         </Link>
 
