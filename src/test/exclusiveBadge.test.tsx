@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
-import { Product } from '../lib/appwrite';
+import { Product } from '../lib/supabase';
 
 // Mock useFavorites hook
 vi.mock('@/hooks/useFavorites', () => ({

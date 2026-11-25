@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { appwriteConfig, databases, ID, uploadProductImage } from "@/lib/appwrite";
+import { getSiteContent, upsertSiteContent, uploadProductImage } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,16 +24,16 @@ export default function HeroManager() {
 
   const fetchHeroData = async () => {
     try {
-      const dbId = appwriteConfig.databaseId;
-      const colId = appwriteConfig.collectionContentId;
-      const doc = await databases.getDocument(dbId, colId, "hero_section");
-      setHeroData({
-        ...heroData,
-        title: doc.title || "",
-        subtitle: doc.subtitle || "",
-        buttonText: doc.buttonText || "",
-        imageUrl: doc.imageUrl || "",
-      });
+      const doc = await getSiteContent("hero_section");
+      if (doc) {
+        setHeroData({
+          ...heroData,
+          title: doc.title || "",
+          subtitle: doc.subtitle || "",
+          buttonText: doc.button_text || "",
+          imageUrl: doc.image_url || "",
+        });
+      }
     } catch (error: any) {
       console.log("No hero document found", error);
     }
@@ -50,22 +50,12 @@ export default function HeroManager() {
         finalImageUrl = await uploadProductImage(heroData.imageFile);
       }
 
-      const dbId = appwriteConfig.databaseId;
-      const colId = appwriteConfig.collectionContentId;
-
-      const dataToSave = {
-        elementId: "hero_section",
+      await upsertSiteContent("hero_section", {
         title: heroData.title,
         subtitle: heroData.subtitle,
-        buttonText: heroData.buttonText,
-        imageUrl: finalImageUrl,
-      };
-
-      try {
-        await databases.updateDocument(dbId, colId, "hero_section", dataToSave);
-      } catch (err) {
-        await databases.createDocument(dbId, colId, "hero_section", dataToSave);
-      }
+        button_text: heroData.buttonText,
+        image_url: finalImageUrl,
+      });
 
       toast.success("Hero section updated successfully!");
       fetchHeroData();

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap, Plus, Trash2, Eye, EyeOff, Loader2, X, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
-import { getOffers, createOffer, deleteOffer, updateOffer, Offer, uploadProductImage } from "@/lib/appwrite";
+import { getOffers, createOffer, deleteOffer, updateOffer, Offer, uploadProductImage } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";

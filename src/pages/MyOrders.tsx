@@ -3,9 +3,8 @@ import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { appwriteConfig, client, databases, getImageUrl, Order } from "@/lib/appwrite";
+import { getImageUrl, getOrderByOrderId, Order, subscribeToOrders } from "@/lib/supabase";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
-import { Query } from "appwrite";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -46,36 +45,30 @@ export default function MyOrders() {
     }
   }, []);
 
-  // Set up real-time subscription to track order updates from Appwrite
+  // Set up real-time subscription to track order updates from Supabase
   useEffect(() => {
-    const unsubscribe = client.subscribe(
-      `databases.${appwriteConfig.databaseId}.collections.${appwriteConfig.ordersCollectionId}.documents`,
-      (response) => {
-        const updatedDoc = response.payload as Order;
-        const isUpdate = response.events.some((e) => e.includes(".update"));
-        const isDelete = response.events.some((e) => e.includes(".delete"));
-
-        if (isUpdate) {
-          setOrders((prevOrders) => {
-            const exists = prevOrders.some((o) => o.$id === updatedDoc.$id);
-            if (exists) {
-              const newOrders = prevOrders.map((o) => (o.$id === updatedDoc.$id ? updatedDoc : o));
-              localStorage.setItem("my_orders", JSON.stringify(newOrders));
-              return newOrders;
-            }
-            return prevOrders;
-          });
-        } else if (isDelete) {
-          setOrders((prevOrders) => {
-            const exists = prevOrders.some((o) => o.$id === updatedDoc.$id);
-            if (exists) {
-              const newOrders = prevOrders.filter((o) => o.$id !== updatedDoc.$id);
-              localStorage.setItem("my_orders", JSON.stringify(newOrders));
-              return newOrders;
-            }
-            return prevOrders;
-          });
-        }
+    const unsubscribe = subscribeToOrders(
+      (updatedDoc) => {
+        setOrders((prevOrders) => {
+          const exists = prevOrders.some((o) => o.$id === updatedDoc.$id);
+          if (exists) {
+            const newOrders = prevOrders.map((o) => (o.$id === updatedDoc.$id ? updatedDoc : o));
+            localStorage.setItem("my_orders", JSON.stringify(newOrders));
+            return newOrders;
+          }
+          return prevOrders;
+        });
+      },
+      (deletedId) => {
+        setOrders((prevOrders) => {
+          const exists = prevOrders.some((o) => o.$id === deletedId);
+          if (exists) {
+            const newOrders = prevOrders.filter((o) => o.$id !== deletedId);
+            localStorage.setItem("my_orders", JSON.stringify(newOrders));
+            return newOrders;
+          }
+          return prevOrders;
+        });
       }
     );
 
@@ -102,22 +95,13 @@ export default function MyOrders() {
 
     setIsSearching(true);
     try {
-      // Search by order_id attribute
-      const response = await databases.listDocuments(
-        appwriteConfig.databaseId,
-        appwriteConfig.ordersCollectionId,
-        [
-          Query.equal("order_id", [queryId])
-        ]
-      );
+      const foundOrder = await getOrderByOrderId(queryId);
 
-      if (response.documents.length === 0) {
+      if (!foundOrder) {
         toast.error(`Order ID "${queryId}" not found. Please verify the ID.`);
         setIsSearching(false);
         return;
       }
-
-      const foundOrder = response.documents[0] as unknown as Order;
 
       // Add to list if not already there
       const exists = orders.some(o => o.$id === foundOrder.$id);

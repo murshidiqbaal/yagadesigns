@@ -1,7 +1,7 @@
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { getPortfolioItems, type PortfolioItem } from '@/lib/appwrite';
+import { getPortfolioItems, type PortfolioItem } from '@/lib/supabase';
 
 import fallback1 from '@/assets/portfolio-1.jpg';
 import fallback2 from '@/assets/portfolio-2.jpg';

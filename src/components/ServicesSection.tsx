@@ -1,4 +1,4 @@
-import { appwriteConfig, databases } from '@/lib/appwrite';
+import { getSiteContent } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Briefcase, Globe, Heart, Sparkles } from 'lucide-react';
@@ -17,13 +17,11 @@ export default function ServicesSection() {
     queryKey: ['servicesSection'],
     queryFn: async () => {
       try {
-        const doc = await databases.getDocument(
-          appwriteConfig.databaseId,
-          appwriteConfig.collectionContentId,
-          'services_section'
-        );
-        if (doc.servicesData) {
-          return JSON.parse(doc.servicesData);
+        const doc = await getSiteContent('services_section');
+        if (doc?.services_data) {
+          return typeof doc.services_data === 'string'
+            ? JSON.parse(doc.services_data)
+            : doc.services_data;
         }
         return null;
       } catch (error) {

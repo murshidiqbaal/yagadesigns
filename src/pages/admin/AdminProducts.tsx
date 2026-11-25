@@ -9,7 +9,7 @@ import {
   deleteProduct,
   Product,
   getImageUrl,
-} from "@/lib/appwrite";
+} from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 

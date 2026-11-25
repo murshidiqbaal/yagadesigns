@@ -1,7 +1,7 @@
 import { Zap } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getActiveOffer } from "@/lib/appwrite";
+import { getActiveOffer } from "@/lib/supabase";
 
 export default function FloatingOffers() {
   const { pathname } = useLocation();

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { addPortfolioItem, deletePortfolioItem, getPortfolioItems, PortfolioItem, uploadProductImage } from "@/lib/appwrite";
+import { addPortfolioItem, deletePortfolioItem, getPortfolioItems, PortfolioItem, uploadProductImage } from "@/lib/supabase";
 import { AnimatePresence, motion } from "framer-motion";
 import { Camera, Layers, Loader2, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";

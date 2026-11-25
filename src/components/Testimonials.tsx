@@ -1,4 +1,4 @@
-import { getImageUrl, getTestimonials, Testimonial } from "@/lib/appwrite";
+import { getImageUrl, getTestimonials, Testimonial } from "@/lib/supabase";
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ChevronLeft, ChevronRight, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";

@@ -6,7 +6,7 @@ import {
   createTestimonial, deleteTestimonial,
   getTestimonials,
   Testimonial
-} from "@/lib/appwrite";
+} from "@/lib/supabase";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Plus, Quote, Star, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";

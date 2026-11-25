@@ -1,7 +1,7 @@
 // import { motion, useInView } from 'framer-motion';
 // import { useRef, useState, useEffect } from 'react';
 // import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
-// import { getTestimonials, type Testimonial } from '@/lib/appwrite';
+// import { getTestimonials, type Testimonial } from '@/lib/supabase';
 
 // const fallbackTestimonials: Testimonial[] = [
 //   { $id: '1', name: 'Priya & Arjun', message: 'Yaga Designs created the most breathtaking bridal lehenga for us. Every single detail was perfection   truly the best bridal designers we could have chosen!', rating: 5 },

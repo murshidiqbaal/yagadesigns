@@ -1,5 +1,5 @@
 import { useFavorites } from '@/hooks/useFavorites';
-import { Product, getImageUrl, trackProductLike } from '@/lib/appwrite';
+import { Product, getImageUrl, trackProductLike } from '@/lib/supabase';
 import { motion } from 'framer-motion';
 import { Heart, Crown, Gem, Flame } from 'lucide-react';
 import { useState } from 'react';

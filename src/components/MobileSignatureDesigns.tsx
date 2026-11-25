@@ -1,5 +1,5 @@
 import { useFavorites } from '@/hooks/useFavorites';
-import { getImageUrl, getProducts, Product } from '@/lib/appwrite';
+import { getImageUrl, getProducts, Product } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { ChevronDown, Heart } from 'lucide-react';

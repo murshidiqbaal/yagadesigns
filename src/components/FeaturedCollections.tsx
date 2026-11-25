@@ -1,6 +1,6 @@
 'use client';
 
-import { getProducts } from '@/lib/appwrite';
+import { getProducts, getImageUrl } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { MouseEvent, useMemo, useRef } from 'react';
@@ -497,7 +497,7 @@ export default function FeaturedCollections() {
       const match = products.find((p: any) => p.category === cat && p.image_url);
       const categoryProductsCount = counts[cat] || 0;
 
-      const config = getCategoryConfig(cat, idx, match?.image_url);
+      const config = getCategoryConfig(cat, idx, match?.image_url ? getImageUrl(match.image_url) : undefined);
 
       return {
         ...config,

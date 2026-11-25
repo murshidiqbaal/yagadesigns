@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { appwriteConfig, databases, uploadProductImage } from "@/lib/appwrite";
+import { getSiteContent, upsertSiteContent, uploadProductImage } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,12 +28,12 @@ export default function ServicesManager() {
 
   const fetchServicesData = async () => {
     try {
-      const dbId = appwriteConfig.databaseId;
-      const colId = appwriteConfig.collectionContentId;
-      const doc = await databases.getDocument(dbId, colId, "services_section");
-      
-      if (doc.servicesData) {
-        const parsed = JSON.parse(doc.servicesData);
+      const doc = await getSiteContent("services_section");
+
+      if (doc?.services_data) {
+        const parsed = typeof doc.services_data === "string"
+          ? JSON.parse(doc.services_data)
+          : (doc.services_data as any[]);
         setServicesData(prev => prev.map((item, i) => ({
           ...item,
           title: parsed[i]?.title || "",
@@ -51,9 +51,6 @@ export default function ServicesManager() {
     setIsLoading(true);
 
     try {
-      const dbId = appwriteConfig.databaseId;
-      const colId = appwriteConfig.collectionContentId;
-      
       const processedServices = await Promise.all(
         servicesData.map(async (service) => {
           let finalImageUrl = service.imageUrl;
@@ -64,18 +61,10 @@ export default function ServicesManager() {
         })
       );
 
-      const stringifiedData = JSON.stringify(processedServices);
-      const dataToSave = {
-        elementId: "services_section",
-        servicesData: stringifiedData
-      };
+      await upsertSiteContent("services_section", {
+        services_data: processedServices,
+      });
 
-      try {
-        await databases.updateDocument(dbId, colId, "services_section", dataToSave);
-      } catch (err) {
-        await databases.createDocument(dbId, colId, "services_section", dataToSave);
-      }
-      
       toast.success("Services section updated!");
       fetchServicesData();
     } catch (err: any) {
@@ -97,9 +86,6 @@ export default function ServicesManager() {
         { id: "s4", title: 'Private Soirée', desc: 'Intimate celebrations and anniversaries designed for unforgettable memories.', imgSrc: fallbackImg4 },
       ];
 
-      const dbId = appwriteConfig.databaseId;
-      const colId = appwriteConfig.collectionContentId;
-
       const processedServices = await Promise.all(
         defaultServicesTemplate.map(async (service, i) => {
           const response = await fetch(service.imgSrc);
@@ -112,14 +98,9 @@ export default function ServicesManager() {
         })
       );
 
-      const dataToSave = {
-        elementId: "services_section",
-        servicesData: JSON.stringify(processedServices)
-      };
-
-      await databases.updateDocument(dbId, colId, "services_section", dataToSave).catch(() => 
-        databases.createDocument(dbId, colId, "services_section", dataToSave)
-      );
+      await upsertSiteContent("services_section", {
+        services_data: processedServices,
+      });
 
       toast.success("Premium services seeded!");
       fetchServicesData();

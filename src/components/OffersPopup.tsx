@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, Zap } from "lucide-react";
-import { getActiveOffer, Offer } from "@/lib/appwrite";
+import { getActiveOffer, Offer } from "@/lib/supabase";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 

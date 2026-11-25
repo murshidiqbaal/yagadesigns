@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
-import { checkSystemStatus, getImageUrl, getProducts, Product, getOrders } from "@/lib/appwrite";
+import { checkSystemStatus, getImageUrl, getProducts, Product, getOrders } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Clock, Heart, MessageCircle, Package, Plus, Sparkles, Tag, ShoppingBag, Calendar } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -82,7 +82,7 @@ export default function AdminDashboard() {
         }
       } catch (err) {
         console.error("Dashboard data fetch error:", err);
-        toast.error("Could not reach Appwrite. Check your connection.");
+        toast.error("Could not reach Supabase. Check your connection.");
       } finally {
         setLoading(false);
       }
@@ -134,12 +134,11 @@ export default function AdminDashboard() {
                   Database Not Found
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Create a database <code className="text-primary">yaga_designs_db</code> with a{" "}
-                  <code className="text-primary">products</code> collection in your{" "}
-                  <a className="text-primary underline" href="https://cloud.appwrite.io" target="_blank" rel="noreferrer">
-                    Appwrite console
-                  </a>
-                  , then refresh.
+                  Run <code className="text-primary">supabase-schema.sql</code> in your{" "}
+                  <a className="text-primary underline" href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">
+                    Supabase SQL Editor
+                  </a>{" "}
+                  to create the <code className="text-primary">products</code> table, then refresh.
                 </p>
               </div>
             </div>

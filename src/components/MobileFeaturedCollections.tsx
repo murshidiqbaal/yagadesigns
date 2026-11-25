@@ -1,4 +1,4 @@
-import { getProducts } from '@/lib/appwrite';
+import { getProducts, getImageUrl } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
@@ -145,7 +145,7 @@ export default function MobileFeaturedCollections() {
       const match = products.find((p: any) => p.category === cat && p.image_url);
       const categoryProductsCount = counts[cat] || 0;
 
-      const config = getCategoryConfig(cat, idx, match?.image_url);
+      const config = getCategoryConfig(cat, idx, match?.image_url ? getImageUrl(match.image_url) : undefined);
 
       return {
         ...config,

@@ -17,7 +17,7 @@ import {
   getProducts,
   updateProduct,
   uploadProductImage
-} from "@/lib/appwrite";
+} from "@/lib/supabase";
 import { CATEGORIES } from "@/lib/constants";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -193,7 +193,7 @@ export default function AdminProductForm() {
       toast.success("Design added to masterpiece collection!");
       navigate("/admin/products");
     },
-    onError: () => toast.error("Failed to add product. Check Appwrite permissions."),
+    onError: (err: any) => toast.error(err?.message || "Failed to add product. Check Supabase permissions."),
   });
 
   const editMut = useMutation({
@@ -204,7 +204,7 @@ export default function AdminProductForm() {
       toast.success("Collection updated successfully.");
       navigate("/admin/products");
     },
-    onError: () => toast.error("Failed to update product."),
+    onError: (err: any) => toast.error(err?.message || "Failed to update product."),
   });
 
   const isSaving = addMut.isPending || editMut.isPending || uploading;
@@ -369,9 +369,9 @@ export default function AdminProductForm() {
       } else {
         addMut.mutate(payload);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Submit error:", err);
-      toast.error("An error occurred while saving the product.");
+      toast.error(err?.message || "An error occurred while saving the product.");
     } finally {
       setUploading(false);
     }

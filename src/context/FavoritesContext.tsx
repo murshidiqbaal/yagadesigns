@@ -1,4 +1,4 @@
-import { Product } from '@/lib/appwrite';
+import { Product } from '@/lib/supabase';
 import React, { createContext, useCallback, useContext, useState } from 'react';
 
 const STORAGE_KEY = 'yaga_favorites';

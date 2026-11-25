@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial, Testimonial, uploadProductImage, getImageUrl } from "@/lib/appwrite";
+import { getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial, Testimonial, uploadProductImage, getImageUrl } from "@/lib/supabase";
 import { Edit2, MessageSquareQuote, Plus, Trash2, Star, User, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

@@ -4,11 +4,11 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AdminOrderDetail from '../pages/admin/AdminOrderDetail';
-import * as appwrite from '../lib/appwrite';
+import * as supabaseLib from '../lib/supabase';
 import { HelmetProvider } from 'react-helmet-async';
 
 // Mock getOrderById
-const mockOrder: appwrite.Order = {
+const mockOrder: supabaseLib.Order = {
   $id: 'order-123',
   order_id: 'YAGA-9999',
   customer_name: 'Ananya Sharma',
@@ -26,12 +26,12 @@ const mockOrder: appwrite.Order = {
   created_at: new Date().toISOString(),
 };
 
-const getOrderByIdSpy = vi.spyOn(appwrite, 'getOrderById').mockResolvedValue(mockOrder);
-const updateOrderStatusSpy = vi.spyOn(appwrite, 'updateOrderStatus').mockResolvedValue({
+const getOrderByIdSpy = vi.spyOn(supabaseLib, 'getOrderById').mockResolvedValue(mockOrder);
+const updateOrderStatusSpy = vi.spyOn(supabaseLib, 'updateOrderStatus').mockResolvedValue({
   ...mockOrder,
   status: 'Contacted',
 });
-const deleteOrderSpy = vi.spyOn(appwrite, 'deleteOrder').mockResolvedValue(undefined);
+const deleteOrderSpy = vi.spyOn(supabaseLib, 'deleteOrder').mockResolvedValue(undefined);
 
 // Mock window.open
 const mockOpen = vi.fn();

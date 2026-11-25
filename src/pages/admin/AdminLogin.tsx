@@ -2,7 +2,6 @@ import logoImg from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
-import { account } from "@/lib/appwrite";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2, Lock } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -10,12 +9,12 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState("admin@gmail.com");
-  const [password, setPassword] = useState("admin@123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { user, loading, checkAuth } = useAuth();
+  const { user, loading, login } = useAuth();
 
   // Auto-redirect if already logged in
   useEffect(() => {
@@ -28,46 +27,11 @@ export default function AdminLogin() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      // Clear any existing session first to avoid "Creation of a session is prohibited when a session is active"
-      try {
-        await account.deleteSession("current");
-      } catch (e) {
-        // Ignore error if no session exists
-      }
-
-      await account.createEmailPasswordSession(email, password);
-      await checkAuth();
+      await login(email, password);
       toast.success("Welcome to Yaga Designs Admin");
       navigate("/admin/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Login failed. Please check your credentials.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCreateAccount = async () => {
-    if (!email || !password) {
-      toast.error("Enter email and password first");
-      return;
-    }
-    setIsLoading(true);
-    try {
-      await account.create("unique()", email, password);
-
-      // Clear any existing session before creating a new one
-      try {
-        await account.deleteSession("current");
-      } catch (e) {
-        // Ignore
-      }
-
-      await account.createEmailPasswordSession(email, password);
-      await checkAuth();
-      toast.success("Admin account created!");
-      navigate("/admin/dashboard");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to create account");
     } finally {
       setIsLoading(false);
     }
@@ -115,7 +79,7 @@ export default function AdminLogin() {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="admin@yagadesigns.com"
+                placeholder="yagadesigns2026@gmail.com"
                 required
                 className="bg-white/5 border-white/10 focus:border-[#D4AF37]/50 h-12 rounded-xl"
               />
@@ -154,19 +118,6 @@ export default function AdminLogin() {
               Sign In
             </Button>
           </form>
-
-          <div className="mt-6 pt-6 border-t border-white/5 text-center">
-            <p className="text-xs text-white/25 mb-2">First time setup?</p>
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={isLoading}
-              onClick={handleCreateAccount}
-              className="text-[#D4AF37]/60 hover:text-[#D4AF37] text-xs uppercase tracking-widest"
-            >
-              Create Admin Account
-            </Button>
-          </div>
         </div>
       </motion.div>
     </div>

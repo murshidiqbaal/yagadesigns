@@ -2,7 +2,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
-import { getOffers, Offer } from "@/lib/appwrite";
+import { getOffers, Offer } from "@/lib/supabase";
 import { Zap, ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";

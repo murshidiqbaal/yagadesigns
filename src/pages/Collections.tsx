@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { SlidersHorizontal } from 'lucide-react';
-import { getProducts } from '@/lib/appwrite';
+import { getProducts } from '@/lib/supabase';
 import { CATEGORIES } from '@/lib/constants';
 import ProductCard from '@/components/ProductCard';
 import Header from '@/components/Header';

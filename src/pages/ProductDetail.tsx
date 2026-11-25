@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useFavorites } from "@/hooks/useFavorites";
-import { createOrder, getImageUrl, getProductById, Order, ProductVariant, trackProductEnquiry, trackProductLike } from "@/lib/appwrite";
+import { createOrder, getImageUrl, getProductById, Order, ProductVariant, trackProductEnquiry, trackProductLike } from "@/lib/supabase";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
 import { useQuery } from "@tanstack/react-query";
 import useEmblaCarousel from "embla-carousel-react";

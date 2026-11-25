@@ -1,4 +1,4 @@
-import { getProducts } from "@/lib/appwrite";
+import { getProducts } from "@/lib/supabase";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";

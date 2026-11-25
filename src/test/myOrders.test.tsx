@@ -3,9 +3,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import MyOrders from "../pages/MyOrders";
-import { databases } from "../lib/appwrite";
 
-// Mock hooks & Appwrite
+// Mock hooks & Supabase
 vi.mock("@/hooks/useAuth", () => ({
   useAuth: () => ({
     user: null,
@@ -25,19 +24,10 @@ vi.mock("@/components/SEO", () => ({
   default: () => <div data-testid="seo-mock">SEO</div>,
 }));
 
-vi.mock("../lib/appwrite", () => {
+vi.mock("../lib/supabase", () => {
   return {
-    client: {
-      subscribe: vi.fn(() => vi.fn()),
-    },
-    databases: {
-      getDocument: vi.fn(),
-      listDocuments: vi.fn(),
-    },
-    appwriteConfig: {
-      databaseId: "yaga-db",
-      ordersCollectionId: "orders",
-    },
+    subscribeToOrders: vi.fn(() => vi.fn()),
+    getOrderByOrderId: vi.fn(),
     getImageUrl: (path: string) => path,
   };
 });

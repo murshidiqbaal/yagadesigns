@@ -4,7 +4,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ProductDetail from '../pages/ProductDetail';
-import * as appwrite from '../lib/appwrite';
+import * as supabaseLib from '../lib/supabase';
 import { FavoritesProvider } from '../context/FavoritesContext';
 import { HelmetProvider } from 'react-helmet-async';
 
@@ -21,7 +21,7 @@ const mockProduct = {
   created_at: new Date().toISOString(),
 };
 
-vi.spyOn(appwrite, 'getProductById').mockResolvedValue(mockProduct);
+vi.spyOn(supabaseLib, 'getProductById').mockResolvedValue(mockProduct);
 
 // Mock window.open
 const mockOpen = vi.fn();

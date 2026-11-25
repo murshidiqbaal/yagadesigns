@@ -1,27 +1,25 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { uploadProductImage, storage } from '@/lib/appwrite';
+import { uploadProductImage, supabase } from '@/lib/supabase';
 
-// Mock the Appwrite SDK
-vi.mock('appwrite', () => {
-  const mockCreateFile = vi.fn().mockResolvedValue({ $id: 'mock-file-id' });
+// Mock the Supabase SDK
+vi.mock('@supabase/supabase-js', () => {
+  const mockUpload = vi.fn().mockResolvedValue({ data: { path: 'mock-file-path' }, error: null });
+  const mockGetPublicUrl = vi.fn().mockReturnValue({
+    data: { publicUrl: 'https://your-project-id.supabase.co/storage/v1/object/public/product-images/mock-file-path' },
+  });
   return {
-    Client: vi.fn().mockImplementation(() => ({
-      setEndpoint: vi.fn().mockReturnThis(),
-      setProject: vi.fn().mockReturnThis(),
+    createClient: vi.fn().mockImplementation(() => ({
+      storage: {
+        from: vi.fn().mockReturnValue({
+          upload: mockUpload,
+          getPublicUrl: mockGetPublicUrl,
+        }),
+      },
     })),
-    Account: vi.fn(),
-    Databases: vi.fn(),
-    Storage: vi.fn().mockImplementation(() => ({
-      createFile: mockCreateFile,
-    })),
-    ID: {
-      unique: vi.fn().mockReturnValue('unique-id'),
-    },
-    Query: {},
   };
 });
 
-describe('WebP Optimization and Image Uploads', () => {
+describe('WebP Optimization and Supabase Storage Uploads', () => {
   let originalCreateElement: typeof document.createElement;
   let originalFileReader: typeof globalThis.FileReader;
   let originalImage: typeof globalThis.Image;
@@ -52,7 +50,7 @@ describe('WebP Optimization and Image Uploads', () => {
     globalThis.FileReader = class MockFileReader {
       onload: (e: any) => void = () => {};
       onerror: (e: any) => void = () => {};
-      readAsDataURL(file: File) {
+      readAsDataURL(_file: File) {
         setTimeout(() => {
           this.onload({ target: { result: 'data:image/png;base64,mockdata' } });
         }, 0);
@@ -79,74 +77,81 @@ describe('WebP Optimization and Image Uploads', () => {
     globalThis.Image = originalImage;
   });
 
-  it('should convert JPEG to WebP and upload', async () => {
+  it('should convert JPEG to WebP and upload to Supabase bucket', async () => {
     const file = new File(['dummy jpeg content'], 'test.jpeg', { type: 'image/jpeg' });
-    const mockCreateFile = storage.createFile as any;
+    const bucket = supabase.storage.from('product-images');
+    const mockUpload = bucket.upload as any;
 
-    await uploadProductImage(file);
+    const url = await uploadProductImage(file);
 
-    expect(mockCreateFile).toHaveBeenCalledTimes(1);
-    const [, , uploadedFile] = mockCreateFile.mock.calls[0];
+    expect(mockUpload).toHaveBeenCalledTimes(1);
+    const [, uploadedFile] = mockUpload.mock.calls[0];
     expect(uploadedFile.type).toBe('image/webp');
     expect(uploadedFile.name).toBe('test.webp');
+    expect(url).toContain('product-images');
   });
 
   it('should convert PNG to WebP and upload', async () => {
     const file = new File(['dummy png content'], 'photo.png', { type: 'image/png' });
-    const mockCreateFile = storage.createFile as any;
+    const bucket = supabase.storage.from('product-images');
+    const mockUpload = bucket.upload as any;
 
     await uploadProductImage(file);
 
-    expect(mockCreateFile).toHaveBeenCalledTimes(1);
-    const [, , uploadedFile] = mockCreateFile.mock.calls[0];
+    expect(mockUpload).toHaveBeenCalledTimes(1);
+    const [, uploadedFile] = mockUpload.mock.calls[0];
     expect(uploadedFile.type).toBe('image/webp');
     expect(uploadedFile.name).toBe('photo.webp');
   });
 
   it('should convert BMP to WebP and upload', async () => {
     const file = new File(['dummy bmp content'], 'artwork.bmp', { type: 'image/bmp' });
-    const mockCreateFile = storage.createFile as any;
+    const bucket = supabase.storage.from('product-images');
+    const mockUpload = bucket.upload as any;
 
     await uploadProductImage(file);
 
-    expect(mockCreateFile).toHaveBeenCalledTimes(1);
-    const [, , uploadedFile] = mockCreateFile.mock.calls[0];
+    expect(mockUpload).toHaveBeenCalledTimes(1);
+    const [, uploadedFile] = mockUpload.mock.calls[0];
     expect(uploadedFile.type).toBe('image/webp');
     expect(uploadedFile.name).toBe('artwork.webp');
   });
 
   it('should NOT convert SVG and upload the original file', async () => {
     const file = new File(['<svg></svg>'], 'logo.svg', { type: 'image/svg+xml' });
-    const mockCreateFile = storage.createFile as any;
+    const bucket = supabase.storage.from('product-images');
+    const mockUpload = bucket.upload as any;
 
     await uploadProductImage(file);
 
-    expect(mockCreateFile).toHaveBeenCalledTimes(1);
-    const [, , uploadedFile] = mockCreateFile.mock.calls[0];
+    expect(mockUpload).toHaveBeenCalledTimes(1);
+    const [, uploadedFile] = mockUpload.mock.calls[0];
     expect(uploadedFile.type).toBe('image/svg+xml');
     expect(uploadedFile.name).toBe('logo.svg');
   });
 
   it('should NOT convert GIF and upload the original file', async () => {
     const file = new File(['dummy gif content'], 'loader.gif', { type: 'image/gif' });
-    const mockCreateFile = storage.createFile as any;
+    const bucket = supabase.storage.from('product-images');
+    const mockUpload = bucket.upload as any;
 
     await uploadProductImage(file);
 
-    expect(mockCreateFile).toHaveBeenCalledTimes(1);
-    const [, , uploadedFile] = mockCreateFile.mock.calls[0];
+    expect(mockUpload).toHaveBeenCalledTimes(1);
+    const [, uploadedFile] = mockUpload.mock.calls[0];
     expect(uploadedFile.type).toBe('image/gif');
     expect(uploadedFile.name).toBe('loader.gif');
   });
 
   it('should NOT convert WebP and upload the original file', async () => {
     const file = new File(['dummy webp content'], 'already-optimized.webp', { type: 'image/webp' });
-    const mockCreateFile = storage.createFile as any;
+    const bucket = supabase.storage.from('product-images');
+    const mockUpload = bucket.upload as any;
 
     await uploadProductImage(file);
 
-    expect(mockCreateFile).toHaveBeenCalledTimes(1);
-    const [, , uploadedFile] = mockCreateFile.mock.calls[0];
+    expect(mockUpload).toHaveBeenCalledTimes(1);
+    const [, uploadedFile] = mockUpload.mock.calls[0];
     expect(uploadedFile.type).toBe('image/webp');
     expect(uploadedFile.name).toBe('already-optimized.webp');
   });
