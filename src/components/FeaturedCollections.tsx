@@ -164,7 +164,7 @@ const MARQUEE_TEXT = Array(8)
   .flatMap(() => ['BRIDAL', '✦', 'ENGAGEMENT', '✦', 'RECEPTION', '✦', 'COUTURE', '✦'])
   .join('  ');
 
-/* ─── Magnetic tilt card ──────────────────────────────────────────── */
+/* ─── Portrait card ──────────────────────────────────────────────── */
 function TiltCard({
   col,
   index,
@@ -177,8 +177,8 @@ function TiltCard({
   const y = useMotionValue(0);
   const springX = useSpring(x, { stiffness: 120, damping: 20 });
   const springY = useSpring(y, { stiffness: 120, damping: 20 });
-  const rotateX = useTransform(springY, [-0.5, 0.5], [6, -6]);
-  const rotateY = useTransform(springX, [-0.5, 0.5], [-6, 6]);
+  const rotateX = useTransform(springY, [-0.5, 0.5], [5, -5]);
+  const rotateY = useTransform(springX, [-0.5, 0.5], [-5, 5]);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;
@@ -194,33 +194,31 @@ function TiltCard({
   return (
     <motion.div
       ref={ref}
-      style={{ perspective: 1000 }}
+      style={{ perspective: 800 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      initial={{ opacity: 0, y: 60 }}
+      initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.9, delay: index * 0.18, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.7, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
     >
       <motion.div style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}>
         <Link
           to={`/collections?category=${col.id}`}
           className="group block relative overflow-hidden"
           style={{
-            borderRadius: 24,
+            borderRadius: 18,
             background: col.gradient,
             border: `1px solid ${col.accentMuted}`,
-            minHeight: 520,
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between',
-            padding: '1.75rem',
+            padding: '1rem',
             transformStyle: 'preserve-3d',
             transition: 'border-color 0.4s ease, box-shadow 0.4s ease',
           }}
           onMouseEnter={e => {
             e.currentTarget.style.borderColor = col.accent;
-            e.currentTarget.style.boxShadow = `0 10px 30px -10px ${col.accent}33`;
+            e.currentTarget.style.boxShadow = `0 8px 24px -8px ${col.accent}44`;
           }}
           onMouseLeave={e => {
             e.currentTarget.style.borderColor = col.accentMuted;
@@ -236,7 +234,7 @@ function TiltCard({
                 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'0.04\'/%3E%3C/svg%3E")',
               backgroundSize: '200px 200px',
               pointerEvents: 'none',
-              borderRadius: 24,
+              borderRadius: 18,
               zIndex: 0,
             }}
           />
@@ -245,7 +243,7 @@ function TiltCard({
           <motion.div
             initial={{ x: '-110%', skewX: -15 }}
             whileHover={{ x: '110%' }}
-            transition={{ duration: 0.7, ease: 'easeInOut' }}
+            transition={{ duration: 0.6, ease: 'easeInOut' }}
             style={{
               position: 'absolute',
               inset: 0,
@@ -263,13 +261,13 @@ function TiltCard({
               alignItems: 'center',
               position: 'relative',
               zIndex: 2,
-              marginBottom: '1rem',
+              marginBottom: '0.65rem',
             }}
           >
             <span
               style={{
                 fontFamily: "'DM Mono', monospace",
-                fontSize: 12,
+                fontSize: 10,
                 color: col.accent,
                 letterSpacing: '0.2em',
                 fontWeight: 500,
@@ -280,14 +278,14 @@ function TiltCard({
             <span
               style={{
                 fontFamily: "'DM Sans', sans-serif",
-                fontSize: 9,
+                fontSize: 8,
                 fontWeight: 500,
-                letterSpacing: '0.18em',
+                letterSpacing: '0.15em',
                 textTransform: 'uppercase',
                 color: '#FFFFFF',
                 background: `${col.accent}20`,
                 border: `1px solid ${col.accent}40`,
-                padding: '4px 12px',
+                padding: '3px 9px',
                 borderRadius: 99,
               }}
             >
@@ -295,16 +293,16 @@ function TiltCard({
             </span>
           </div>
 
-          {/* DYNAMIC IMAGE: high-fashion category display */}
+          {/* PORTRAIT IMAGE — tall 3:4 ratio */}
           <div
             style={{
               position: 'relative',
               width: '100%',
-              height: 200,
-              borderRadius: 16,
+              aspectRatio: '3 / 4',
+              borderRadius: 12,
               overflow: 'hidden',
               border: '1px solid rgba(255,255,255,0.06)',
-              marginBottom: '1.25rem',
+              marginBottom: '0.85rem',
               zIndex: 2,
             }}
           >
@@ -319,142 +317,121 @@ function TiltCard({
               }}
               className="group-hover:scale-110"
             />
-            {/* Elegant overlay */}
+            {/* Gradient overlay */}
             <div
               style={{
                 position: 'absolute',
                 inset: 0,
-                background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)',
+                background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)',
               }}
             />
 
-            {/* Piece count badge overlaid on image */}
+            {/* Piece count badge */}
             <span
               style={{
                 position: 'absolute',
-                bottom: '0.75rem',
-                right: '0.75rem',
+                bottom: '0.5rem',
+                right: '0.5rem',
                 fontFamily: "'DM Mono', monospace",
-                fontSize: 10,
+                fontSize: 9,
                 color: '#FFFFFF',
                 background: 'rgba(0,0,0,0.65)',
                 backdropFilter: 'blur(4px)',
                 border: '1px solid rgba(255,255,255,0.15)',
-                padding: '3px 8px',
-                borderRadius: 6,
+                padding: '2px 7px',
+                borderRadius: 5,
               }}
             >
               {col.pieces}
             </span>
-          </div>
 
-          {/* BOTTOM: content block */}
-          <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'space-between' }}>
-            <div>
-              {/* Category Name */}
+            {/* Category name overlaid bottom-left on image */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '0.6rem',
+                left: '0.65rem',
+                zIndex: 3,
+              }}
+            >
               <h3
                 style={{
                   fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: '2.1rem',
+                  fontSize: '1.4rem',
                   fontWeight: 300,
                   color: '#FFFFFF',
                   letterSpacing: '0.02em',
                   lineHeight: 1.1,
-                  marginBottom: '0.35rem',
+                  margin: 0,
+                  textShadow: '0 2px 8px rgba(0,0,0,0.6)',
                 }}
               >
                 {col.displayName}
               </h3>
+            </div>
+          </div>
 
-              {/* Beginner-friendly Occasion Pill */}
-              <div
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: 10,
-                  fontWeight: 500,
-                  color: col.accent,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  marginBottom: '0.75rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                }}
-              >
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: col.accent, display: 'inline-block' }} />
-                <span>{col.beginnerTag}</span>
-              </div>
-
-              {/* Description */}
-              <p
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: 12.5,
-                  fontWeight: 300,
-                  color: 'rgba(255,255,255,0.45)',
-                  lineHeight: 1.6,
-                  marginBottom: '1.25rem',
-                }}
-              >
-                {col.description}
-              </p>
+          {/* BOTTOM: compact footer */}
+          <div
+            style={{
+              position: 'relative',
+              zIndex: 2,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            {/* Occasion tag */}
+            <div
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 9,
+                fontWeight: 500,
+                color: col.accent,
+                letterSpacing: '0.07em',
+                textTransform: 'uppercase',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+              }}
+            >
+              <span style={{ width: 4, height: 4, borderRadius: '50%', background: col.accent, display: 'inline-block', flexShrink: 0 }} />
+              <span style={{ maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {col.beginnerTag.replace('For: ', '')}
+              </span>
             </div>
 
-            {/* Footer row */}
+            {/* Explore arrow */}
             <div
               style={{
                 display: 'flex',
-                justifyContent: 'space-between',
                 alignItems: 'center',
-                borderTop: '1px solid rgba(255,255,255,0.06)',
-                paddingTop: '1rem',
-                marginTop: 'auto',
+                gap: 5,
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 9,
+                fontWeight: 500,
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                color: col.accent,
               }}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: 10,
-                  fontWeight: 500,
-                  letterSpacing: '0.22em',
-                  textTransform: 'uppercase',
-                  color: col.accent,
-                }}
+              <span>Explore</span>
+              <motion.svg
+                width="11"
+                height="11"
+                viewBox="0 0 14 14"
+                fill="none"
+                whileHover={{ x: 3 }}
+                transition={{ duration: 0.3 }}
               >
-                <span>Explore</span>
-                <motion.svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  whileHover={{ x: 4 }}
-                  transition={{ duration: 0.3 }}
-                  style={{ display: 'inline-block' }}
-                >
-                  <path
-                    d="M1 7h12M8 2l5 5-5 5"
-                    stroke={col.accent}
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </motion.svg>
-              </div>
-
-              <span
-                style={{
-                  fontFamily: "'DM Mono', monospace",
-                  fontSize: 9,
-                  color: 'rgba(255,255,255,0.3)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                }}
-              >
-                {col.tag2}
-              </span>
+                <path
+                  d="M1 7h12M8 2l5 5-5 5"
+                  stroke={col.accent}
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </motion.svg>
             </div>
           </div>
         </Link>
@@ -673,14 +650,15 @@ export default function FeaturedCollections() {
             ))}
           </motion.div>
 
-          {/* ── Cards Grid ────────────────────────────────────────── */}
+          {/* ── Cards Grid — 4 portrait cards per row ─────────────── */}
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-              gap: '2rem',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '1.25rem',
               marginBottom: '5rem',
             }}
+            className="max-sm:!grid-cols-1 sm:max-md:!grid-cols-2 md:max-lg:!grid-cols-3"
           >
             {dynamicCollections.map((col, i) => (
               <TiltCard key={col.id} col={col} index={i} />
