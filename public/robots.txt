@@ -2,11 +2,11 @@ User-agent: *
 Allow: /
 
 # Block admin panel from indexing
-Disallow: /#/admin
-Disallow: /#/admin/
+Disallow: /admin
+Disallow: /admin/
 
 # Block utility/non-content pages
-Disallow: /#/my-orders
-Disallow: /#/favorites
+Disallow: /my-orders
+Disallow: /favorites
 
-Sitemap: https://yagadesigns.in/sitemap.xml
+Sitemap: https://www.yagadesigns.com/sitemap.xml

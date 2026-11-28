@@ -8,92 +8,78 @@
 
   <!-- ── Core Pages ─────────────────────────────────────────────── -->
   <url>
-    <loc>https://yagadesigns.in/</loc>
+    <loc>https://www.yagadesigns.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <lastmod>2026-11-28</lastmod>
   </url>
 
   <url>
-    <loc>https://yagadesigns.in/#/collections</loc>
+    <loc>https://www.yagadesigns.com/collections</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
     <lastmod>2026-11-28</lastmod>
   </url>
 
   <url>
-    <loc>https://yagadesigns.in/#/about</loc>
+    <loc>https://www.yagadesigns.com/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <lastmod>2026-11-28</lastmod>
   </url>
 
   <url>
-    <loc>https://yagadesigns.in/#/contact</loc>
+    <loc>https://www.yagadesigns.com/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <lastmod>2026-11-28</lastmod>
   </url>
 
   <url>
-    <loc>https://yagadesigns.in/#/offers</loc>
+    <loc>https://www.yagadesigns.com/offers</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
-    <lastmod>2026-11-28</lastmod>
-  </url>
-
-  <url>
-    <loc>https://yagadesigns.in/#/favorites</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.4</priority>
-    <lastmod>2026-11-28</lastmod>
-  </url>
-
-  <url>
-    <loc>https://yagadesigns.in/#/my-orders</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.4</priority>
     <lastmod>2026-11-28</lastmod>
   </url>
 
   <!-- ── Category Collections ───────────────────────────────────── -->
   <url>
-    <loc>https://yagadesigns.in/#/collections?category=Bridal</loc>
+    <loc>https://www.yagadesigns.com/collections?category=Bridal</loc>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <lastmod>2026-11-28</lastmod>
   </url>
 
   <url>
-    <loc>https://yagadesigns.in/#/collections?category=Engagement</loc>
+    <loc>https://www.yagadesigns.com/collections?category=Engagement</loc>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <lastmod>2026-11-28</lastmod>
   </url>
 
   <url>
-    <loc>https://yagadesigns.in/#/collections?category=Reception</loc>
+    <loc>https://www.yagadesigns.com/collections?category=Reception</loc>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <lastmod>2026-11-28</lastmod>
   </url>
 
   <url>
-    <loc>https://yagadesigns.in/#/collections?category=Party+Wear</loc>
+    <loc>https://www.yagadesigns.com/collections?category=Party+Wear</loc>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
     <lastmod>2026-11-28</lastmod>
   </url>
 
   <url>
-    <loc>https://yagadesigns.in/#/collections?category=Lehenga</loc>
+    <loc>https://www.yagadesigns.com/collections?category=Lehenga</loc>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
     <lastmod>2026-11-28</lastmod>
   </url>
 
   <url>
-    <loc>https://yagadesigns.in/#/collections?category=Saree</loc>
+    <loc>https://www.yagadesigns.com/collections?category=Saree</loc>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
     <lastmod>2026-11-28</lastmod>

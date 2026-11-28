@@ -55,7 +55,7 @@ export default function Contact() {
         title="Contact Yaga Designs | Best Bridal Boutique in Kothamangalam"
         description="Book a consultation with Yaga Designs in Kothamangalam. We offer premium bridal styling and custom lehengas in Ernakulam, Muvattupuzha, and nearby areas."
         keywords="contact bridal designer Kerala, bridal studio Kothamangalam, wedding designer Ernakulam"
-        canonical="https://yagadesigns.in/contact"
+        canonical="https://www.yagadesigns.com/contact"
       />
       <Header />
       <main className="pt-28 pb-24">

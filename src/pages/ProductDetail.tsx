@@ -442,7 +442,7 @@ export default function ProductDetail() {
         title={`${product.name} - Luxury Bridal Wear in Kerala | Yaga Designs`}
         description={`Custom ${product.category} ${product.name} by Yaga Designs. Handcrafted luxury bridal couture available in Kothamangalam, Ernakulam, and throughout Kerala.`}
         keywords={`${product.name}, bridal ${product.category}, custom wedding wear Kerala, bridal boutique Ernakulam`}
-        canonical={`https://yagadesigns.in/product/${product.$id}`}
+        canonical={`https://www.yagadesigns.com/product/${product.$id}`}
         ogImage={getImageUrl(product.image_url)}
       />
       {/* ── Navigation Header (Mobile Only) ─────────────────────────── */}

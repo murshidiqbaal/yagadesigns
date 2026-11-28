@@ -47,7 +47,7 @@ export default function Collections() {
         title={`${activeCategory === 'All' ? 'Bridal Collections Kerala' : activeCategory + ' in Kerala'} | Yaga Designs`}
         description={`Explore our exclusive ${activeCategory === 'All' ? 'bridal lehengas, engagement wear, and reception outfits' : activeCategory} at Yaga Designs, the premier bridal boutique in Kerala.`}
         keywords={`bridal ${activeCategory.toLowerCase()}, wedding wear Kerala, ${activeCategory.toLowerCase()} boutique Kothamangalam`}
-        canonical={`https://yagadesigns.in/collections${activeCategory !== 'All' ? '?category=' + activeCategory : ''}`}
+        canonical={`https://www.yagadesigns.com/collections${activeCategory !== 'All' ? '?category=' + activeCategory : ''}`}
       />
       <Header />
       <main className="pt-28 pb-24">

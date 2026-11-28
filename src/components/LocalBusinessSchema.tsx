@@ -6,9 +6,9 @@ const LocalBusinessSchema: React.FC = () => {
     "@context": "https://schema.org",
     "@type": "ClothingStore",
     "name": "Yaga Designs",
-    "image": "https://yagadesigns.in/favicon.png",
-    "@id": "https://yagadesigns.in/",
-    "url": "https://yagadesigns.in/",
+    "image": "https://www.yagadesigns.com/favicon.png",
+    "@id": "https://www.yagadesigns.com/",
+    "url": "https://www.yagadesigns.com/",
     "telephone": "+91 98765 43210", // Should be updated with real number if available
     "priceRange": "$$$",
     "address": {
